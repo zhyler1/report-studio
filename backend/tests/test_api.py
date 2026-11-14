@@ -83,3 +83,15 @@ def test_media_upload(c, tmp_path, monkeypatch):
     assert r.status_code == 200 and r.json()["url"].endswith(".mp3")
     assert (tmp_path / r.json()["name"]).read_bytes() == b"ID3xxxx"
     assert c.post("/api/media", files={"file": ("a.exe", b"MZ", "application/octet-stream")}).status_code == 415
+
+
+def test_export_embeds_media(c, tmp_path, monkeypatch):
+    import app.api as api
+    monkeypatch.setattr(api, "MEDIA_DIR", tmp_path)
+    name = c.post("/api/media", files={"file": ("a.mp3", b"ID3xxxx", "audio/mpeg")}).json()["name"]
+    d = json.loads(json.dumps(SEED))
+    d["sections"][0]["blocks"] = [{"type": "media", "title": "Audio", "media": {"kind": "audio", "src": f"/media/{name}", "slot": "a.mp3"}}] + d["sections"][0].get("blocks", [])
+    rid = c.post("/api/reports", json={"data": d}).json()["id"]
+    assert f"/media/{name}" in c.get(f"/api/reports/{rid}/preview").text
+    h = c.get(f"/api/reports/{rid}/export.html").text
+    assert f"/media/{name}" not in h and "data:audio/mpeg;base64," in h

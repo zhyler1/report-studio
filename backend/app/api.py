@@ -7,6 +7,9 @@ from __future__ import annotations
 
 import io
 import os
+import mimetypes
+import base64
+import re
 import uuid
 from pathlib import Path
 from typing import Any
@@ -119,8 +122,23 @@ def restore(rid: int, n: int, s: Store = Depends(get_store)):
     return s.get(rid)
 
 
-def _html(s: Store, rid: int) -> str:
-    return render(_valid(_get(s, rid)["data"]))
+def _html(s: Store, rid: int, embed: bool = False) -> str:
+    h = render(_valid(_get(s, rid)["data"]))
+    return embed_media(h) if embed else h
+
+
+_MEDIA_RE = re.compile(r'(src|poster)="/media/([A-Za-z0-9_.-]+)"')
+
+
+def embed_media(html: str) -> str:
+    """Reemplaza /media/<archivo> por data URI para que el HTML exportado sea un solo archivo."""
+    def sub(m):
+        f = MEDIA_DIR / m.group(2)
+        if not f.is_file():
+            return m.group(0)
+        mime = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
+        return f'{m.group(1)}="data:{mime};base64,{base64.b64encode(f.read_bytes()).decode()}"'
+    return _MEDIA_RE.sub(sub, html)
 
 
 @router.get("/reports/{rid}/preview", response_class=HTMLResponse)
@@ -136,12 +154,12 @@ def render_draft(body: dict[str, Any] = Body(...)):
 
 @router.get("/reports/{rid}/export.html")
 def export_html(rid: int, s: Store = Depends(get_store)):
-    return Response(_html(s, rid), media_type="text/html; charset=utf-8", headers={"Content-Disposition": f'attachment; filename="informe-{rid}.html"'})
+    return Response(_html(s, rid, embed=True), media_type="text/html; charset=utf-8", headers={"Content-Disposition": f'attachment; filename="informe-{rid}.html"'})
 
 
 @router.get("/reports/{rid}/export.pdf")
 def export_pdf(rid: int, s: Store = Depends(get_store)):
-    html = _html(s, rid)
+    html = _html(s, rid, embed=True)
     try:
         from playwright.sync_api import sync_playwright
         with sync_playwright() as p:

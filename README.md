@@ -71,3 +71,5 @@ Desarrollo con recarga: `npm run dev` (puerto 5173, redirige /api al 8000).
 - [x] La vista previa salta a la sección que se está editando
 - [x] Galería de ejemplo: `python3 scripts/make_charts_demo.py` genera `seed/charts_demo.json` (importarlo desde la interfaz)
 - El motor solo se incluye en el HTML si el informe tiene gráficos
+
+- Exportar HTML incrusta imágenes, audio y video subidos como data URI: el archivo viaja solo (pesa más).
