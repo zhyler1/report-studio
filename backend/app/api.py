@@ -20,6 +20,7 @@ from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pydantic import BaseModel
 
 from .render import render
+from . import ingest, llm
 from .schema import json_schema
 from .store import Store
 from .validate import load
@@ -172,6 +173,40 @@ def export_pdf(rid: int, s: Store = Depends(get_store)):
     except Exception as e:  # navegador no instalado u otro fallo
         raise HTTPException(503, f"No se pudo generar el PDF: {type(e).__name__}: {str(e)[:200]}")
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="informe-{rid}.pdf"'})
+
+
+@router.get("/ingest/status")
+def ingest_status():
+    return {"engine": llm.engine(), "formats": sorted(ingest.EXT)}
+
+
+@router.post("/ingest/extract")
+async def ingest_extract(file: UploadFile = File(...)):
+    ext = Path(file.filename or "").suffix.lower()
+    if ext not in ingest.EXT:
+        raise HTTPException(415, f"Formato no soportado: {ext or 'sin extensión'}. Usa PDF, Word, PPT, Excel, HTML o texto.")
+    data = await file.read()
+    if len(data) > 50 * 1024 * 1024:
+        raise HTTPException(413, "El archivo supera 50 MB")
+    rep = ingest.embedded_report(file.filename or "", data)
+    if rep is not None:
+        return {"name": file.filename, "report": rep, "text": ""}
+    try:
+        text = ingest.extract_text(file.filename or "", data)
+    except Exception as e:
+        raise HTTPException(422, f"No se pudo leer el archivo: {type(e).__name__}: {str(e)[:160]}")
+    return {"name": file.filename, "report": None, "text": text}
+
+
+@router.post("/ingest/propose")
+def ingest_propose(body: dict[str, Any] = Body(...)):
+    text = str(body.get("text", "")).strip()
+    if len(text) < 10:
+        raise HTTPException(400, "No hay texto para analizar")
+    try:
+        return ingest.propose(text, str(body.get("hint", "")))
+    except Exception as e:
+        raise HTTPException(502, f"El motor de IA falló: {type(e).__name__}: {str(e)[:200]}")
 
 
 MEDIA_DIR = Path(os.environ.get("RS_MEDIA", "data/media"))

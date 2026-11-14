@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
 import { attach, getAt, setAt, listOps } from './editLayer'
 import { BLOCK } from './labels'
+import Loader from './Loader'
 import { api, type Json, type ReportRow, type Version } from './api'
 
 const LS = {
@@ -108,6 +109,7 @@ export default function App() {
   const [sel, setSelS] = useState<string | null>(null)
   const [picker, setPicker] = useState<{ list: string; index: number } | null>(null)
   const [toast, setToast] = useState('')
+  const [loader, setLoader] = useState<number | null>(null)
   const dRef = useRef<Json | null>(null); dRef.current = d
   const selRef = useRef<string | null>(null); selRef.current = sel
   const select = useCallback((p: string | null) => { setSelS(p); if (p) setTabS('casilla'); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
@@ -167,6 +169,17 @@ export default function App() {
     setD(listOps.insert(dRef.current, picker.list, picker.index, b)); setPicker(null)
     select(picker.list + '.' + picker.index)
   }
+  const addLoaded = (si: number, blocks: Json[]) => {
+    const dd = dRef.current; if (!dd) return
+    const s = dd.sections[si]
+    const list = s.tabs?.length ? `sections.${si}.tabs.0.blocks` : `sections.${si}.blocks`
+    const at = (getAt(dd, list) || []).length
+    setD(blocks.reduce((acc, b, k) => listOps.insert(acc, list, at + k, b), dd)); setLoader(null)
+    goPreview(s.id); select(list + '.' + at)
+  }
+  const openLoaded = async (data: Json) => {
+    try { const r = await api.create(data, 'Importado desde HTML'); setLoader(null); await refresh(); open(r.id) } catch (e: any) { alert((e.issues?.length ? e.issues : [e.message]).join('\n')) }
+  }
   const goPreview = (sid: string) => {  // llevar la vista previa a la sección que se edita
     const doc = frame.current?.contentDocument
     if (!doc) return
@@ -204,6 +217,7 @@ export default function App() {
     {ready && d && id !== null ? <div className="main">
       <div className="edit">
         <div className="bar"><button className="pri" disabled={!dirty || issues.length > 0} onClick={save}>Guardar</button>
+          <button onClick={() => setLoader(Math.max(0, d.sections.findIndex((s: Json) => sel?.startsWith(`sections.${d.sections.indexOf(s)}.`))))}>📥 Cargar documento</button>
           <a href={`/api/reports/${id}/export.html`}><button>HTML</button></a><a href={`/api/reports/${id}/export.pdf`}><button>PDF</button></a>
           <button className="danger" onClick={remove}>Eliminar</button>
           <span className="mut">{dirty ? 'Cambios sin guardar' : msg}</span></div>
@@ -221,11 +235,12 @@ export default function App() {
       <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
       {picker && <div className="modal" onClick={() => setPicker(null)}><div className="modal-b" onClick={e => e.stopPropagation()}>
         <h2 style={{ marginTop: 0 }}>¿Qué quieres poner aquí?</h2>
-        <div className="tiles">{([['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video, audio o imagen'], ['stat_grid', '🔢', 'Cifras destacadas'], ['card_list', '📝', 'Texto con lista'], ['table', '▦', 'Tabla'], ['grid', '◫', 'Columnas (poner cosas lado a lado)']] as const).map(([k, i, l]) =>
-          <button key={k} className="tile" onClick={() => insertBlock(k)}><span style={{ fontSize: 30 }}>{i}</span>{l}</button>)}</div>
+        <div className="tiles">{([['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video, audio o imagen'], ['stat_grid', '🔢', 'Cifras destacadas'], ['card_list', '📝', 'Texto con lista'], ['table', '▦', 'Tabla'], ['grid', '◫', 'Columnas (poner cosas lado a lado)'], ['__doc', '📥', 'Desde un documento o texto']] as const).map(([k, i, l]) =>
+          <button key={k} className="tile" onClick={() => k === '__doc' ? (setLoader(Number(picker.list.split('.')[1]) || 0), setPicker(null)) : insertBlock(k)}><span style={{ fontSize: 30 }}>{i}</span>{l}</button>)}</div>
         <p className="mut" style={{ marginBottom: 4 }}>Otros tipos</p>
         <select defaultValue="" onChange={e => e.target.value && insertBlock(e.target.value)}><option value="">Elegir…</option>{blockTypes().map(x => <option key={x.type} value={x.type}>{BLOCK[x.type] || x.type}</option>)}</select>
         <div style={{ textAlign: 'right', marginTop: 12 }}><button onClick={() => setPicker(null)}>Cancelar</button></div></div></div>}
+      {loader !== null && <Loader sections={d.sections} defSection={loader} onAdd={addLoaded} onOpenReport={openLoaded} onClose={() => setLoader(null)} />}
       {toast && <div className="toast">{toast}</div>}
     </div> : <div className="empty">Elige un informe de la izquierda o importa uno.</div>}
   </div>

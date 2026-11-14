@@ -26,5 +26,8 @@ export const api = {
   validate: (data: Json): Promise<{ ok: boolean; issues: string[] }> => req('/api/validate', J(data)).then(r => r.json()),
   schema: (): Promise<Json> => req('/api/schema').then(r => r.json()),
   upload: (f: File): Promise<{ url: string }> => { const fd = new FormData(); fd.append('file', f); return req('/api/media', { method: 'POST', body: fd }).then(r => r.json()) },
+  ingestStatus: (): Promise<{ engine: string | null }> => req('/api/ingest/status').then(r => r.json()),
+  extract: (f: File): Promise<{ name: string; text: string; report: Json | null }> => { const fd = new FormData(); fd.append('file', f); return req('/api/ingest/extract', { method: 'POST', body: fd }).then(r => r.json()) },
+  propose: (text: string, hint: string): Promise<{ engine: string | null; blocks: Json[]; issues: string[] }> => req('/api/ingest/propose', J({ text, hint })).then(r => r.json()),
   render: (data: Json, edit = false): Promise<string> => req('/api/render' + (edit ? '?edit=1' : ''), J(data)).then(r => r.text()),
 }

@@ -507,6 +507,9 @@ def render(rep: Report, edit: bool = False) -> str:
         tpl = SHELL.parent
         out = out.replace("</head>", "<style>" + (tpl / "charts.css").read_text(encoding="utf-8") + "</style></head>", 1)
         out = out.replace("</body>", "<script>" + (tpl / "charts.js").read_text(encoding="utf-8").replace("</", "<\\/") + "</script></body>", 1)
+    if not edit:  # el informe completo viaja dentro del HTML para poder reimportarlo sin pérdida
+        blob = json.dumps(rep.model_dump(mode="json"), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
+        out = out.replace("</body>", f'<script type="application/json" id="rs-report">{blob}</script></body>', 1)
     left = re.findall(r"@@[A-Z_]+@@", out)
     assert not left, f"marcadores sin resolver: {left}"
     return out

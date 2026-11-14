@@ -73,3 +73,11 @@ Desarrollo con recarga: `npm run dev` (puerto 5173, redirige /api al 8000).
 - El motor solo se incluye en el HTML si el informe tiene gráficos
 
 - Exportar HTML incrusta imágenes, audio y video subidos como data URI: el archivo viaja solo (pesa más).
+
+## Cargar datos desde documentos
+Botón **📥 Cargar documento** (o «Desde un documento o texto» en «+ Agregar casilla»): PDF, Word, PPT, Excel, HTML o texto pegado → casillas propuestas → eliges cuáles agregar.
+- Un HTML exportado por Report Studio se reabre completo como informe nuevo (el informe viaja dentro del HTML).
+- Motor de IA (opcional; sin él se usa lectura básica de tablas, listas y cifras):
+  - Claude: `export ANTHROPIC_API_KEY=...` (modelo con `RS_ANTHROPIC_MODEL`, por defecto `claude-sonnet-5-5`).
+  - Llama local: `export RS_OLLAMA_URL=http://localhost:11434` (modelo con `RS_OLLAMA_MODEL`, por defecto `llama3.1:70b`).
+  - `RS_LLM=none|anthropic|ollama` fuerza uno.

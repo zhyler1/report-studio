@@ -94,4 +94,4 @@ def test_export_embeds_media(c, tmp_path, monkeypatch):
     rid = c.post("/api/reports", json={"data": d}).json()["id"]
     assert f"/media/{name}" in c.get(f"/api/reports/{rid}/preview").text
     h = c.get(f"/api/reports/{rid}/export.html").text
-    assert f"/media/{name}" not in h and "data:audio/mpeg;base64," in h
+    assert f'src="/media/{name}"' not in h and "data:audio/mpeg;base64," in h
