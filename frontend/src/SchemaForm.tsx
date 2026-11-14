@@ -215,3 +215,11 @@ export function SectionForm({ section, set }: { section: any; set: (v: any) => v
 export function MetaForm({ meta, set }: { meta: any; set: (v: any) => void }) {
   return <ObjectField s={Defs.current.Meta} value={meta} set={set} bare />
 }
+
+export function BlockForm({ block, set }: { block: any; set: (v: any) => void }) {
+  const def = Object.values(Defs.current).find((x: any) => x?.properties?.type?.const === block.type) as S | undefined
+  return def ? <ObjectField s={def} value={block} set={set} bare /> : <p className="mut">Tipo desconocido: {block.type}</p>
+}
+export function blockTypes(): { type: string; def: S }[] {
+  return Object.values(Defs.current).filter((x: any) => x?.properties?.type?.const && x.properties.type.const !== 'media_dummy').map((x: any) => ({ type: x.properties.type.const, def: x }))
+}

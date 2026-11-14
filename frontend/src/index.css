@@ -25,3 +25,9 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px;text-
 .sub-head button{padding:2px 8px}.sub-body{padding:4px 12px 12px;border-top:1px solid var(--line)}.obj{border-left:3px solid #E4E7EC;padding-left:10px;margin-top:4px}
 .chips{display:flex;gap:10px;flex-wrap:wrap}.chip{font-weight:500;color:var(--ink);margin:0;display:flex;gap:4px;align-items:center}
 .upl{border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;background:#fff;margin:0;color:var(--ink);white-space:nowrap}
+
+.modal{position:fixed;inset:0;background:rgba(10,20,40,.55);display:flex;align-items:center;justify-content:center;z-index:50}
+.modal-b{background:var(--card,#fff);border-radius:16px;padding:22px;width:min(560px,92vw);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
+.tile{display:flex;flex-direction:column;gap:6px;align-items:center;padding:16px 8px;border-radius:12px;font-weight:600;text-align:center;height:auto}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f1b33;color:#fff;padding:10px 16px;border-radius:10px;font-weight:600;z-index:60}

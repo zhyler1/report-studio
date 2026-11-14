@@ -57,8 +57,10 @@ def num_text(v, prefix="", suffix="") -> str:
 
 
 class Ctx:
-    def __init__(self, rep: Report):
+    def __init__(self, rep: Report, edit: bool = False):
         self.rep = rep
+        self.edit = edit
+        self.path = ""
         self.th = tuple(rep.meta.thresholds)
         self.acts = {}
         self.plants = None
@@ -320,7 +322,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
     t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
     cols = ""
     for ci, col in enumerate(b.columns):
-        inner = "".join(render_block(x, ctx) for x in col)
+        inner = "".join(render_block(x, ctx, f"{ctx.path}.columns.{ci}.{bi}") for bi, x in enumerate(col)) + add_slot(ctx, f"{ctx.path}.columns.{ci}")
         cols += f"<div>{inner}</div>" if ci == 0 else f'<div class="stk">{inner}</div>'
     sec = " sec" if not b.title else ""
     return f'{t}<div class="grid g2{sec}">{cols}</div>'
@@ -332,20 +334,33 @@ R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList
      Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid}
 
 
-def render_block(b, ctx: Ctx) -> str:
-    return "" if b.hidden else R[type(b)](b, ctx)
+def render_block(b, ctx: Ctx, path: str = "") -> str:
+    if b.hidden:
+        return ""
+    prev, ctx.path = ctx.path, path
+    try:
+        out = R[type(b)](b, ctx)
+    finally:
+        ctx.path = prev
+    if ctx.edit and path:  # modo edición: cada casilla se marca para poder seleccionarla en la vista previa
+        out = f'<div class="rs-b" data-bp="{attr(path)}" data-bt="{b.type}" style="display:contents">{out}</div>'
+    return out
+
+
+def add_slot(ctx: Ctx, path: str) -> str:
+    return f'<div class="rs-add" data-addto="{attr(path)}">+ Agregar casilla</div>' if ctx.edit else ""
 
 
 # ───────────────────────── secciones, inicio, alertas ─────────────────────────
-def r_section(s: Section, ctx: Ctx) -> str:
+def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
     h = f'<section class="panel" id="p-{s.id}"><div class="ptitle" data-r><div><h2>{esc(s.title)}</h2><p>{esc(s.subtitle)}</p></div></div>'
     if s.tabs:
         h += f'<div class="subnav" id="sn-{s.id}">' + "".join(
             f'<button class="sbtn{" on" if i == 0 else ""}" data-s="{attr(t.id)}" type="button">{esc(t.label)}</button>' for i, t in enumerate(s.tabs)) + "</div>"
         for i, t in enumerate(s.tabs):
-            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + "".join(render_block(b, ctx) for b in t.blocks) + "</div>"
+            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + "".join(render_block(b, ctx, f"sections.{si}.tabs.{i}.blocks.{bi}") for bi, b in enumerate(t.blocks)) + add_slot(ctx, f"sections.{si}.tabs.{i}.blocks") + "</div>"
     else:
-        h += "".join(render_block(b, ctx) for b in s.blocks)
+        h += "".join(render_block(b, ctx, f"sections.{si}.blocks.{bi}") for bi, b in enumerate(s.blocks)) + add_slot(ctx, f"sections.{si}.blocks")
         if any(isinstance(b, Grid) and any(isinstance(x, Workflow) for c in b.columns for x in c) for b in s.blocks):
             h += '<div class="printonly" id="ptPrint"></div>'
     return h + "</section>"
@@ -465,14 +480,14 @@ def _has_chart(rep: Report) -> bool:
     return any(isinstance(b, Chart) and not b.hidden for s in rep.sections for b in _blocks(s))
 
 
-def render(rep: Report) -> str:
+def render(rep: Report, edit: bool = False) -> str:
     m = rep.meta
-    ctx = Ctx(rep)
+    ctx = Ctx(rep, edit)
     out = SHELL.read_text(encoding="utf-8")
     tabs = '<button class="tab active" data-t="inicio" type="button">Inicio</button>\n' + "\n".join(
         f'    <button class="tab" data-t="{s.id}" type="button"{" hidden" if s.hidden else ""}>{esc(s.label)}</button>' for s in rep.sections)
     tabs += f'\n    <button class="tab" data-t="alertas" type="button"{"" if m.show_alerts else " hidden"}>Alertas</button>'
-    panels = r_inicio(ctx) + "\n" + "\n".join(r_section(s, ctx) for s in rep.sections if not s.hidden) + "\n" + r_alertas(ctx)
+    panels = r_inicio(ctx) + "\n" + "\n".join(r_section(s, ctx, si) for si, s in enumerate(rep.sections) if not s.hidden) + "\n" + r_alertas(ctx)
     wf = next((x for s in rep.sections for x in _blocks(s) if isinstance(x, Workflow)), None)
     c = pt_counts(wf) if wf else {"ejecutado": 0, "proceso": 0, "espera": 0}
     vals = {

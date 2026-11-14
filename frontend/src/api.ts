@@ -26,5 +26,5 @@ export const api = {
   validate: (data: Json): Promise<{ ok: boolean; issues: string[] }> => req('/api/validate', J(data)).then(r => r.json()),
   schema: (): Promise<Json> => req('/api/schema').then(r => r.json()),
   upload: (f: File): Promise<{ url: string }> => { const fd = new FormData(); fd.append('file', f); return req('/api/media', { method: 'POST', body: fd }).then(r => r.json()) },
-  render: (data: Json): Promise<string> => req('/api/render', J(data)).then(r => r.text()),
+  render: (data: Json, edit = false): Promise<string> => req('/api/render' + (edit ? '?edit=1' : ''), J(data)).then(r => r.text()),
 }

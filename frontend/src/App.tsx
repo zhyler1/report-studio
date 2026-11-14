@@ -1,11 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { MetaForm, SectionForm, Defs, blank } from './SchemaForm'
+import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
+import { attach, getAt, setAt, listOps } from './editLayer'
+import { BLOCK } from './labels'
 import { api, type Json, type ReportRow, type Version } from './api'
 
 const LS = {
   get<T>(k: string, def: T): T { try { const v = localStorage.getItem('rs.' + k); return v === null ? def : JSON.parse(v) } catch { return def } },
   set(k: string, v: unknown) { try { localStorage.setItem('rs.' + k, JSON.stringify(v)) } catch { /* sin almacenamiento */ } },
   del(k: string) { try { localStorage.removeItem('rs.' + k) } catch { /* sin almacenamiento */ } },
+}
+const STARTERS: Record<string, any> = {
+  chart: { kind: 'bar', title: 'Nuevo gráfico', labels: ['A', 'B', 'C'], series: [{ name: 'Serie 1', values: [10, 20, 15], color: 'auto', points: [], ohlc: [] }] },
+  media: { title: '', media: { kind: 'video', slot: 'video.mp4', src: '', poster: '', alt: '', caption: '', zoom: true, height: 220, autoplay: false, loop: false, muted: true } },
+  stat_grid: { items: [{ label: 'Descripción de la cifra', value: 0 }] },
+  card_list: { title: 'Título', items: ['Primer punto'] },
+  table: { title: 'Nueva tabla', columns: [{ key: 'a', label: 'Columna A', format: 'text' }, { key: 'b', label: 'Columna B', format: 'text' }], rows: [{ a: 'Dato', b: 'Dato' }] },
+  grid: { columns: [[], []] },
 }
 type Prev = { tab: string; sub: (string | null)[]; y: number }
 const restoreJs = (p: Prev) => `<script>addEventListener('load',function(){setTimeout(function(){var g=document.getElementById('iGo');if(g)g.click();var t=document.querySelector('.tab[data-t="${p.tab}"]');if(t)t.click();${JSON.stringify(p.sub)}.forEach(function(s){var b=document.querySelector('.sbtn[data-s="'+s+'"]');if(b)b.click()});setTimeout(function(){scrollTo(0,${p.y})},200)},120)})</script>`
@@ -14,7 +24,7 @@ const readPrev = (doc?: Document | null): Prev | null => {
   return { tab: a.getAttribute('data-t') || 'inicio', sub: Array.from(doc.querySelectorAll('.sbtn.on')).map(b => b.getAttribute('data-s')), y: doc.scrollingElement?.scrollTop || 0 }
 }
 
-type Tab = 'general' | 'secciones' | 'alertas' | 'json' | 'versiones'
+type Tab = 'general' | 'secciones' | 'alertas' | 'json' | 'versiones' | 'casilla'
 const TABS: [Tab, string][] = [['general', 'General'], ['secciones', 'Secciones'], ['alertas', 'Alertas'], ['json', 'JSON'], ['versiones', 'Versiones']]
 
 function General({ d, set }: { d: Json; set: (d: Json) => void }) {
@@ -95,6 +105,18 @@ export default function App() {
   const [ready, setReady] = useState(false)
   const frame = useRef<HTMLIFrameElement>(null)
   const seen = useRef(false)
+  const [sel, setSelS] = useState<string | null>(null)
+  const [picker, setPicker] = useState<{ list: string; index: number } | null>(null)
+  const [toast, setToast] = useState('')
+  const dRef = useRef<Json | null>(null); dRef.current = d
+  const selRef = useRef<string | null>(null); selRef.current = sel
+  const select = useCallback((p: string | null) => { setSelS(p); if (p) setTabS('casilla'); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
+  const flash = useCallback((m: string) => { setToast(m); setTimeout(() => setToast(''), 3500) }, [])
+  const kinds = useMemo(() => { const k: any = Defs.current?.Chart?.properties?.kind; const r = k?.$ref ? Defs.current[k.$ref.split('/').pop()] : k; return (r?.enum || []) as string[] }, [id, ready])
+  const onLoad = () => {
+    const doc = frame.current?.contentDocument; if (!doc) return
+    attach(doc, { get: () => dRef.current, put: v => setD(v), select, sel: () => selRef.current, add: (list, index = 0) => setPicker({ list, index }), kinds, toast: flash })
+  }
   useEffect(() => { api.schema().then(s => { Defs.current = s.$defs; setReady(true) }) }, [])
   const dirty = useMemo(() => d !== null && JSON.stringify(d) !== saved, [d, saved])
 
@@ -127,7 +149,7 @@ export default function App() {
       if (!v) return
       setIssues(v.issues)
       if (v.ok) {
-        let h = await api.render(d).catch(() => '')
+        let h = await api.render(d, true).catch(() => '')
         const doc = frame.current?.contentDocument
         const prev = (seen.current ? readPrev(doc) : null) || LS.get<Prev | null>('prev', null)
         if (h && prev) h = h.replace('</body>', restoreJs(prev) + '</body>')
@@ -138,6 +160,13 @@ export default function App() {
     return () => clearTimeout(t)
   }, [d])
 
+  const insertBlock = (type: string) => {
+    if (!picker || !dRef.current) return
+    const def = blockTypes().find(x => x.type === type)?.def; if (!def) return
+    const b = { ...blank(def), ...(STARTERS[type] || {}) }
+    setD(listOps.insert(dRef.current, picker.list, picker.index, b)); setPicker(null)
+    select(picker.list + '.' + picker.index)
+  }
   const goPreview = (sid: string) => {  // llevar la vista previa a la sección que se edita
     const doc = frame.current?.contentDocument
     if (!doc) return
@@ -179,14 +208,25 @@ export default function App() {
           <button className="danger" onClick={remove}>Eliminar</button>
           <span className="mut">{dirty ? 'Cambios sin guardar' : msg}</span></div>
         {issues.length > 0 && <div className="issues"><b>Corrige antes de guardar:</b><ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{issues.map((x, i) => <li key={i}>{x}</li>)}</ul></div>}
-        <div className="tabs">{TABS.map(([k, l]) => <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}</div>
+        <div className="tabs">{(sel ? [['casilla', 'Casilla seleccionada'] as [Tab, string], ...TABS] : TABS).map(([k, l]) => <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}</div>
+        {tab === 'casilla' && (sel && getAt(d, sel) ? <div className="card"><div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}><b style={{ flex: 1 }}>{BLOCK[getAt(d, sel).type] || getAt(d, sel).type}</b><button onClick={() => select(null)}>Deseleccionar</button></div>
+          <p className="mut" style={{ marginTop: 0 }}>Doble clic sobre cualquier texto de la vista previa para editarlo ahí mismo. Aquí están todas las opciones de esta casilla.</p>
+          <BlockForm block={getAt(d, sel)} set={v => setD(setAt(d, sel, v))} /></div> : <div className="card"><p className="mut">Haz clic en una casilla de la vista previa para editarla, o en «+ Agregar casilla» dentro de una sección.</p></div>)}
         {tab === 'general' && <General d={d} set={setD} />}
         {tab === 'secciones' && <Secciones d={d} set={setD} focus={goPreview} />}
         {tab === 'alertas' && <Alertas d={d} set={setD} />}
         {tab === 'json' && <JsonEditor d={d} set={setD} />}
         {tab === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}
       </div>
-      <div className="prev"><iframe ref={frame} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
+      <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
+      {picker && <div className="modal" onClick={() => setPicker(null)}><div className="modal-b" onClick={e => e.stopPropagation()}>
+        <h2 style={{ marginTop: 0 }}>¿Qué quieres poner aquí?</h2>
+        <div className="tiles">{([['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video, audio o imagen'], ['stat_grid', '🔢', 'Cifras destacadas'], ['card_list', '📝', 'Texto con lista'], ['table', '▦', 'Tabla'], ['grid', '◫', 'Columnas (poner cosas lado a lado)']] as const).map(([k, i, l]) =>
+          <button key={k} className="tile" onClick={() => insertBlock(k)}><span style={{ fontSize: 30 }}>{i}</span>{l}</button>)}</div>
+        <p className="mut" style={{ marginBottom: 4 }}>Otros tipos</p>
+        <select defaultValue="" onChange={e => e.target.value && insertBlock(e.target.value)}><option value="">Elegir…</option>{blockTypes().map(x => <option key={x.type} value={x.type}>{BLOCK[x.type] || x.type}</option>)}</select>
+        <div style={{ textAlign: 'right', marginTop: 12 }}><button onClick={() => setPicker(null)}>Cancelar</button></div></div></div>}
+      {toast && <div className="toast">{toast}</div>}
     </div> : <div className="empty">Elige un informe de la izquierda o importa uno.</div>}
   </div>
 }

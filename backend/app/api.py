@@ -147,9 +147,9 @@ def preview(rid: int, s: Store = Depends(get_store)):
 
 
 @router.post("/render", response_class=HTMLResponse)
-def render_draft(body: dict[str, Any] = Body(...)):
-    """Vista previa de un borrador sin guardarlo."""
-    return HTMLResponse(render(_valid(body)))
+def render_draft(body: dict[str, Any] = Body(...), edit: bool = False):
+    """Vista previa de un borrador sin guardarlo. edit=1 marca las casillas para edición directa."""
+    return HTMLResponse(render(_valid(body), edit=edit))
 
 
 @router.get("/reports/{rid}/export.html")
