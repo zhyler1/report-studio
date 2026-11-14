@@ -196,12 +196,17 @@ function BlockList({ s, value, set }: { s: S; value: any[]; set: (v: any[]) => v
   const map: Record<string, string> = s.discriminator?.mapping || Object.fromEntries((s.oneOf || s.anyOf || []).map((x: S) => [deref(x).properties?.type?.const, x.$ref]))
   const [pick, setPick] = useState(Object.keys(map)[0])
   const def = (t: string) => Defs.current[map[t].split('/').pop()!]
-  return <div>{value.map((b, i) => <Row key={i} head={<><b>{BLOCK[b.type] || b.type}</b> <span className="mut">{short(b)}{b.hidden ? ' · oculto' : ''}</span></>}
+  const [fresh, setFresh] = useState(-1)
+  const addT = (t: string) => { setFresh(value.length); set([...value, blank(def(t))]) }
+  return <div>{value.map((b, i) => <Row key={i + ':' + (i === fresh ? 'n' : '')} defaultOpen={i === fresh} head={<><b>{BLOCK[b.type] || b.type}</b> <span className="mut">{short(b)}{b.hidden ? ' · oculto' : ''}</span></>}
     onUp={() => set(mv(value, i, -1))} onDown={() => set(mv(value, i, 1))} onDel={() => confirm('¿Eliminar este bloque?') && set(value.filter((_, j) => j !== i))}
     onDup={() => set([...value.slice(0, i + 1), JSON.parse(JSON.stringify(b)), ...value.slice(i + 1)])}>
     {map[b.type] ? <ObjectField s={def(b.type)} value={b} set={v => set(value.map((y, j) => (j === i ? v : y)))} bare /> : <p className="mut">Tipo desconocido: {b.type}</p>}</Row>)}
+    <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+      {map.chart && <button className="pri" onClick={() => addT('chart')}>📊 Agregar gráfico</button>}
+      {map.media && <button className="pri" onClick={() => addT('media')}>🎬 Agregar imagen / video / audio</button>}</div>
     <div style={{ display: 'flex', gap: 6, marginTop: 6 }}><select value={pick} onChange={e => setPick(e.target.value)}>{Object.keys(map).map(t => <option key={t} value={t}>{BLOCK[t] || t}</option>)}</select>
-      <button className="pri" onClick={() => set([...value, blank(def(pick))])}>+ Agregar bloque</button></div></div>
+      <button onClick={() => addT(pick)}>+ Agregar otro bloque</button></div></div>
 }
 
 export function SectionForm({ section, set }: { section: any; set: (v: any) => void }) {
