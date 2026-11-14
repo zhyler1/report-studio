@@ -1,0 +1,2745 @@
+{
+ "$defs": {
+  "Activities": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "activities",
+     "default": "activities",
+     "title": "Type",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/Activity"
+     },
+     "title": "Items",
+     "type": "array"
+    },
+    "budget": {
+     "default": "",
+     "title": "Budget",
+     "type": "string"
+    },
+    "total": {
+     "default": "",
+     "title": "Total",
+     "type": "string"
+    },
+    "total_label": {
+     "default": "Proyección PAA",
+     "title": "Total Label",
+     "type": "string"
+    },
+    "efr_measure": {
+     "default": "EFR",
+     "title": "Efr Measure",
+     "type": "string"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "Activities",
+   "type": "object"
+  },
+  "Activity": {
+   "additionalProperties": false,
+   "properties": {
+    "measure": {
+     "title": "Measure",
+     "type": "string"
+    },
+    "name": {
+     "title": "Name",
+     "type": "string"
+    },
+    "frequency": {
+     "title": "Frequency",
+     "type": "string"
+    },
+    "pct": {
+     "maximum": 100,
+     "minimum": 0,
+     "title": "Pct",
+     "type": "number"
+    },
+    "date": {
+     "title": "Date",
+     "type": "string"
+    },
+    "note": {
+     "default": "",
+     "title": "Note",
+     "type": "string"
+    },
+    "value": {
+     "default": "",
+     "title": "Value",
+     "type": "string"
+    }
+   },
+   "required": [
+    "measure",
+    "name",
+    "frequency",
+    "pct",
+    "date"
+   ],
+   "title": "Activity",
+   "type": "object"
+  },
+  "Agreement": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "agreement",
+     "default": "agreement",
+     "title": "Type",
+     "type": "string"
+    },
+    "heading": {
+     "title": "Heading",
+     "type": "string"
+    },
+    "cutoff": {
+     "title": "Cutoff",
+     "type": "string"
+    },
+    "avg": {
+     "title": "Avg",
+     "type": "number"
+    },
+    "color": {
+     "default": "auto",
+     "enum": [
+      "auto",
+      "blue",
+      "red",
+      "green",
+      "orange",
+      "yellow",
+      "purple",
+      "navy"
+     ],
+     "title": "Color",
+     "type": "string"
+    },
+    "summary": {
+     "title": "Summary",
+     "type": "string"
+    },
+    "milestone_date": {
+     "title": "Milestone Date",
+     "type": "string"
+    },
+    "milestone": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Milestone",
+     "type": "array"
+    },
+    "progress": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Progress",
+     "type": "array"
+    },
+    "watch": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Watch",
+     "type": "array"
+    },
+    "table": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Table"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    }
+   },
+   "required": [
+    "heading",
+    "cutoff",
+    "avg",
+    "summary",
+    "milestone_date",
+    "milestone",
+    "progress",
+    "watch"
+   ],
+   "title": "Agreement",
+   "type": "object"
+  },
+  "Alert": {
+   "additionalProperties": false,
+   "properties": {
+    "group": {
+     "title": "Group",
+     "type": "string"
+    },
+    "level": {
+     "enum": [
+      "alto",
+      "medio",
+      "bajo"
+     ],
+     "title": "Level",
+     "type": "string"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    }
+   },
+   "required": [
+    "group",
+    "level",
+    "text"
+   ],
+   "title": "Alert",
+   "type": "object"
+  },
+  "Budget": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "budget",
+     "default": "budget",
+     "title": "Type",
+     "type": "string"
+    },
+    "source": {
+     "title": "Source",
+     "type": "string"
+    }
+   },
+   "required": [
+    "source"
+   ],
+   "title": "Budget",
+   "type": "object"
+  },
+  "Button": {
+   "additionalProperties": false,
+   "properties": {
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "url": {
+     "default": "",
+     "title": "Url",
+     "type": "string"
+    },
+    "disabled": {
+     "default": false,
+     "title": "Disabled",
+     "type": "boolean"
+    },
+    "note": {
+     "default": "",
+     "title": "Note",
+     "type": "string"
+    }
+   },
+   "required": [
+    "label"
+   ],
+   "title": "Button",
+   "type": "object"
+  },
+  "CalendarBlock": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "calendar",
+     "default": "calendar",
+     "title": "Type",
+     "type": "string"
+    },
+    "source": {
+     "title": "Source",
+     "type": "string"
+    },
+    "default_month": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Default Month"
+    }
+   },
+   "required": [
+    "source"
+   ],
+   "title": "CalendarBlock",
+   "type": "object"
+  },
+  "CardList": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "card_list",
+     "default": "card_list",
+     "title": "Type",
+     "type": "string"
+    },
+    "style": {
+     "default": "plain",
+     "enum": [
+      "checks",
+      "plain",
+      "warn"
+     ],
+     "title": "Style",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Items",
+     "type": "array"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "CardList",
+   "type": "object"
+  },
+  "Chart": {
+   "additionalProperties": false,
+   "description": "Gráficos de cualquier tipo (aún sin dibujar; el esquema ya los admite).",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "chart",
+     "default": "chart",
+     "title": "Type",
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "bar",
+      "line",
+      "area",
+      "pie",
+      "donut",
+      "radar",
+      "gauge",
+      "stacked",
+      "candles"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "labels": {
+     "default": [],
+     "items": {
+      "type": "string"
+     },
+     "title": "Labels",
+     "type": "array"
+    },
+    "series": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Series"
+     },
+     "title": "Series",
+     "type": "array"
+    },
+    "unit": {
+     "default": "",
+     "title": "Unit",
+     "type": "string"
+    },
+    "projection_from": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Projection From"
+    }
+   },
+   "required": [
+    "kind"
+   ],
+   "title": "Chart",
+   "type": "object"
+  },
+  "Column": {
+   "additionalProperties": false,
+   "properties": {
+    "key": {
+     "title": "Key",
+     "type": "string"
+    },
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "align": {
+     "default": "left",
+     "enum": [
+      "left",
+      "right",
+      "center"
+     ],
+     "title": "Align",
+     "type": "string"
+    },
+    "format": {
+     "default": "text",
+     "enum": [
+      "text",
+      "money",
+      "pct",
+      "pct_bar",
+      "pill",
+      "number"
+     ],
+     "title": "Format",
+     "type": "string"
+    }
+   },
+   "required": [
+    "key",
+    "label"
+   ],
+   "title": "Column",
+   "type": "object"
+  },
+  "Gallery": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "gallery",
+     "default": "gallery",
+     "title": "Type",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/Media"
+     },
+     "title": "Items",
+     "type": "array"
+    },
+    "side_card": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/InfoCard"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "Gallery",
+   "type": "object"
+  },
+  "Grid": {
+   "additionalProperties": false,
+   "description": "Reparte bloques en columnas.",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "grid",
+     "default": "grid",
+     "title": "Type",
+     "type": "string"
+    },
+    "ratio": {
+     "default": [
+      1,
+      1
+     ],
+     "items": {
+      "type": "number"
+     },
+     "title": "Ratio",
+     "type": "array"
+    },
+    "columns": {
+     "items": {
+      "items": {
+       "discriminator": {
+        "mapping": {
+         "activities": "#/$defs/Activities",
+         "agreement": "#/$defs/Agreement",
+         "budget": "#/$defs/Budget",
+         "calendar": "#/$defs/CalendarBlock",
+         "card_list": "#/$defs/CardList",
+         "chart": "#/$defs/Chart",
+         "gallery": "#/$defs/Gallery",
+         "grid": "#/$defs/Grid",
+         "link_cards": "#/$defs/LinkCards",
+         "media": "#/$defs/MediaBlock",
+         "note_list": "#/$defs/NoteList",
+         "numbered_cards": "#/$defs/NumberedCards",
+         "plants": "#/$defs/Plants",
+         "proposals": "#/$defs/Proposals",
+         "ring_card": "#/$defs/RingCard",
+         "row_list": "#/$defs/RowList",
+         "stat_grid": "#/$defs/StatGrid",
+         "status_list": "#/$defs/StatusList",
+         "step_cards": "#/$defs/StepCards",
+         "table": "#/$defs/Table",
+         "workflow": "#/$defs/Workflow"
+        },
+        "propertyName": "type"
+       },
+       "oneOf": [
+        {
+         "$ref": "#/$defs/StatGrid"
+        },
+        {
+         "$ref": "#/$defs/RowList"
+        },
+        {
+         "$ref": "#/$defs/NoteList"
+        },
+        {
+         "$ref": "#/$defs/CardList"
+        },
+        {
+         "$ref": "#/$defs/RingCard"
+        },
+        {
+         "$ref": "#/$defs/StatusList"
+        },
+        {
+         "$ref": "#/$defs/NumberedCards"
+        },
+        {
+         "$ref": "#/$defs/StepCards"
+        },
+        {
+         "$ref": "#/$defs/LinkCards"
+        },
+        {
+         "$ref": "#/$defs/Gallery"
+        },
+        {
+         "$ref": "#/$defs/Table"
+        },
+        {
+         "$ref": "#/$defs/Plants"
+        },
+        {
+         "$ref": "#/$defs/Workflow"
+        },
+        {
+         "$ref": "#/$defs/Agreement"
+        },
+        {
+         "$ref": "#/$defs/Activities"
+        },
+        {
+         "$ref": "#/$defs/Budget"
+        },
+        {
+         "$ref": "#/$defs/CalendarBlock"
+        },
+        {
+         "$ref": "#/$defs/Proposals"
+        },
+        {
+         "$ref": "#/$defs/Chart"
+        },
+        {
+         "$ref": "#/$defs/MediaBlock"
+        },
+        {
+         "$ref": "#/$defs/Grid"
+        }
+       ]
+      },
+      "type": "array"
+     },
+     "title": "Columns",
+     "type": "array"
+    }
+   },
+   "required": [
+    "columns"
+   ],
+   "title": "Grid",
+   "type": "object"
+  },
+  "HomeCard": {
+   "additionalProperties": false,
+   "properties": {
+    "stats": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Stat"
+     },
+     "title": "Stats",
+     "type": "array"
+    },
+    "text": {
+     "default": "",
+     "title": "Text",
+     "type": "string"
+    },
+    "tag": {
+     "default": "",
+     "title": "Tag",
+     "type": "string"
+    },
+    "tag_tone": {
+     "default": "red",
+     "enum": [
+      "red",
+      "green"
+     ],
+     "title": "Tag Tone",
+     "type": "string"
+    }
+   },
+   "title": "HomeCard",
+   "type": "object"
+  },
+  "InfoCard": {
+   "additionalProperties": false,
+   "properties": {
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Items",
+     "type": "array"
+    }
+   },
+   "required": [
+    "title",
+    "items"
+   ],
+   "title": "InfoCard",
+   "type": "object"
+  },
+  "LinkCard": {
+   "additionalProperties": false,
+   "properties": {
+    "n": {
+     "title": "N",
+     "type": "string"
+    },
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    },
+    "button": {
+     "$ref": "#/$defs/Button"
+    }
+   },
+   "required": [
+    "n",
+    "title",
+    "text",
+    "button"
+   ],
+   "title": "LinkCard",
+   "type": "object"
+  },
+  "LinkCards": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "link_cards",
+     "default": "link_cards",
+     "title": "Type",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/LinkCard"
+     },
+     "title": "Items",
+     "type": "array"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "LinkCards",
+   "type": "object"
+  },
+  "Media": {
+   "additionalProperties": false,
+   "properties": {
+    "kind": {
+     "default": "image",
+     "enum": [
+      "image",
+      "video",
+      "audio"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "slot": {
+     "default": "",
+     "title": "Slot",
+     "type": "string"
+    },
+    "src": {
+     "default": "",
+     "title": "Src",
+     "type": "string"
+    },
+    "poster": {
+     "default": "",
+     "title": "Poster",
+     "type": "string"
+    },
+    "alt": {
+     "default": "",
+     "title": "Alt",
+     "type": "string"
+    },
+    "caption": {
+     "default": "",
+     "title": "Caption",
+     "type": "string"
+    },
+    "zoom": {
+     "default": true,
+     "title": "Zoom",
+     "type": "boolean"
+    },
+    "autoplay": {
+     "default": false,
+     "title": "Autoplay",
+     "type": "boolean"
+    },
+    "loop": {
+     "default": false,
+     "title": "Loop",
+     "type": "boolean"
+    },
+    "muted": {
+     "default": true,
+     "title": "Muted",
+     "type": "boolean"
+    },
+    "start": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Start"
+    },
+    "end": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "End"
+    }
+   },
+   "title": "Media",
+   "type": "object"
+  },
+  "MediaBlock": {
+   "additionalProperties": false,
+   "description": "Imagen, video o audio incrustado (el archivo vive en el servidor de media).",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "media",
+     "default": "media",
+     "title": "Type",
+     "type": "string"
+    },
+    "media": {
+     "$ref": "#/$defs/Media"
+    }
+   },
+   "required": [
+    "media"
+   ],
+   "title": "MediaBlock",
+   "type": "object"
+  },
+  "Meta": {
+   "additionalProperties": false,
+   "properties": {
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "subtitle": {
+     "title": "Subtitle",
+     "type": "string"
+    },
+    "org": {
+     "title": "Org",
+     "type": "string"
+    },
+    "boss_role": {
+     "default": "Jefe de Oficina",
+     "title": "Boss Role",
+     "type": "string"
+    },
+    "boss": {
+     "default": "",
+     "title": "Boss",
+     "type": "string"
+    },
+    "tagline": {
+     "default": "",
+     "title": "Tagline",
+     "type": "string"
+    },
+    "hero_kicker": {
+     "default": "",
+     "title": "Hero Kicker",
+     "type": "string"
+    },
+    "hero_title": {
+     "default": "",
+     "title": "Hero Title",
+     "type": "string"
+    },
+    "hero_text": {
+     "default": "",
+     "title": "Hero Text",
+     "type": "string"
+    },
+    "footer": {
+     "default": "",
+     "title": "Footer",
+     "type": "string"
+    },
+    "share_url": {
+     "default": "",
+     "title": "Share Url",
+     "type": "string"
+    },
+    "theme": {
+     "$ref": "#/$defs/Theme",
+     "default": {
+      "default": "light",
+      "cover": "foto",
+      "palace_url": "",
+      "logo_dark": "",
+      "logo_light": "",
+      "intro_word": "Presentación"
+     }
+    },
+    "show_alerts": {
+     "default": false,
+     "title": "Show Alerts",
+     "type": "boolean"
+    },
+    "thresholds": {
+     "default": [
+      90,
+      80,
+      50
+     ],
+     "maxItems": 3,
+     "minItems": 3,
+     "prefixItems": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "integer"
+      }
+     ],
+     "title": "Thresholds",
+     "type": "array"
+    }
+   },
+   "required": [
+    "title",
+    "subtitle",
+    "org"
+   ],
+   "title": "Meta",
+   "type": "object"
+  },
+  "NoteList": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "note_list",
+     "default": "note_list",
+     "title": "Type",
+     "type": "string"
+    },
+    "header": {
+     "default": "OBSERVACIONES",
+     "title": "Header",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "type": "string"
+     },
+     "title": "Items",
+     "type": "array"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "NoteList",
+   "type": "object"
+  },
+  "NumberedCard": {
+   "additionalProperties": false,
+   "properties": {
+    "n": {
+     "default": "",
+     "title": "N",
+     "type": "string"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    },
+    "tone": {
+     "default": "none",
+     "enum": [
+      "none",
+      "violet"
+     ],
+     "title": "Tone",
+     "type": "string"
+    }
+   },
+   "required": [
+    "text"
+   ],
+   "title": "NumberedCard",
+   "type": "object"
+  },
+  "NumberedCards": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "numbered_cards",
+     "default": "numbered_cards",
+     "title": "Type",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/NumberedCard"
+     },
+     "title": "Items",
+     "type": "array"
+    },
+    "min_width": {
+     "default": 280,
+     "title": "Min Width",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "NumberedCards",
+   "type": "object"
+  },
+  "Plant": {
+   "additionalProperties": false,
+   "properties": {
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "provistos": {
+     "title": "Provistos",
+     "type": "integer"
+    },
+    "vacantes": {
+     "title": "Vacantes",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "label",
+    "provistos",
+    "vacantes"
+   ],
+   "title": "Plant",
+   "type": "object"
+  },
+  "Plants": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "plants",
+     "default": "plants",
+     "title": "Type",
+     "type": "string"
+    },
+    "plants": {
+     "items": {
+      "$ref": "#/$defs/Plant"
+     },
+     "title": "Plants",
+     "type": "array"
+    },
+    "procesos": {
+     "title": "Procesos",
+     "type": "integer"
+    },
+    "procesos_label": {
+     "title": "Procesos Label",
+     "type": "string"
+    },
+    "posesiones": {
+     "title": "Posesiones",
+     "type": "integer"
+    },
+    "posesiones_label": {
+     "title": "Posesiones Label",
+     "type": "string"
+    },
+    "logro": {
+     "title": "Logro",
+     "type": "string"
+    }
+   },
+   "required": [
+    "plants",
+    "procesos",
+    "procesos_label",
+    "posesiones",
+    "posesiones_label",
+    "logro"
+   ],
+   "title": "Plants",
+   "type": "object"
+  },
+  "Proposals": {
+   "additionalProperties": false,
+   "description": "Cotizaciones de Bienestar (vacaciones, bonos, anchetas, velitas).",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "proposals",
+     "default": "proposals",
+     "title": "Type",
+     "type": "string"
+    },
+    "show": {
+     "default": [
+      "ancheta",
+      "velitas"
+     ],
+     "items": {
+      "enum": [
+       "vacations",
+       "bonus",
+       "ancheta",
+       "velitas"
+      ],
+      "type": "string"
+     },
+     "title": "Show",
+     "type": "array"
+    },
+    "ancheta_title": {
+     "default": "PROPUESTAS · Anchetas",
+     "title": "Ancheta Title",
+     "type": "string"
+    },
+    "velitas_title": {
+     "default": "PROPUESTAS · Kit de velitas",
+     "title": "Velitas Title",
+     "type": "string"
+    },
+    "vacations": {
+     "default": [],
+     "items": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "title": "Vacations",
+     "type": "array"
+    },
+    "vacations_value": {
+     "default": "",
+     "title": "Vacations Value",
+     "type": "string"
+    },
+    "bonus": {
+     "default": [],
+     "items": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "title": "Bonus",
+     "type": "array"
+    },
+    "bonus_label": {
+     "default": "TOTAL",
+     "title": "Bonus Label",
+     "type": "string"
+    },
+    "bonus_total": {
+     "default": "",
+     "title": "Bonus Total",
+     "type": "string"
+    },
+    "ancheta": {
+     "default": [],
+     "items": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "title": "Ancheta",
+     "type": "array"
+    },
+    "ancheta_media": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Media"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "velitas": {
+     "default": [],
+     "items": {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "title": "Velitas",
+     "type": "array"
+    },
+    "velitas_media": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Media"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "velitas_note": {
+     "default": "",
+     "title": "Velitas Note",
+     "type": "string"
+    }
+   },
+   "title": "Proposals",
+   "type": "object"
+  },
+  "RingCard": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "ring_card",
+     "default": "ring_card",
+     "title": "Type",
+     "type": "string"
+    },
+    "value": {
+     "title": "Value",
+     "type": "number"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    },
+    "color": {
+     "default": "auto",
+     "enum": [
+      "auto",
+      "blue",
+      "red",
+      "green",
+      "orange",
+      "yellow",
+      "purple",
+      "navy"
+     ],
+     "title": "Color",
+     "type": "string"
+    }
+   },
+   "required": [
+    "value",
+    "text"
+   ],
+   "title": "RingCard",
+   "type": "object"
+  },
+  "RowItem": {
+   "additionalProperties": false,
+   "properties": {
+    "n": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "string"
+      }
+     ],
+     "title": "N"
+    },
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    },
+    "evidence": {
+     "default": "",
+     "title": "Evidence",
+     "type": "string"
+    },
+    "bar_pct": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Bar Pct"
+    },
+    "bar_color": {
+     "default": "blue",
+     "enum": [
+      "auto",
+      "blue",
+      "red",
+      "green",
+      "orange",
+      "yellow",
+      "purple",
+      "navy"
+     ],
+     "title": "Bar Color",
+     "type": "string"
+    }
+   },
+   "required": [
+    "n",
+    "title",
+    "text"
+   ],
+   "title": "RowItem",
+   "type": "object"
+  },
+  "RowList": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "row_list",
+     "default": "row_list",
+     "title": "Type",
+     "type": "string"
+    },
+    "header": {
+     "default": "ACCIONES DE GESTIÓN",
+     "title": "Header",
+     "type": "string"
+    },
+    "columns": {
+     "default": [
+      "Acción / información a reportar",
+      "Evidencia / dónde verificar"
+     ],
+     "maxItems": 2,
+     "minItems": 2,
+     "prefixItems": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "string"
+      }
+     ],
+     "title": "Columns",
+     "type": "array"
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/RowItem"
+     },
+     "title": "Items",
+     "type": "array"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "RowList",
+   "type": "object"
+  },
+  "Section": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "subtitle": {
+     "default": "",
+     "title": "Subtitle",
+     "type": "string"
+    },
+    "icon": {
+     "default": "none",
+     "enum": [
+      "none",
+      "people",
+      "stock",
+      "heart",
+      "doc",
+      "radio",
+      "shield"
+     ],
+     "title": "Icon",
+     "type": "string"
+    },
+    "background": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Background"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "home": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/HomeCard"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "blocks": {
+     "default": [],
+     "items": {
+      "discriminator": {
+       "mapping": {
+        "activities": "#/$defs/Activities",
+        "agreement": "#/$defs/Agreement",
+        "budget": "#/$defs/Budget",
+        "calendar": "#/$defs/CalendarBlock",
+        "card_list": "#/$defs/CardList",
+        "chart": "#/$defs/Chart",
+        "gallery": "#/$defs/Gallery",
+        "grid": "#/$defs/Grid",
+        "link_cards": "#/$defs/LinkCards",
+        "media": "#/$defs/MediaBlock",
+        "note_list": "#/$defs/NoteList",
+        "numbered_cards": "#/$defs/NumberedCards",
+        "plants": "#/$defs/Plants",
+        "proposals": "#/$defs/Proposals",
+        "ring_card": "#/$defs/RingCard",
+        "row_list": "#/$defs/RowList",
+        "stat_grid": "#/$defs/StatGrid",
+        "status_list": "#/$defs/StatusList",
+        "step_cards": "#/$defs/StepCards",
+        "table": "#/$defs/Table",
+        "workflow": "#/$defs/Workflow"
+       },
+       "propertyName": "type"
+      },
+      "oneOf": [
+       {
+        "$ref": "#/$defs/StatGrid"
+       },
+       {
+        "$ref": "#/$defs/RowList"
+       },
+       {
+        "$ref": "#/$defs/NoteList"
+       },
+       {
+        "$ref": "#/$defs/CardList"
+       },
+       {
+        "$ref": "#/$defs/RingCard"
+       },
+       {
+        "$ref": "#/$defs/StatusList"
+       },
+       {
+        "$ref": "#/$defs/NumberedCards"
+       },
+       {
+        "$ref": "#/$defs/StepCards"
+       },
+       {
+        "$ref": "#/$defs/LinkCards"
+       },
+       {
+        "$ref": "#/$defs/Gallery"
+       },
+       {
+        "$ref": "#/$defs/Table"
+       },
+       {
+        "$ref": "#/$defs/Plants"
+       },
+       {
+        "$ref": "#/$defs/Workflow"
+       },
+       {
+        "$ref": "#/$defs/Agreement"
+       },
+       {
+        "$ref": "#/$defs/Activities"
+       },
+       {
+        "$ref": "#/$defs/Budget"
+       },
+       {
+        "$ref": "#/$defs/CalendarBlock"
+       },
+       {
+        "$ref": "#/$defs/Proposals"
+       },
+       {
+        "$ref": "#/$defs/Chart"
+       },
+       {
+        "$ref": "#/$defs/MediaBlock"
+       },
+       {
+        "$ref": "#/$defs/Grid"
+       }
+      ]
+     },
+     "title": "Blocks",
+     "type": "array"
+    },
+    "tabs": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tab"
+     },
+     "title": "Tabs",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "label",
+    "title"
+   ],
+   "title": "Section",
+   "type": "object"
+  },
+  "Series": {
+   "additionalProperties": false,
+   "properties": {
+    "name": {
+     "title": "Name",
+     "type": "string"
+    },
+    "values": {
+     "items": {
+      "type": "number"
+     },
+     "title": "Values",
+     "type": "array"
+    },
+    "color": {
+     "default": "auto",
+     "enum": [
+      "auto",
+      "blue",
+      "red",
+      "green",
+      "orange",
+      "yellow",
+      "purple",
+      "navy"
+     ],
+     "title": "Color",
+     "type": "string"
+    }
+   },
+   "required": [
+    "name",
+    "values"
+   ],
+   "title": "Series",
+   "type": "object"
+  },
+  "Stat": {
+   "additionalProperties": false,
+   "properties": {
+    "value": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "integer"
+      },
+      {
+       "type": "number"
+      }
+     ],
+     "title": "Value"
+    },
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "prefix": {
+     "default": "",
+     "title": "Prefix",
+     "type": "string"
+    },
+    "suffix": {
+     "default": "",
+     "title": "Suffix",
+     "type": "string"
+    },
+    "animate": {
+     "default": true,
+     "title": "Animate",
+     "type": "boolean"
+    },
+    "color": {
+     "default": "auto",
+     "enum": [
+      "auto",
+      "blue",
+      "red",
+      "green",
+      "orange",
+      "yellow",
+      "purple",
+      "navy"
+     ],
+     "title": "Color",
+     "type": "string"
+    },
+    "long": {
+     "default": false,
+     "title": "Long",
+     "type": "boolean"
+    },
+    "bind": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Bind"
+    }
+   },
+   "required": [
+    "value",
+    "label"
+   ],
+   "title": "Stat",
+   "type": "object"
+  },
+  "StatGrid": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "stat_grid",
+     "default": "stat_grid",
+     "title": "Type",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/Stat"
+     },
+     "title": "Items",
+     "type": "array"
+    },
+    "min_width": {
+     "default": 220,
+     "title": "Min Width",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "StatGrid",
+   "type": "object"
+  },
+  "StatusItem": {
+   "additionalProperties": false,
+   "properties": {
+    "value": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "integer"
+      }
+     ],
+     "title": "Value"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    },
+    "color": {
+     "default": "blue",
+     "enum": [
+      "auto",
+      "blue",
+      "red",
+      "green",
+      "orange",
+      "yellow",
+      "purple",
+      "navy"
+     ],
+     "title": "Color",
+     "type": "string"
+    }
+   },
+   "required": [
+    "value",
+    "text"
+   ],
+   "title": "StatusItem",
+   "type": "object"
+  },
+  "StatusList": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "status_list",
+     "default": "status_list",
+     "title": "Type",
+     "type": "string"
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/StatusItem"
+     },
+     "title": "Items",
+     "type": "array"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "StatusList",
+   "type": "object"
+  },
+  "StepCard": {
+   "additionalProperties": false,
+   "properties": {
+    "n": {
+     "title": "N",
+     "type": "string"
+    },
+    "tag": {
+     "title": "Tag",
+     "type": "string"
+    },
+    "date": {
+     "title": "Date",
+     "type": "string"
+    },
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    }
+   },
+   "required": [
+    "n",
+    "tag",
+    "date",
+    "title",
+    "text"
+   ],
+   "title": "StepCard",
+   "type": "object"
+  },
+  "StepCards": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "step_cards",
+     "default": "step_cards",
+     "title": "Type",
+     "type": "string"
+    },
+    "header": {
+     "default": "",
+     "title": "Header",
+     "type": "string"
+    },
+    "media": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Media"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "items": {
+     "items": {
+      "$ref": "#/$defs/StepCard"
+     },
+     "title": "Items",
+     "type": "array"
+    }
+   },
+   "required": [
+    "items"
+   ],
+   "title": "StepCards",
+   "type": "object"
+  },
+  "Tab": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "blocks": {
+     "items": {
+      "discriminator": {
+       "mapping": {
+        "activities": "#/$defs/Activities",
+        "agreement": "#/$defs/Agreement",
+        "budget": "#/$defs/Budget",
+        "calendar": "#/$defs/CalendarBlock",
+        "card_list": "#/$defs/CardList",
+        "chart": "#/$defs/Chart",
+        "gallery": "#/$defs/Gallery",
+        "grid": "#/$defs/Grid",
+        "link_cards": "#/$defs/LinkCards",
+        "media": "#/$defs/MediaBlock",
+        "note_list": "#/$defs/NoteList",
+        "numbered_cards": "#/$defs/NumberedCards",
+        "plants": "#/$defs/Plants",
+        "proposals": "#/$defs/Proposals",
+        "ring_card": "#/$defs/RingCard",
+        "row_list": "#/$defs/RowList",
+        "stat_grid": "#/$defs/StatGrid",
+        "status_list": "#/$defs/StatusList",
+        "step_cards": "#/$defs/StepCards",
+        "table": "#/$defs/Table",
+        "workflow": "#/$defs/Workflow"
+       },
+       "propertyName": "type"
+      },
+      "oneOf": [
+       {
+        "$ref": "#/$defs/StatGrid"
+       },
+       {
+        "$ref": "#/$defs/RowList"
+       },
+       {
+        "$ref": "#/$defs/NoteList"
+       },
+       {
+        "$ref": "#/$defs/CardList"
+       },
+       {
+        "$ref": "#/$defs/RingCard"
+       },
+       {
+        "$ref": "#/$defs/StatusList"
+       },
+       {
+        "$ref": "#/$defs/NumberedCards"
+       },
+       {
+        "$ref": "#/$defs/StepCards"
+       },
+       {
+        "$ref": "#/$defs/LinkCards"
+       },
+       {
+        "$ref": "#/$defs/Gallery"
+       },
+       {
+        "$ref": "#/$defs/Table"
+       },
+       {
+        "$ref": "#/$defs/Plants"
+       },
+       {
+        "$ref": "#/$defs/Workflow"
+       },
+       {
+        "$ref": "#/$defs/Agreement"
+       },
+       {
+        "$ref": "#/$defs/Activities"
+       },
+       {
+        "$ref": "#/$defs/Budget"
+       },
+       {
+        "$ref": "#/$defs/CalendarBlock"
+       },
+       {
+        "$ref": "#/$defs/Proposals"
+       },
+       {
+        "$ref": "#/$defs/Chart"
+       },
+       {
+        "$ref": "#/$defs/MediaBlock"
+       },
+       {
+        "$ref": "#/$defs/Grid"
+       }
+      ]
+     },
+     "title": "Blocks",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "label",
+    "blocks"
+   ],
+   "title": "Tab",
+   "type": "object"
+  },
+  "Table": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "table",
+     "default": "table",
+     "title": "Type",
+     "type": "string"
+    },
+    "columns": {
+     "items": {
+      "$ref": "#/$defs/Column"
+     },
+     "title": "Columns",
+     "type": "array"
+    },
+    "rows": {
+     "items": {
+      "additionalProperties": {
+       "anyOf": [
+        {
+         "type": "string"
+        },
+        {
+         "type": "integer"
+        },
+        {
+         "type": "number"
+        },
+        {
+         "type": "null"
+        }
+       ]
+      },
+      "type": "object"
+     },
+     "title": "Rows",
+     "type": "array"
+    }
+   },
+   "required": [
+    "columns",
+    "rows"
+   ],
+   "title": "Table",
+   "type": "object"
+  },
+  "Theme": {
+   "additionalProperties": false,
+   "properties": {
+    "default": {
+     "enum": [
+      "light",
+      "dark"
+     ],
+     "type": "string",
+     "default": "light",
+     "title": "Default"
+    },
+    "cover": {
+     "default": "foto",
+     "enum": [
+      "foto",
+      "clasica"
+     ],
+     "title": "Cover",
+     "type": "string"
+    },
+    "palace_url": {
+     "default": "",
+     "title": "Palace Url",
+     "type": "string"
+    },
+    "logo_dark": {
+     "default": "",
+     "title": "Logo Dark",
+     "type": "string"
+    },
+    "logo_light": {
+     "default": "",
+     "title": "Logo Light",
+     "type": "string"
+    },
+    "intro_word": {
+     "default": "Presentación",
+     "title": "Intro Word",
+     "type": "string"
+    }
+   },
+   "title": "Theme",
+   "type": "object"
+  },
+  "Workflow": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "type": {
+     "const": "workflow",
+     "default": "workflow",
+     "title": "Type",
+     "type": "string"
+    },
+    "heading": {
+     "title": "Heading",
+     "type": "string"
+    },
+    "subtitle": {
+     "default": "",
+     "title": "Subtitle",
+     "type": "string"
+    },
+    "teaser": {
+     "default": "",
+     "title": "Teaser",
+     "type": "string"
+    },
+    "button_label": {
+     "default": "Ver planta transitoria ↗",
+     "title": "Button Label",
+     "type": "string"
+    },
+    "link": {
+     "default": "",
+     "title": "Link",
+     "type": "string"
+    },
+    "steps": {
+     "items": {
+      "$ref": "#/$defs/WorkflowStep"
+     },
+     "title": "Steps",
+     "type": "array"
+    }
+   },
+   "required": [
+    "heading",
+    "steps"
+   ],
+   "title": "Workflow",
+   "type": "object"
+  },
+  "WorkflowStep": {
+   "additionalProperties": false,
+   "properties": {
+    "n": {
+     "title": "N",
+     "type": "integer"
+    },
+    "title": {
+     "title": "Title",
+     "type": "string"
+    },
+    "owner": {
+     "default": "",
+     "title": "Owner",
+     "type": "string"
+    },
+    "status": {
+     "enum": [
+      "ejecutado",
+      "proceso",
+      "espera"
+     ],
+     "title": "Status",
+     "type": "string"
+    },
+    "times": {
+     "default": "",
+     "title": "Times",
+     "type": "string"
+    },
+    "hours": {
+     "default": "",
+     "title": "Hours",
+     "type": "string"
+    },
+    "other": {
+     "default": "",
+     "title": "Other",
+     "type": "string"
+    }
+   },
+   "required": [
+    "n",
+    "title",
+    "status"
+   ],
+   "title": "WorkflowStep",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "properties": {
+  "schema_version": {
+   "const": "1.0",
+   "default": "1.0",
+   "title": "Schema Version",
+   "type": "string"
+  },
+  "meta": {
+   "$ref": "#/$defs/Meta"
+  },
+  "sections": {
+   "items": {
+    "$ref": "#/$defs/Section"
+   },
+   "title": "Sections",
+   "type": "array"
+  },
+  "alerts": {
+   "default": [],
+   "items": {
+    "$ref": "#/$defs/Alert"
+   },
+   "title": "Alerts",
+   "type": "array"
+  }
+ },
+ "required": [
+  "meta",
+  "sections"
+ ],
+ "title": "Report",
+ "type": "object"
+}

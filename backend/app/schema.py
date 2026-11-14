@@ -1,0 +1,399 @@
+"""Esquema del informe (versión 1.0).
+
+Un informe es: metadatos + secciones + alertas.
+Cada sección es una lista de *bloques* (o pestañas con bloques). Cada bloque tiene un
+`type` que dice qué es (cifras, tabla, línea de tiempo, gráfico, audio, video...).
+Agregar un tipo nuevo = agregar una clase aquí y una función de dibujo en el renderizador;
+el administrador lo ofrece solo a partir del JSON Schema exportado.
+
+Texto enriquecido (`Rich`): texto plano con **negrilla**. Es lo único que se permite, para
+que nunca llegue HTML arbitrario al informe.
+"""
+from __future__ import annotations
+
+from typing import Annotated, Literal, Optional, Union
+
+from pydantic import BaseModel, ConfigDict, Field
+
+SCHEMA_VERSION = "1.0"
+
+Rich = str  # texto con **negrilla**
+Color = Literal["auto", "blue", "red", "green", "orange", "yellow", "purple", "navy"]
+Level = Literal["alto", "medio", "bajo"]
+Status = Literal["ejecutado", "proceso", "espera"]
+Icon = Literal["none", "people", "stock", "heart", "doc", "radio", "shield"]
+
+
+class Base(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+# ───────────────────────── piezas pequeñas ─────────────────────────
+class Stat(Base):
+    value: Union[str, int, float]
+    label: str
+    prefix: str = ""
+    suffix: str = ""
+    animate: bool = True          # cuenta hacia arriba
+    color: Color = "auto"
+    long: bool = False            # cifra larga (montos): letra un poco menor
+    bind: Optional[str] = None    # dato calculado, p. ej. "plants.total"
+
+
+class Button(Base):
+    label: str
+    url: str = ""
+    disabled: bool = False        # p. ej. "Piloto con datos ficticios"
+    note: str = ""                # aviso si falta el enlace
+
+
+class Media(Base):
+    kind: Literal["image", "video", "audio"] = "image"
+    slot: str = ""                # nombre de archivo esperado (marcador punteado)
+    src: str = ""
+    poster: str = ""
+    alt: str = ""
+    caption: str = ""
+    zoom: bool = True
+    autoplay: bool = False
+    loop: bool = False
+    muted: bool = True
+    start: Optional[float] = None
+    end: Optional[float] = None
+
+
+class Column(Base):
+    key: str
+    label: str
+    align: Literal["left", "right", "center"] = "left"
+    format: Literal["text", "money", "pct", "pct_bar", "pill", "number"] = "text"
+
+
+# ───────────────────────── bloques ─────────────────────────
+class BlockBase(Base):
+    id: Optional[str] = None
+    title: Optional[str] = None
+    hidden: bool = False
+
+
+class StatGrid(BlockBase):
+    type: Literal["stat_grid"] = "stat_grid"
+    items: list[Stat]
+    min_width: int = 220
+
+
+class RowItem(Base):
+    n: Union[int, str]
+    title: str
+    text: Rich
+    evidence: str = ""
+    bar_pct: Optional[float] = None
+    bar_color: Color = "blue"
+
+
+class RowList(BlockBase):
+    type: Literal["row_list"] = "row_list"
+    header: str = "ACCIONES DE GESTIÓN"
+    columns: tuple[str, str] = ("Acción / información a reportar", "Evidencia / dónde verificar")
+    items: list[RowItem]
+
+
+class NoteList(BlockBase):
+    type: Literal["note_list"] = "note_list"
+    header: str = "OBSERVACIONES"
+    items: list[Rich]
+
+
+class CardList(BlockBase):
+    type: Literal["card_list"] = "card_list"
+    style: Literal["checks", "plain", "warn"] = "plain"
+    items: list[Rich]
+
+
+class RingCard(BlockBase):
+    type: Literal["ring_card"] = "ring_card"
+    value: float
+    text: Rich
+    color: Color = "auto"         # auto = semáforo por umbrales
+
+
+class StatusItem(Base):
+    value: Union[str, int]
+    text: Rich
+    color: Color = "blue"
+
+
+class StatusList(BlockBase):
+    type: Literal["status_list"] = "status_list"
+    items: list[StatusItem]
+
+
+class NumberedCard(Base):
+    n: str = ""
+    text: Rich
+    tone: Literal["none", "violet"] = "none"
+
+
+class NumberedCards(BlockBase):
+    type: Literal["numbered_cards"] = "numbered_cards"
+    items: list[NumberedCard]
+    min_width: int = 280
+
+
+class StepCard(Base):
+    n: str
+    tag: str
+    date: str
+    title: str
+    text: Rich
+
+
+class StepCards(BlockBase):
+    type: Literal["step_cards"] = "step_cards"
+    header: str = ""
+    media: Optional[Media] = None
+    items: list[StepCard]
+
+
+class LinkCard(Base):
+    n: str
+    title: str
+    text: str
+    button: Button
+
+
+class LinkCards(BlockBase):
+    type: Literal["link_cards"] = "link_cards"
+    items: list[LinkCard]
+
+
+class Gallery(BlockBase):
+    type: Literal["gallery"] = "gallery"
+    items: list[Media]
+    side_card: Optional["InfoCard"] = None
+
+
+class InfoCard(Base):
+    title: str
+    items: list[Rich]
+
+
+class Table(BlockBase):
+    type: Literal["table"] = "table"
+    columns: list[Column]
+    rows: list[dict[str, Union[str, int, float, None]]]
+
+
+class Plant(Base):
+    label: str
+    provistos: int
+    vacantes: int
+
+
+class Plants(BlockBase):
+    type: Literal["plants"] = "plants"
+    plants: list[Plant]
+    procesos: int
+    procesos_label: str
+    posesiones: int
+    posesiones_label: str
+    logro: Rich
+
+
+class WorkflowStep(Base):
+    n: int
+    title: str
+    owner: str = ""
+    status: Status
+    times: str = ""
+    hours: str = ""
+    other: str = ""
+
+
+class Workflow(BlockBase):
+    type: Literal["workflow"] = "workflow"
+    heading: str
+    subtitle: str = ""
+    teaser: str = ""
+    button_label: str = "Ver planta transitoria ↗"
+    link: str = ""
+    steps: list[WorkflowStep]
+
+
+class AgreementItem(Base):
+    text: Rich
+
+
+class Agreement(BlockBase):
+    type: Literal["agreement"] = "agreement"
+    heading: str
+    cutoff: str
+    avg: float
+    color: Color = "auto"
+    summary: Rich
+    milestone_date: str
+    milestone: list[str]
+    progress: list[str]
+    watch: list[str]
+    table: Optional[Table] = None
+
+
+class Activity(Base):
+    measure: str
+    name: str
+    frequency: str
+    pct: float = Field(ge=0, le=100)
+    date: str
+    note: str = ""
+    value: str = ""               # "$ 151.272.800"
+
+
+class Activities(BlockBase):
+    type: Literal["activities"] = "activities"
+    items: list[Activity]
+    budget: str = ""              # "$ 844.784.981"
+    total: str = ""               # vacío = suma de actividades
+    total_label: str = "Proyección PAA"
+    efr_measure: str = "EFR"      # medida que se agrupa como "MEDIDAS EFR"; el resto es "ACUERDO SINDICAL"
+
+
+class Budget(BlockBase):
+    type: Literal["budget"] = "budget"
+    source: str                   # id de un bloque activities
+
+
+class CalendarBlock(BlockBase):
+    type: Literal["calendar"] = "calendar"
+    source: str                   # id de un bloque activities
+    default_month: Optional[str] = None  # "2026-12"
+
+
+class Proposals(BlockBase):
+    """Cotizaciones de Bienestar (vacaciones, bonos, anchetas, velitas)."""
+    type: Literal["proposals"] = "proposals"
+    show: list[Literal["vacations", "bonus", "ancheta", "velitas"]] = ["ancheta", "velitas"]
+    ancheta_title: str = "PROPUESTAS · Anchetas"
+    velitas_title: str = "PROPUESTAS · Kit de velitas"
+    vacations: list[list[str]] = []
+    vacations_value: str = ""
+    bonus: list[list[str]] = []
+    bonus_label: str = "TOTAL"
+    bonus_total: str = ""
+    ancheta: list[list[str]] = []
+    ancheta_media: Optional[Media] = None
+    velitas: list[list[str]] = []
+    velitas_media: Optional[Media] = None
+    velitas_note: str = ""
+
+
+class Series(Base):
+    name: str
+    values: list[float]
+    color: Color = "auto"
+
+
+class Chart(BlockBase):
+    """Gráficos de cualquier tipo (aún sin dibujar; el esquema ya los admite)."""
+    type: Literal["chart"] = "chart"
+    kind: Literal["bar", "line", "area", "pie", "donut", "radar", "gauge", "stacked", "candles"]
+    labels: list[str] = []
+    series: list[Series] = []
+    unit: str = ""
+    projection_from: Optional[int] = None   # índice desde el cual los valores son proyección
+
+
+class MediaBlock(BlockBase):
+    """Imagen, video o audio incrustado (el archivo vive en el servidor de media)."""
+    type: Literal["media"] = "media"
+    media: Media
+
+
+class Grid(BlockBase):
+    """Reparte bloques en columnas."""
+    type: Literal["grid"] = "grid"
+    ratio: list[float] = [1, 1]
+    columns: list[list["Block"]]
+
+
+Block = Annotated[
+    Union[
+        StatGrid, RowList, NoteList, CardList, RingCard, StatusList, NumberedCards, StepCards,
+        LinkCards, Gallery, Table, Plants, Workflow, Agreement, Activities, Budget,
+        CalendarBlock, Proposals, Chart, MediaBlock, Grid,
+    ],
+    Field(discriminator="type"),
+]
+
+
+# ───────────────────────── secciones e informe ─────────────────────────
+class HomeCard(Base):
+    stats: list[Stat] = []
+    text: str = ""
+    tag: str = ""
+    tag_tone: Literal["red", "green"] = "red"
+
+
+class Tab(Base):
+    id: str
+    label: str
+    blocks: list[Block]
+
+
+class Section(Base):
+    id: str
+    label: str                    # texto de la pestaña
+    title: str
+    subtitle: str = ""
+    icon: Icon = "none"
+    background: Optional[str] = None   # animación de fondo; None = la del icono
+    hidden: bool = False
+    home: Optional[HomeCard] = None
+    blocks: list[Block] = []
+    tabs: list[Tab] = []
+
+
+class Alert(Base):
+    group: str
+    level: Level
+    text: str
+
+
+class Theme(Base):
+    default: Literal["light", "dark"] = "light"
+    cover: Literal["foto", "clasica"] = "foto"
+    palace_url: str = ""
+    logo_dark: str = ""
+    logo_light: str = ""
+    intro_word: str = "Presentación"
+
+
+class Meta(Base):
+    title: str
+    subtitle: str
+    org: str
+    boss_role: str = "Jefe de Oficina"
+    boss: str = ""
+    tagline: str = ""
+    hero_kicker: str = ""
+    hero_title: str = ""
+    hero_text: str = ""
+    footer: str = ""
+    share_url: str = ""
+    theme: Theme = Theme()
+    show_alerts: bool = False
+    thresholds: tuple[int, int, int] = (90, 80, 50)   # verde, amarillo, naranja; menos = rojo
+
+
+class Report(Base):
+    schema_version: Literal["1.0"] = SCHEMA_VERSION
+    meta: Meta
+    sections: list[Section]
+    alerts: list[Alert] = []
+
+
+for _m in (Gallery, Grid, Section, Tab, Report):
+    _m.model_rebuild()
+
+
+def json_schema() -> dict:
+    return Report.model_json_schema()
