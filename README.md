@@ -61,3 +61,4 @@ Desarrollo con recarga: `npm run dev` (puerto 5173, redirige /api al 8000).
 - [x] Subida de imagen, audio y video (`POST /api/media`, se guardan en `data/media` y se sirven en `/media`)
 - [x] La vista previa conserva la pestaña donde estás al editar
 - [ ] Pendiente: al exportar el HTML, los archivos subidos quedan como enlaces a `/media/...` (falta incrustarlos o publicarlos junto al informe)
+- [x] Al recargar la página vuelve al informe, pestaña del editor, sección abierta y pestaña/posición de la vista previa; los cambios sin guardar se conservan como borrador en el navegador

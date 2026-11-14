@@ -2,6 +2,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank } from './SchemaForm'
 import { api, type Json, type ReportRow, type Version } from './api'
 
+const LS = {
+  get<T>(k: string, def: T): T { try { const v = localStorage.getItem('rs.' + k); return v === null ? def : JSON.parse(v) } catch { return def } },
+  set(k: string, v: unknown) { try { localStorage.setItem('rs.' + k, JSON.stringify(v)) } catch { /* sin almacenamiento */ } },
+  del(k: string) { try { localStorage.removeItem('rs.' + k) } catch { /* sin almacenamiento */ } },
+}
+type Prev = { tab: string; sub: (string | null)[]; y: number }
+const restoreJs = (p: Prev) => `<script>addEventListener('load',function(){setTimeout(function(){var g=document.getElementById('iGo');if(g)g.click();var t=document.querySelector('.tab[data-t="${p.tab}"]');if(t)t.click();${JSON.stringify(p.sub)}.forEach(function(s){var b=document.querySelector('.sbtn[data-s="'+s+'"]');if(b)b.click()});setTimeout(function(){scrollTo(0,${p.y})},200)},120)})</script>`
+const readPrev = (doc?: Document | null): Prev | null => {
+  const a = doc?.querySelector('.tab.active'); if (!doc || !a || doc.getElementById('intro')?.getBoundingClientRect().height) return null
+  return { tab: a.getAttribute('data-t') || 'inicio', sub: Array.from(doc.querySelectorAll('.sbtn.on')).map(b => b.getAttribute('data-s')), y: doc.scrollingElement?.scrollTop || 0 }
+}
+
 type Tab = 'general' | 'secciones' | 'alertas' | 'json' | 'versiones'
 const TABS: [Tab, string][] = [['general', 'General'], ['secciones', 'Secciones'], ['alertas', 'Alertas'], ['json', 'JSON'], ['versiones', 'Versiones']]
 
@@ -11,7 +23,8 @@ function General({ d, set }: { d: Json; set: (d: Json) => void }) {
 
 function Secciones({ d, set }: { d: Json; set: (d: Json) => void }) {
   const secs: Json[] = d.sections
-  const [open, setOpen] = useState<number | null>(null)
+  const [open, setOpenS] = useState<number | null>(() => LS.get('sec', null))
+  const setOpen = (v: number | null) => { setOpenS(v); LS.set('sec', v) }
   const put = (i: number, s: Json) => set({ ...d, sections: secs.map((x, k) => (k === i ? s : x)) })
   const move = (i: number, dx: number) => {
     const a = [...secs]; const j = i + dx
@@ -73,7 +86,8 @@ export default function App() {
   const [id, setId] = useState<number | null>(null)
   const [d, setD] = useState<Json | null>(null)
   const [saved, setSaved] = useState('')
-  const [tab, setTab] = useState<Tab>('general')
+  const [tab, setTabS] = useState<Tab>(() => LS.get<Tab>('tab', 'general'))
+  const setTab = (k: Tab) => { setTabS(k); LS.set('tab', k) }
   const [issues, setIssues] = useState<string[]>([])
   const [html, setHtml] = useState('')
   const [msg, setMsg] = useState('')
@@ -86,10 +100,24 @@ export default function App() {
 
   const refresh = useCallback(() => api.list().then(setRows), [])
   useEffect(() => { refresh() }, [refresh])
+  useEffect(() => { const i = setInterval(() => { const p = readPrev(frame.current?.contentDocument); if (p) LS.set('prev', p) }, 1000); return () => clearInterval(i) }, [])
+  useEffect(() => {  // al recargar, volver al informe que se estaba editando (con su borrador si lo había)
+    const rid = LS.get<number | null>('id', null)
+    if (rid === null) return
+    api.get(rid).then(r => {
+      const draft = LS.get<Json | null>('draft.' + rid, null)
+      setId(rid); setSaved(JSON.stringify(r.data))
+      if (draft) { setD(draft); setMsg('Borrador sin guardar recuperado') } else setD(r.data)
+    }).catch(() => LS.del('id'))
+  }, [])
+  useEffect(() => {  // guarda el borrador mientras haya cambios sin guardar
+    if (id === null || d === null) return
+    if (dirty) LS.set('draft.' + id, d); else LS.del('draft.' + id)
+  }, [d, id, dirty])
 
   const open = useCallback(async (rid: number) => {
     if (dirty && !confirm('Hay cambios sin guardar. ¿Descartarlos?')) return
-    const r = await api.get(rid); setId(rid); setD(r.data); setSaved(JSON.stringify(r.data)); setMsg(''); setVk(k => k + 1)
+    const r = await api.get(rid); setId(rid); LS.set('id', rid); LS.del('prev'); seen.current = false; setD(LS.get<Json | null>('draft.' + rid, null) ?? r.data); setSaved(JSON.stringify(r.data)); setMsg(''); setVk(k => k + 1)
   }, [dirty])
 
   useEffect(() => {  // vista previa en vivo con retraso
@@ -101,13 +129,8 @@ export default function App() {
       if (v.ok) {
         let h = await api.render(d).catch(() => '')
         const doc = frame.current?.contentDocument
-        if (h && seen.current && doc) {  // conservar pestaña y posición: saltar la portada
-          const tab = doc.querySelector('.tab.active')?.getAttribute('data-t') || 'inicio'
-          const sub = Array.from(doc.querySelectorAll('.sbtn.on')).map(b => b.getAttribute('data-s'))
-          const y = doc.scrollingElement?.scrollTop || 0
-          const js = `<script>addEventListener('load',function(){setTimeout(function(){var g=document.getElementById('iGo');if(g)g.click();var t=document.querySelector('.tab[data-t="${tab}"]');if(t)t.click();${JSON.stringify(sub)}.forEach(function(s){var b=document.querySelector('.sbtn[data-s="'+s+'"]');if(b)b.click()});setTimeout(function(){scrollTo(0,${y})},150)},120)})</script>`
-          h = h.replace('</body>', js + '</body>')
-        }
+        const prev = (seen.current ? readPrev(doc) : null) || LS.get<Prev | null>('prev', null)
+        if (h && prev) h = h.replace('</body>', restoreJs(prev) + '</body>')
         seen.current = true
         setHtml(h)
       }
@@ -124,11 +147,11 @@ export default function App() {
   const create = async () => {
     if (!d) { alert('Importa un JSON para crear el primer informe; luego podrás duplicarlo.'); return }
     const copy = JSON.parse(JSON.stringify(d))
-    const r = await api.create(copy, 'Copia'); await refresh(); setId(r.id); setD(r.data); setSaved(JSON.stringify(r.data))
+    const r = await api.create(copy, 'Copia'); await refresh(); setId(r.id); LS.set('id', r.id); setD(r.data); setSaved(JSON.stringify(r.data))
   }
   const remove = async () => {
     if (id === null || !confirm('¿Eliminar este informe y todas sus versiones?')) return
-    await api.remove(id); setId(null); setD(null); refresh()
+    await api.remove(id); LS.del('id'); LS.del('draft.' + id); LS.del('prev'); setId(null); setD(null); refresh()
   }
 
   return <div className="app">
