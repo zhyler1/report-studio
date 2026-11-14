@@ -74,3 +74,12 @@ def test_pdf_ok_or_clear_error(c):
     assert r.status_code in (200, 503)
     if r.status_code == 200:
         assert r.content[:4] == b"%PDF"
+
+
+def test_media_upload(c, tmp_path, monkeypatch):
+    import app.api as api
+    monkeypatch.setattr(api, "MEDIA_DIR", tmp_path)
+    r = c.post("/api/media", files={"file": ("a.mp3", b"ID3xxxx", "audio/mpeg")})
+    assert r.status_code == 200 and r.json()["url"].endswith(".mp3")
+    assert (tmp_path / r.json()["name"]).read_bytes() == b"ID3xxxx"
+    assert c.post("/api/media", files={"file": ("a.exe", b"MZ", "application/octet-stream")}).status_code == 415

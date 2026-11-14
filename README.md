@@ -55,3 +55,9 @@ Desarrollo: `cd backend && uvicorn app.api:app --reload` (documentación en `/do
 
 Uso: `cd frontend && npm install && npm run build`; después el servidor (`cd backend && python -m uvicorn app.api:app`) sirve la interfaz en http://localhost:8000.
 Desarrollo con recarga: `npm run dev` (puerto 5173, redirige /api al 8000).
+
+### Hito 3, parte 2: control total desde formularios
+- [x] Formularios generados desde el esquema (`frontend/src/SchemaForm.tsx`): cualquier bloque, tarjeta, tabla, calendario, presupuesto, plantas... se edita sin JSON; también agregar, duplicar, mover y borrar bloques y secciones
+- [x] Subida de imagen, audio y video (`POST /api/media`, se guardan en `data/media` y se sirven en `/media`)
+- [x] La vista previa conserva la pestaña donde estás al editar
+- [ ] Pendiente: al exportar el HTML, los archivos subidos quedan como enlaces a `/media/...` (falta incrustarlos o publicarlos junto al informe)

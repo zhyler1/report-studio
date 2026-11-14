@@ -20,3 +20,8 @@ textarea{min-height:70px;resize:vertical}label{display:block;font-size:12px;font
 .json{font-family:ui-monospace,Menlo,monospace;font-size:12px;min-height:60vh;white-space:pre}
 table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
 .empty{display:grid;place-items:center;height:100vh;color:var(--mut)}
+
+.sub-card{border:1px solid var(--line);border-radius:10px;margin:6px 0;background:#FAFAFB}.sub-head{display:flex;gap:4px;align-items:center;padding:6px 8px;font-size:13px}
+.sub-head button{padding:2px 8px}.sub-body{padding:4px 12px 12px;border-top:1px solid var(--line)}.obj{border-left:3px solid #E4E7EC;padding-left:10px;margin-top:4px}
+.chips{display:flex;gap:10px;flex-wrap:wrap}.chip{font-weight:500;color:var(--ink);margin:0;display:flex;gap:4px;align-items:center}
+.upl{border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer;background:#fff;margin:0;color:var(--ink);white-space:nowrap}

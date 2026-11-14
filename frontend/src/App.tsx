@@ -1,38 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { MetaForm, SectionForm, Defs, blank } from './SchemaForm'
 import { api, type Json, type ReportRow, type Version } from './api'
 
 type Tab = 'general' | 'secciones' | 'alertas' | 'json' | 'versiones'
 const TABS: [Tab, string][] = [['general', 'General'], ['secciones', 'Secciones'], ['alertas', 'Alertas'], ['json', 'JSON'], ['versiones', 'Versiones']]
 
-function Field({ label, value, onChange, area }: { label: string; value: string; onChange: (v: string) => void; area?: boolean }) {
-  return <div><label>{label}</label>{area ? <textarea value={value ?? ''} onChange={e => onChange(e.target.value)} /> : <input value={value ?? ''} onChange={e => onChange(e.target.value)} />}</div>
-}
-
 function General({ d, set }: { d: Json; set: (d: Json) => void }) {
-  const m = d.meta, t = m.theme
-  const sm = (k: string) => (v: any) => set({ ...d, meta: { ...m, [k]: v } })
-  const st = (k: string) => (v: any) => set({ ...d, meta: { ...m, theme: { ...t, [k]: v } } })
-  return <>
-    <div className="card"><b>Encabezado y portada</b>
-      <div className="grid2"><Field label="Título" value={m.title} onChange={sm('title')} /><Field label="Subtítulo (dependencia)" value={m.subtitle} onChange={sm('subtitle')} />
-        <Field label="Entidad" value={m.org} onChange={sm('org')} /><Field label="Cargo de quien firma" value={m.boss_role} onChange={sm('boss_role')} /></div>
-      <Field label="Nombre de quien firma" value={m.boss} onChange={sm('boss')} />
-      <Field label="Línea bajo el título" value={m.tagline} onChange={sm('tagline')} />
-      <Field label="Pie de página" value={m.footer} onChange={sm('footer')} /></div>
-    <div className="card"><b>Inicio</b>
-      <Field label="Rótulo superior" value={m.hero_kicker} onChange={sm('hero_kicker')} />
-      <Field label="Título del inicio" value={m.hero_title} onChange={sm('hero_title')} />
-      <Field label="Texto" value={m.hero_text} onChange={sm('hero_text')} area />
-      <Field label="Enlace para el QR (dirección donde publicarás el informe)" value={m.share_url} onChange={sm('share_url')} />
-      <label><input type="checkbox" style={{ width: 'auto' }} checked={!!m.show_alerts} onChange={e => sm('show_alerts')(e.target.checked)} /> Mostrar la pestaña y tarjeta de Alertas</label></div>
-    <div className="card"><b>Apariencia</b>
-      <div className="grid2"><div><label>Tema inicial</label><select value={t.default} onChange={e => st('default')(e.target.value)}><option value="light">Claro</option><option value="dark">Oscuro</option></select></div>
-        <div><label>Portada</label><select value={t.cover} onChange={e => st('cover')(e.target.value)}><option value="foto">Con foto</option><option value="clasica">Clásica</option></select></div></div>
-      <Field label="Palabra animada de la portada" value={t.intro_word} onChange={st('intro_word')} />
-      <Field label="Logo (fondo oscuro)" value={t.logo_dark} onChange={st('logo_dark')} />
-      <Field label="Logo (fondo claro)" value={t.logo_light} onChange={st('logo_light')} />
-      <Field label="Foto del palacio (dirección)" value={t.palace_url} onChange={st('palace_url')} /></div>
-  </>
+  return <div className="card"><MetaForm meta={d.meta} set={m => set({ ...d, meta: m })} /></div>
 }
 
 function Secciones({ d, set }: { d: Json; set: (d: Json) => void }) {
@@ -44,17 +18,20 @@ function Secciones({ d, set }: { d: Json; set: (d: Json) => void }) {
     if (j < 0 || j >= a.length) return
     ;[a[i], a[j]] = [a[j], a[i]]; set({ ...d, sections: a })
   }
-  return <>{secs.map((s, i) => <div className="card" key={s.id}>
+  const add = () => {
+    const id = (prompt('Identificador corto de la sección (sin espacios ni tildes, por ejemplo "juridica")') || '').trim()
+    if (!id) return
+    const s = blank(Defs.current.Section); s.id = id; s.label = id; s.title = id
+    set({ ...d, sections: [...secs, s] }); setOpen(secs.length)
+  }
+  return <>{secs.map((s, i) => <div className="card" key={i}>
     <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
       <b style={{ flex: 1 }}>{s.label} <span className="mut">· {s.id}{s.hidden ? ' · oculta' : ''}</span></b>
       <button onClick={() => move(i, -1)} aria-label="Subir">↑</button><button onClick={() => move(i, 1)} aria-label="Bajar">↓</button>
-      <button onClick={() => setOpen(open === i ? null : i)}>{open === i ? 'Cerrar' : 'Editar'}</button></div>
-    {open === i && <>
-      <div className="grid2"><Field label="Texto de la pestaña" value={s.label} onChange={v => put(i, { ...s, label: v })} /><Field label="Título" value={s.title} onChange={v => put(i, { ...s, title: v })} /></div>
-      <Field label="Subtítulo" value={s.subtitle} onChange={v => put(i, { ...s, subtitle: v })} />
-      <label><input type="checkbox" style={{ width: 'auto' }} checked={!!s.hidden} onChange={e => put(i, { ...s, hidden: e.target.checked })} /> Ocultar esta sección</label>
-      <p className="mut">El contenido de la sección ({s.tabs?.length ? `${s.tabs.length} pestañas` : `${s.blocks?.length || 0} bloques`}) se edita por ahora en la pestaña JSON; los formularios por bloque vienen enseguida.</p></>}
-  </div>)}</>
+      <button onClick={() => setOpen(open === i ? null : i)}>{open === i ? 'Cerrar' : 'Editar'}</button>
+      <button className="danger" onClick={() => confirm(`¿Eliminar la sección «${s.label}» con todo su contenido?`) && set({ ...d, sections: secs.filter((_, k) => k !== i) })}>✕</button></div>
+    {open === i && <SectionForm section={s} set={v => put(i, v)} />}
+  </div>)}<button className="pri" onClick={add}>+ Agregar sección</button></>
 }
 
 function Alertas({ d, set }: { d: Json; set: (d: Json) => void }) {
@@ -101,6 +78,10 @@ export default function App() {
   const [html, setHtml] = useState('')
   const [msg, setMsg] = useState('')
   const [vk, setVk] = useState(0)
+  const [ready, setReady] = useState(false)
+  const frame = useRef<HTMLIFrameElement>(null)
+  const seen = useRef(false)
+  useEffect(() => { api.schema().then(s => { Defs.current = s.$defs; setReady(true) }) }, [])
   const dirty = useMemo(() => d !== null && JSON.stringify(d) !== saved, [d, saved])
 
   const refresh = useCallback(() => api.list().then(setRows), [])
@@ -117,7 +98,19 @@ export default function App() {
       const v = await api.validate(d).catch(() => null)
       if (!v) return
       setIssues(v.issues)
-      if (v.ok) setHtml(await api.render(d).catch(() => ''))
+      if (v.ok) {
+        let h = await api.render(d).catch(() => '')
+        const doc = frame.current?.contentDocument
+        if (h && seen.current && doc) {  // conservar pestaña y posición: saltar la portada
+          const tab = doc.querySelector('.tab.active')?.getAttribute('data-t') || 'inicio'
+          const sub = Array.from(doc.querySelectorAll('.sbtn.on')).map(b => b.getAttribute('data-s'))
+          const y = doc.scrollingElement?.scrollTop || 0
+          const js = `<script>addEventListener('load',function(){setTimeout(function(){var g=document.getElementById('iGo');if(g)g.click();var t=document.querySelector('.tab[data-t="${tab}"]');if(t)t.click();${JSON.stringify(sub)}.forEach(function(s){var b=document.querySelector('.sbtn[data-s="'+s+'"]');if(b)b.click()});setTimeout(function(){scrollTo(0,${y})},150)},120)})</script>`
+          h = h.replace('</body>', js + '</body>')
+        }
+        seen.current = true
+        setHtml(h)
+      }
     }, 700)
     return () => clearTimeout(t)
   }, [d])
@@ -149,7 +142,7 @@ export default function App() {
       {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={() => open(r.id)}>{r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
       {!rows.length && <p className="mut">Aún no hay informes. Importa el JSON del seed para empezar.</p>}
     </aside>
-    {d && id !== null ? <div className="main">
+    {ready && d && id !== null ? <div className="main">
       <div className="edit">
         <div className="bar"><button className="pri" disabled={!dirty || issues.length > 0} onClick={save}>Guardar</button>
           <a href={`/api/reports/${id}/export.html`}><button>HTML</button></a><a href={`/api/reports/${id}/export.pdf`}><button>PDF</button></a>
@@ -163,7 +156,7 @@ export default function App() {
         {tab === 'json' && <JsonEditor d={d} set={setD} />}
         {tab === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}
       </div>
-      <div className="prev"><iframe title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
+      <div className="prev"><iframe ref={frame} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
     </div> : <div className="empty">Elige un informe de la izquierda o importa uno.</div>}
   </div>
 }

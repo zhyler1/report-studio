@@ -6,10 +6,12 @@
 from __future__ import annotations
 
 import io
+import os
+import uuid
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, Query
+from fastapi import APIRouter, Body, Depends, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pydantic import BaseModel
@@ -154,6 +156,24 @@ def export_pdf(rid: int, s: Store = Depends(get_store)):
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="informe-{rid}.pdf"'})
 
 
+MEDIA_DIR = Path(os.environ.get("RS_MEDIA", "data/media"))
+OK_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".mp4", ".webm", ".mov", ".mp3", ".wav", ".m4a", ".ogg"}
+
+
+@router.post("/media")
+async def upload(file: UploadFile = File(...)):
+    ext = Path(file.filename or "").suffix.lower()
+    if ext not in OK_EXT:
+        raise HTTPException(415, f"Formato no permitido: {ext or 'sin extensión'}")
+    data = await file.read()
+    if len(data) > 200 * 1024 * 1024:
+        raise HTTPException(413, "El archivo supera 200 MB")
+    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+    name = f"{uuid.uuid4().hex[:12]}{ext}"
+    (MEDIA_DIR / name).write_bytes(data)
+    return {"url": f"/media/{name}", "name": name, "size": len(data)}
+
+
 @router.get("/qr.svg")
 def qr(url: str = Query(..., max_length=500)):
     import qrcode
@@ -172,6 +192,8 @@ def create_app() -> FastAPI:
     def health():
         return JSONResponse({"ok": True})
 
+    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+    app.mount("/media", StaticFiles(directory=MEDIA_DIR), name="media")
     dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
     if dist.is_dir():  # la interfaz compilada se sirve desde el mismo servidor
         app.mount("/", StaticFiles(directory=dist, html=True), name="ui")

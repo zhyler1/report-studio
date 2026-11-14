@@ -24,5 +24,7 @@ export const api = {
   versions: (id: number): Promise<Version[]> => req(`/api/reports/${id}/versions`).then(r => r.json()),
   restore: (id: number, n: number) => req(`/api/reports/${id}/versions/${n}/restore`, { method: 'POST' }).then(r => r.json()),
   validate: (data: Json): Promise<{ ok: boolean; issues: string[] }> => req('/api/validate', J(data)).then(r => r.json()),
+  schema: (): Promise<Json> => req('/api/schema').then(r => r.json()),
+  upload: (f: File): Promise<{ url: string }> => { const fd = new FormData(); fd.append('file', f); return req('/api/media', { method: 'POST', body: fd }).then(r => r.json()) },
   render: (data: Json): Promise<string> => req('/api/render', J(data)).then(r => r.text()),
 }
