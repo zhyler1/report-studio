@@ -288,20 +288,55 @@ class Proposals(BlockBase):
     velitas_note: str = ""
 
 
+ChartKind = Literal[
+    "bar", "hbar", "stacked", "stacked100", "line", "area", "stacked_area", "combo", "lollipop",
+    "pie", "donut", "radialbar", "gauge", "bullet", "radar", "scatter", "bubble", "waterfall", "funnel",
+    "candles", "heatmap", "treemap", "timeline", "gantt"]
+
+
+class Point(Base):
+    x: float
+    y: float
+    r: float = 0          # tamaño (solo burbujas)
+    label: str = ""
+
+
 class Series(Base):
     name: str
-    values: list[float]
+    values: list[float] = []
     color: Color = "auto"
+    kind: Optional[Literal["bar", "line"]] = None   # solo en «combinado»
+    points: list[Point] = []                         # dispersión y burbujas
+    ohlc: list[list[float]] = []                     # velas: [apertura, máximo, mínimo, cierre] por etiqueta
+
+
+class Event(Base):
+    label: str
+    start: str                  # AAAA-MM-DD
+    end: str = ""               # vacío = hito de un solo día
+    text: str = ""
+    color: Color = "auto"
+    done: Optional[float] = None   # avance 0-100 (cronograma)
 
 
 class Chart(BlockBase):
-    """Gráficos de cualquier tipo (aún sin dibujar; el esquema ya los admite)."""
+    """Gráficos de todo tipo, dibujados en SVG dentro del informe."""
     type: Literal["chart"] = "chart"
-    kind: Literal["bar", "line", "area", "pie", "donut", "radar", "gauge", "stacked", "candles"]
+    kind: ChartKind
     labels: list[str] = []
     series: list[Series] = []
+    events: list[Event] = []                 # línea de tiempo y cronograma
     unit: str = ""
-    projection_from: Optional[int] = None   # índice desde el cual los valores son proyección
+    target: list[float] = []                 # metas (bullet) o meta única
+    max: Optional[float] = None              # tope del medidor / anillos
+    totals: list[int] = []                   # cascada: índices de etiquetas que son totales
+    forecast: int = 0                        # periodos a proyectar con tendencia lineal
+    forecast_labels: list[str] = []
+    projection_from: Optional[int] = None    # desde este índice los datos son proyección (línea punteada)
+    height: int = 320
+    show_legend: bool = True
+    show_values: bool = True
+    caption: str = ""
 
 
 class MediaBlock(BlockBase):

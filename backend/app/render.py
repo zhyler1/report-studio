@@ -304,8 +304,10 @@ def r_proposals(b: Proposals, ctx: Ctx) -> str:
 
 
 def r_chart(b: Chart, ctx: Ctx) -> str:
-    t = f"<h3>{esc(b.title)}</h3>" if b.title else ""
-    return f'<div class="card" data-r>{t}<p class="muted">Gráfico «{esc(b.kind)}»: el dibujo llega en el hito siguiente.</p></div>'
+    spec = b.model_dump(mode="json", exclude={"id", "title", "hidden", "type", "caption"})
+    h = f"<h3>{esc(b.title)}</h3>" if b.title else ""
+    cap = f'<p class="cap">{esc(b.caption)}</p>' if b.caption else ""
+    return f'<div class="card chart-card" data-r>{h}<div class="rs-chart" data-spec="{attr(json.dumps(spec, ensure_ascii=False, separators=(",", ":")))}"></div>{cap}</div>'
 
 
 def r_media(b: MediaBlock, ctx: Ctx) -> str:
@@ -459,6 +461,10 @@ def hours_text(w: Workflow | None) -> str:
     return f"Suma de la columna HORA: {t} h" + (f" (sin dato en los pasos {' y '.join(map(str, sin))})" if sin else "")
 
 
+def _has_chart(rep: Report) -> bool:
+    return any(isinstance(b, Chart) and not b.hidden for s in rep.sections for b in _blocks(s))
+
+
 def render(rep: Report) -> str:
     m = rep.meta
     ctx = Ctx(rep)
@@ -482,6 +488,10 @@ def render(rep: Report) -> str:
     out = out.replace("@@TABS@@", tabs).replace("@@PANELS@@", panels)
     for name, v in js_data(rep).items():
         out = re.sub(r"/\*@%s\*/.*?/\*@/%s\*/" % (name, name), lambda _m, n=name, j=_json(v): f"/*@{n}*/{j}/*@/{n}*/", out, flags=re.S)
+    if _has_chart(rep):  # el motor de gráficos solo viaja si el informe los usa
+        tpl = SHELL.parent
+        out = out.replace("</head>", "<style>" + (tpl / "charts.css").read_text(encoding="utf-8") + "</style></head>", 1)
+        out = out.replace("</body>", "<script>" + (tpl / "charts.js").read_text(encoding="utf-8").replace("</", "<\\/") + "</script></body>", 1)
     left = re.findall(r"@@[A-Z_]+@@", out)
     assert not left, f"marcadores sin resolver: {left}"
     return out

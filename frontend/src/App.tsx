@@ -21,10 +21,10 @@ function General({ d, set }: { d: Json; set: (d: Json) => void }) {
   return <div className="card"><MetaForm meta={d.meta} set={m => set({ ...d, meta: m })} /></div>
 }
 
-function Secciones({ d, set }: { d: Json; set: (d: Json) => void }) {
+function Secciones({ d, set, focus }: { d: Json; set: (d: Json) => void; focus: (id: string) => void }) {
   const secs: Json[] = d.sections
   const [open, setOpenS] = useState<number | null>(() => LS.get('sec', null))
-  const setOpen = (v: number | null) => { setOpenS(v); LS.set('sec', v) }
+  const setOpen = (v: number | null) => { setOpenS(v); LS.set('sec', v); if (v !== null && secs[v]) focus(secs[v].id) }
   const put = (i: number, s: Json) => set({ ...d, sections: secs.map((x, k) => (k === i ? s : x)) })
   const move = (i: number, dx: number) => {
     const a = [...secs]; const j = i + dx
@@ -138,6 +138,13 @@ export default function App() {
     return () => clearTimeout(t)
   }, [d])
 
+  const goPreview = (sid: string) => {  // llevar la vista previa a la sección que se edita
+    const doc = frame.current?.contentDocument
+    if (!doc) return
+    const g = doc.getElementById('iGo') as HTMLElement | null
+    if (g && doc.getElementById('intro')?.getBoundingClientRect().height) g.click()
+    ;(doc.querySelector(`.tab[data-t="${sid}"]`) as HTMLElement | null)?.click()
+  }
   const save = async () => {
     if (!d || id === null) return
     const note = prompt('¿Qué cambió? (opcional)') ?? ''
@@ -174,7 +181,7 @@ export default function App() {
         {issues.length > 0 && <div className="issues"><b>Corrige antes de guardar:</b><ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{issues.map((x, i) => <li key={i}>{x}</li>)}</ul></div>}
         <div className="tabs">{TABS.map(([k, l]) => <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}</div>
         {tab === 'general' && <General d={d} set={setD} />}
-        {tab === 'secciones' && <Secciones d={d} set={setD} />}
+        {tab === 'secciones' && <Secciones d={d} set={setD} focus={goPreview} />}
         {tab === 'alertas' && <Alertas d={d} set={setD} />}
         {tab === 'json' && <JsonEditor d={d} set={setD} />}
         {tab === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}

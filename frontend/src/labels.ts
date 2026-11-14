@@ -20,7 +20,9 @@ export const FIELD: Record<string, string> = {
   thresholds: 'Umbrales del semáforo (verde, amarillo, naranja)', times: 'Tiempos', title: 'Título', tone: 'Tono', total: 'Total', total_label: 'Rótulo del total', unit: 'Unidad',
   url: 'Dirección', vacantes: 'Vacantes', vacations: 'Filas de vacaciones', vacations_value: 'Valor de vacaciones', value: 'Valor', values: 'Valores', velitas: 'Filas de velitas',
   velitas_media: 'Imagen de velitas', velitas_note: 'Nota de velitas', velitas_title: 'Título de velitas', watch: 'Aspectos a vigilar', zoom: 'Ampliar al hacer clic',
-  provistos_: '', columns_: '',
+  forecast: 'Periodos a proyectar (tendencia lineal)', forecast_labels: 'Nombres de los periodos proyectados', events: 'Eventos', target: 'Metas (una por etiqueta)', max: 'Valor máximo de la escala',
+  totals: 'Posiciones que son totales (0 = primera)', points: 'Puntos (x, y, tamaño)', ohlc: 'Apertura, máximo, mínimo, cierre', show_legend: 'Mostrar leyenda', show_values: 'Mostrar valores', done: 'Avance (%)',
+  x: 'Valor en x', y: 'Valor en y', r: 'Tamaño',
 }
 
 export const BLOCK: Record<string, string> = {
@@ -36,8 +38,22 @@ export const OPT: Record<string, string> = {
   purple: 'Morado', navy: 'Azul oscuro', left: 'Izquierda', right: 'Derecha', center: 'Centro', text: 'Texto', money: 'Dinero', pct: 'Porcentaje', pct_bar: 'Porcentaje con barra',
   pill: 'Etiqueta', number: 'Número', image: 'Imagen', video: 'Video', audio: 'Audio', checks: 'Con vistos', plain: 'Viñetas', warn: 'Advertencia', violet: 'Violeta',
   ejecutado: 'Ejecutado', proceso: 'En proceso', espera: 'En espera', vacations: 'Vacaciones', bonus: 'Bonificación', ancheta: 'Ancheta', velitas: 'Velitas',
-  bar: 'Barras', line: 'Líneas', area: 'Área', pie: 'Torta', donut: 'Dona', radar: 'Radar', gauge: 'Medidor', stacked: 'Barras apiladas', candles: 'Velas (bolsa)',
+  bar: 'Barras', hbar: 'Barras horizontales', stacked100: 'Barras apiladas al 100 %', stacked_area: 'Áreas apiladas', combo: 'Combinado (barras + línea)', lollipop: 'Paletas',
+  radialbar: 'Anillos concéntricos', bullet: 'Avance frente a meta', scatter: 'Dispersión', bubble: 'Burbujas', waterfall: 'Cascada', funnel: 'Embudo', heatmap: 'Mapa de calor',
+  treemap: 'Mapa de árbol', timeline: 'Línea de tiempo', gantt: 'Cronograma (Gantt)',
+  line: 'Líneas', area: 'Área', pie: 'Torta', donut: 'Dona', radar: 'Radar', gauge: 'Medidor', stacked: 'Barras apiladas', candles: 'Velas (bolsa)',
 }
 
 export const LONG = new Set(['text', 'summary', 'teaser', 'note', 'hero_text', 'caption', 'velitas_note', 'logro', 'tagline', 'evidence', 'other', 'times'])
 export const label = (k: string) => FIELD[k] || k.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase())
+
+const CART = ['bar', 'hbar', 'stacked', 'stacked100', 'line', 'area', 'stacked_area', 'combo', 'lollipop']
+const COMMON = ['kind', 'title', 'caption', 'unit', 'height', 'show_legend', 'show_values', 'id', 'hidden']
+export const CHART_FIELDS: Record<string, string[]> = {
+  ...Object.fromEntries(CART.map(k => [k, [...COMMON, 'labels', 'series', ...(['bar', 'line', 'area', 'combo', 'lollipop'].includes(k) ? ['forecast', 'forecast_labels', 'projection_from'] : [])]])),
+  pie: [...COMMON, 'labels', 'series'], donut: [...COMMON, 'labels', 'series'], treemap: [...COMMON, 'labels', 'series'], funnel: [...COMMON, 'labels', 'series'],
+  radialbar: [...COMMON, 'labels', 'series', 'max'], gauge: [...COMMON, 'series', 'max'], bullet: [...COMMON, 'labels', 'series', 'target', 'max'], radar: [...COMMON, 'labels', 'series', 'max'],
+  scatter: [...COMMON, 'series'], bubble: [...COMMON, 'series'], waterfall: [...COMMON, 'labels', 'series', 'totals'], candles: [...COMMON, 'labels', 'series'],
+  heatmap: [...COMMON, 'labels', 'series'], timeline: [...COMMON, 'events'], gantt: [...COMMON, 'events'],
+}
+export const SERIES_FIELDS = (kind: string) => ['name', 'color', ...(kind === 'combo' ? ['kind'] : []), ...(kind === 'scatter' || kind === 'bubble' ? ['points'] : kind === 'candles' ? ['ohlc'] : ['values'])]

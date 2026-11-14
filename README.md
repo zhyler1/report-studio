@@ -62,3 +62,12 @@ Desarrollo con recarga: `npm run dev` (puerto 5173, redirige /api al 8000).
 - [x] La vista previa conserva la pestaña donde estás al editar
 - [ ] Pendiente: al exportar el HTML, los archivos subidos quedan como enlaces a `/media/...` (falta incrustarlos o publicarlos junto al informe)
 - [x] Al recargar la página vuelve al informe, pestaña del editor, sección abierta y pestaña/posición de la vista previa; los cambios sin guardar se conservan como borrador en el navegador
+
+### Hito 4: gráficos
+- [x] 24 tipos dibujados en SVG dentro del informe (`backend/app/templates/charts.js`): barras, barras horizontales, apiladas, apiladas al 100 %, líneas, áreas, áreas apiladas, combinado, paletas, torta, dona, anillos concéntricos, medidor, avance frente a meta, radar, dispersión, burbujas, cascada, embudo, velas, mapa de calor, mapa de árbol, línea de tiempo y cronograma
+- [x] Proyección por tendencia lineal con banda de confianza (`forecast`) o datos proyectados propios (`projection_from`)
+- [x] Información al pasar el cursor, leyenda que oculta series, animación solo la primera vez, tema claro y oscuro, impresión sin animaciones
+- [x] Formularios que muestran solo los campos de cada tipo y botón «Pegar datos desde Excel»
+- [x] La vista previa salta a la sección que se está editando
+- [x] Galería de ejemplo: `python3 scripts/make_charts_demo.py` genera `seed/charts_demo.json` (importarlo desde la interfaz)
+- El motor solo se incluye en el HTML si el informe tiene gráficos

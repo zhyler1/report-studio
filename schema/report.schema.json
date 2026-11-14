@@ -469,7 +469,7 @@
   },
   "Chart": {
    "additionalProperties": false,
-   "description": "Gráficos de cualquier tipo (aún sin dibujar; el esquema ya los admite).",
+   "description": "Gráficos de todo tipo, dibujados en SVG dentro del informe.",
    "properties": {
     "id": {
      "anyOf": [
@@ -509,14 +509,29 @@
     "kind": {
      "enum": [
       "bar",
+      "hbar",
+      "stacked",
+      "stacked100",
       "line",
       "area",
+      "stacked_area",
+      "combo",
+      "lollipop",
       "pie",
       "donut",
-      "radar",
+      "radialbar",
       "gauge",
-      "stacked",
-      "candles"
+      "bullet",
+      "radar",
+      "scatter",
+      "bubble",
+      "waterfall",
+      "funnel",
+      "candles",
+      "heatmap",
+      "treemap",
+      "timeline",
+      "gantt"
      ],
      "title": "Kind",
      "type": "string"
@@ -537,10 +552,59 @@
      "title": "Series",
      "type": "array"
     },
+    "events": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Event"
+     },
+     "title": "Events",
+     "type": "array"
+    },
     "unit": {
      "default": "",
      "title": "Unit",
      "type": "string"
+    },
+    "target": {
+     "default": [],
+     "items": {
+      "type": "number"
+     },
+     "title": "Target",
+     "type": "array"
+    },
+    "max": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Max"
+    },
+    "totals": {
+     "default": [],
+     "items": {
+      "type": "integer"
+     },
+     "title": "Totals",
+     "type": "array"
+    },
+    "forecast": {
+     "default": 0,
+     "title": "Forecast",
+     "type": "integer"
+    },
+    "forecast_labels": {
+     "default": [],
+     "items": {
+      "type": "string"
+     },
+     "title": "Forecast Labels",
+     "type": "array"
     },
     "projection_from": {
      "anyOf": [
@@ -553,6 +617,26 @@
      ],
      "default": null,
      "title": "Projection From"
+    },
+    "height": {
+     "default": 320,
+     "title": "Height",
+     "type": "integer"
+    },
+    "show_legend": {
+     "default": true,
+     "title": "Show Legend",
+     "type": "boolean"
+    },
+    "show_values": {
+     "default": true,
+     "title": "Show Values",
+     "type": "boolean"
+    },
+    "caption": {
+     "default": "",
+     "title": "Caption",
+     "type": "string"
     }
    },
    "required": [
@@ -601,6 +685,62 @@
     "label"
    ],
    "title": "Column",
+   "type": "object"
+  },
+  "Event": {
+   "additionalProperties": false,
+   "properties": {
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "start": {
+     "title": "Start",
+     "type": "string"
+    },
+    "end": {
+     "default": "",
+     "title": "End",
+     "type": "string"
+    },
+    "text": {
+     "default": "",
+     "title": "Text",
+     "type": "string"
+    },
+    "color": {
+     "default": "auto",
+     "enum": [
+      "auto",
+      "blue",
+      "red",
+      "green",
+      "orange",
+      "yellow",
+      "purple",
+      "navy"
+     ],
+     "title": "Color",
+     "type": "string"
+    },
+    "done": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Done"
+    }
+   },
+   "required": [
+    "label",
+    "start"
+   ],
+   "title": "Event",
    "type": "object"
   },
   "Gallery": {
@@ -1454,6 +1594,35 @@
    "title": "Plants",
    "type": "object"
   },
+  "Point": {
+   "additionalProperties": false,
+   "properties": {
+    "x": {
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "title": "Y",
+     "type": "number"
+    },
+    "r": {
+     "default": 0,
+     "title": "R",
+     "type": "number"
+    },
+    "label": {
+     "default": "",
+     "title": "Label",
+     "type": "string"
+    }
+   },
+   "required": [
+    "x",
+    "y"
+   ],
+   "title": "Point",
+   "type": "object"
+  },
   "Proposals": {
    "additionalProperties": false,
    "description": "Cotizaciones de Bienestar (vacaciones, bonos, anchetas, velitas).",
@@ -2002,6 +2171,7 @@
      "type": "string"
     },
     "values": {
+     "default": [],
      "items": {
       "type": "number"
      },
@@ -2022,11 +2192,45 @@
      ],
      "title": "Color",
      "type": "string"
+    },
+    "kind": {
+     "anyOf": [
+      {
+       "enum": [
+        "bar",
+        "line"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Kind"
+    },
+    "points": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Point"
+     },
+     "title": "Points",
+     "type": "array"
+    },
+    "ohlc": {
+     "default": [],
+     "items": {
+      "items": {
+       "type": "number"
+      },
+      "type": "array"
+     },
+     "title": "Ohlc",
+     "type": "array"
     }
    },
    "required": [
-    "name",
-    "values"
+    "name"
    ],
    "title": "Series",
    "type": "object"

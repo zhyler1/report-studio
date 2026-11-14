@@ -1,0 +1,2253 @@
+{
+ "schema_version": "1.0",
+ "meta": {
+  "title": "Seguimiento Interno",
+  "subtitle": "Oficina de Talento Humano",
+  "org": "Presidencia de la República",
+  "boss_role": "Jefe de Oficina",
+  "boss": "William Andrés Molina Agudelo",
+  "tagline": "Presidencia de la República · Reunión de seguimiento interno",
+  "hero_kicker": "OFICINA DE TALENTO HUMANO",
+  "hero_title": "Reporte de gestión",
+  "hero_text": "Elija un grupo para ver su información.",
+  "footer": "www.presidencia.gov.co",
+  "share_url": "https://claude.ai/artifact/3GFU61QtVkG6EUTy4Nv5ph",
+  "theme": {
+   "default": "light",
+   "cover": "foto",
+   "palace_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Costado2_Casa_de_Nari%C3%B1o.jpg?width=1600",
+   "logo_dark": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/LOGO%20BLANCO.png",
+   "logo_light": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/LOGO%20COLOR.png",
+   "intro_word": "Presentación"
+  },
+  "show_alerts": false,
+  "thresholds": [
+   90,
+   80,
+   50
+  ]
+ },
+ "sections": [
+  {
+   "id": "personal",
+   "label": "Gestión de Personal",
+   "title": "GRUPO DE GESTIÓN DE PERSONAL",
+   "subtitle": "Seguimiento Ejecutivo | 14 de octubre al 11 de noviembre de 2026",
+   "icon": "people",
+   "hidden": false,
+   "home": {
+    "title": "Grupo de Gestión de Personal",
+    "columns": 3,
+    "stats": [
+     {
+      "value": 869,
+      "label": "Planta permanente",
+      "prefix": "",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": false,
+      "bind": "plants.first_total"
+     },
+     {
+      "value": 121,
+      "label": "Procesos de vinculación",
+      "prefix": "",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": false,
+      "bind": "plants.procesos"
+     },
+     {
+      "value": 60,
+      "label": "Posesiones realizadas",
+      "prefix": "",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": false,
+      "bind": "plants.posesiones"
+     }
+    ],
+    "text": "",
+    "tag": "",
+    "tag_tone": "red"
+   },
+   "blocks": [
+    {
+     "title": "Planta de Personal",
+     "hidden": false,
+     "type": "plants",
+     "plants": [
+      {
+       "label": "Planta Permanente (LNR y Carrera Administrativa)",
+       "provistos": 586,
+       "vacantes": 283
+      },
+      {
+       "label": "Planta Transitoria OCCP",
+       "provistos": 16,
+       "vacantes": 73
+      },
+      {
+       "label": "Planta Transitoria FondoPaz",
+       "provistos": 12,
+       "vacantes": 48
+      }
+     ],
+     "procesos": 121,
+     "procesos_label": "Procesos de Vinculación",
+     "posesiones": 60,
+     "posesiones_label": "Posesiones realizadas del 14 de octubre al 11 de noviembre de 2026",
+     "logro": "Se gestionaron 121 procesos de vinculación y se realizaron 60 posesiones entre el 14 de octubre y el 11 de noviembre de 2026."
+    },
+    {
+     "hidden": false,
+     "type": "grid",
+     "ratio": [
+      1.0,
+      1.0
+     ],
+     "columns": [
+      [
+       {
+        "title": "Alertas y Riesgos · Mejoras SIGEPRE",
+        "hidden": false,
+        "type": "table",
+        "columns": [
+         {
+          "key": "codigo",
+          "label": "Código",
+          "align": "left",
+          "format": "text"
+         },
+         {
+          "key": "estado",
+          "label": "Estado",
+          "align": "left",
+          "format": "pill"
+         },
+         {
+          "key": "avance",
+          "label": "Avance",
+          "align": "left",
+          "format": "pct_bar"
+         },
+         {
+          "key": "cierre",
+          "label": "Fecha de cierre",
+          "align": "left",
+          "format": "text"
+         }
+        ],
+        "rows": [
+         {
+          "codigo": "NCR-1359",
+          "estado": "Vencida",
+          "avance": 80.0,
+          "cierre": "20/11/2026"
+         },
+         {
+          "codigo": "NCR-1315",
+          "estado": "Vencida",
+          "avance": 70.0,
+          "cierre": "20/11/2026"
+         }
+        ]
+       },
+       {
+        "title": "Situación actual",
+        "hidden": false,
+        "type": "card_list",
+        "style": "plain",
+        "items": [
+         "**NCR-1359:** se cargó plan de mejoramiento, pendiente aprobación.",
+         "**NCR-1315:** Se cargó evidencias relacionadas. Pendiente aprobación",
+         "**Responsable:** José Robinson Ferrucho Ortiz"
+        ]
+       }
+      ],
+      [
+       {
+        "title": "Acciones Implementadas",
+        "hidden": false,
+        "type": "card_list",
+        "style": "checks",
+        "items": [
+         "Gestión integral de 121 procesos de vinculación.",
+         "Seguimiento permanente a las vacantes en trámite.",
+         "Gestión de acciones para cierre de las mejoras NCR-1359 y NCR-1315.",
+         "Redistribución de cargas operativas.",
+         "Apoyo temporal de cinco servidores de los Grupos de Bienestar e Historias Laborales."
+        ]
+       },
+       {
+        "hidden": false,
+        "type": "workflow",
+        "heading": "Planta transitoria",
+        "modal_title": "Planta transitoria · Flujo de trabajo de la prórroga",
+        "subtitle": "Seguimiento de actividades",
+        "teaser": "Flujo de trabajo para la prórroga de la planta transitoria.",
+        "button_label": "Ver planta transitoria ↗",
+        "link": "",
+        "steps": [
+         {
+          "n": 1,
+          "title": "Solicitar a la Oficina del Consejero Comisionado de Paz la justificación (técnica, jurídica y financiera) y el número de empleos requeridos para prorrogar la planta transitoria.",
+          "owner": "Oficina del Consejero Comisionado de Paz",
+          "status": "ejecutado",
+          "times": "No existe tacitamente información sobre tiempos,",
+          "hours": "0",
+          "other": "Se solicito via mail."
+         },
+         {
+          "n": 2,
+          "title": "Elaborar el Estudio Técnico (incluyendo mapa de procesos, organigrama y costos) para presentar ante el DAFP y MinHacienda.",
+          "owner": "Oficina de Talento Humano",
+          "status": "proceso",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo con base en la experiencia y el volumen son dos dias en este paso",
+          "hours": "17",
+          "other": ""
+         },
+         {
+          "n": 3,
+          "title": "Calcular los costos de los empleos a prorrogar en la matriz oficial del Ministerio de Hacienda.",
+          "owner": "Oficina de Talento Humano",
+          "status": "proceso",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo con base en la experiencia y el detalle de la matriz que exige Min Hacienda se estima medio día",
+          "hours": "4",
+          "other": "Matriz de Min Hacienda"
+         },
+         {
+          "n": 4,
+          "title": "Proyectar el Decreto de modificación y prórroga de la planta transitoria.",
+          "owner": "Oficina de Talento Humano",
+          "status": "proceso",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Se estima medio día (ya Existe una proyeción del decreto)",
+          "hours": "4",
+          "other": ""
+         },
+         {
+          "n": 5,
+          "title": "Proyectar la memoria justificativa del Decreto de prórroga.",
+          "owner": "Oficina de Talento Humano",
+          "status": "proceso",
+          "times": "",
+          "hours": "",
+          "other": ""
+         },
+         {
+          "n": 6,
+          "title": "Revisión de los actos administrativos y soportes documentales con el Asesor de la Secretaría Jurídica para validar antes de radicar.",
+          "owner": "Oficina de Talento Humano",
+          "status": "espera",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo con se agenda una sesión de 1.5 horas a 2 horas para revisión",
+          "hours": "2",
+          "other": "Reunión presencial"
+         },
+         {
+          "n": 7,
+          "title": "Reunión de socialización informativa sobre la prórroga de la planta transitoria con Directivos del DAPRE y Organizaciones Sindicales.",
+          "owner": "Oficina de Talento Humano",
+          "status": "espera",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo se proyecta 1 hora maximo",
+          "hours": "1",
+          "other": "Reunión presencial"
+         },
+         {
+          "n": 8,
+          "title": "Preparar la presentación (diapositivas) para la reunión de socialización con los sindicatos.",
+          "owner": "Oficina de Talento Humano",
+          "status": "espera",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo se proyecta 1 hora maximo",
+          "hours": "2",
+          "other": "Presentación"
+         },
+         {
+          "n": 9,
+          "title": "Proyectar los oficios remisorios dirigidos al DAFP y MinHacienda para la firma de la Dirección del DAPRE.",
+          "owner": "Oficina de Talento Humano",
+          "status": "proceso",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo se proyecta 1 hora maximo",
+          "hours": "0,5",
+          "other": "Escribe"
+         },
+         {
+          "n": 10,
+          "title": "Emisión de la Viabilidad Técnica por parte del DAFP tras revisar el estudio técnico y el decreto.",
+          "owner": "DAFP",
+          "status": "proceso",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo dada la premura neesitamos que la respuesta no pase de 1 semana",
+          "hours": "42",
+          "other": ""
+         },
+         {
+          "n": 11,
+          "title": "Emisión de la Viabilidad Financiera por parte del Ministerio de Hacienda tras evaluar los costos y disponibilidad de recursos.",
+          "owner": "Ministerio de Hacienda",
+          "status": "espera",
+          "times": "NO existe un tiempo estimado este proceso de respuesta de Min Hacienda lleva tiempo.",
+          "hours": "",
+          "other": ""
+         },
+         {
+          "n": 12,
+          "title": "Revisión final de viabilidades por parte de la Secretaría Jurídica y envío del Decreto para la firma del Presidente de la República.",
+          "owner": "Secretaría Jurídica del DAPRE",
+          "status": "espera",
+          "times": "NO hay existe un estimado de tiempo reglamentado. Sin embargo como ya hubo una sesión previa (punto 6) se espera sea muy rapido el envio de Juridica a Presidencia",
+          "hours": "8",
+          "other": ""
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "hidden": false,
+     "type": "agreement",
+     "heading": "Seguimiento al Acuerdo Colectivo Sectorial 2025-2027",
+     "cutoff": "Corte 12 de noviembre de 2026",
+     "avg": 81.9,
+     "color": "green",
+     "summary": "81,9 % de avance promedio en los compromisos priorizados definidos en la mesa de seguimiento ante la Procuraduría Delegada para la Salud y el Trabajo. La gestión adelantada permitió reconstruir evidencia documental, validar soportes y consolidar acciones con las entidades del sector para avanzar en el cierre de los compromisos objeto de seguimiento.",
+     "milestone_date": "26 de noviembre de 2026",
+     "milestone": [
+      "Reunión sectorial con las organizaciones sindicales.",
+      "Consolidación definitiva de evidencias.",
+      "Suscripción del acta de cumplimiento.",
+      "Presentación de resultados ante la Procuraduría Delegada para la Salud y el Trabajo."
+     ],
+     "progress": [
+      "Cumplimiento y cierre de acciones asociadas a educación formal, capacitación institucional y compensación de tiempo por actividades de formación.",
+      "Consolidación del seguimiento sectorial a los procesos de formalización laboral.",
+      "Desarrollo de mesas técnicas para la actualización del Sistema Propio de Evaluación del Desempeño Laboral.",
+      "Articulación entre el DAPRE y las entidades del sector para la validación de evidencias y cumplimiento de compromisos priorizados."
+     ],
+     "watch": [
+      "Numeral 19: culminar ajustes y remitir la propuesta de actualización del Sistema Propio de Evaluación del Desempeño Laboral a la CNSC.",
+      "Numerales 23 y 25: finalizar, validar y socializar los lineamientos sectoriales con las organizaciones sindicales.",
+      "Numeral 27: fortalecer la instancia bipartita de seguimiento mediante sesión con la alta dirección."
+     ]
+    }
+   ],
+   "tabs": []
+  },
+  {
+   "id": "nomina",
+   "label": "Nómina",
+   "title": "GRUPO DE NÓMINA",
+   "subtitle": "Seguimiento Ejecutivo | 16 de octubre al 6 de noviembre de 2026",
+   "icon": "stock",
+   "hidden": false,
+   "home": {
+    "title": "Grupo de Nómina",
+    "columns": 1,
+    "stats": [
+     {
+      "value": 159,
+      "label": "actos en los ultimos 15 dias",
+      "prefix": "",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": false
+     },
+     {
+      "value": 39498787,
+      "label": "Cartera de incapacidades al 6 de noviembre",
+      "prefix": "$ ",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": true
+     }
+    ],
+    "text": "",
+    "tag": "",
+    "tag_tone": "red"
+   },
+   "blocks": [
+    {
+     "hidden": false,
+     "type": "stat_grid",
+     "items": [
+      {
+       "value": 159,
+       "label": "Actos en los ultimos 15 dias (137 de prestaciones y 22 de otros procesos)",
+       "prefix": "",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": false
+      },
+      {
+       "value": "86,2 %",
+       "label": "Prestaciones sobre el total de actos",
+       "prefix": "",
+       "suffix": "",
+       "animate": false,
+       "color": "auto",
+       "long": false
+      },
+      {
+       "value": 39498787,
+       "label": "Cartera de incapacidades, corte al 6 de noviembre",
+       "prefix": "$ ",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": true
+      },
+      {
+       "value": 68,
+       "label": "Exfuncionarios de octubre de 2026 por liquidar",
+       "prefix": "",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": false
+      }
+     ],
+     "min_width": 270
+    },
+    {
+     "hidden": false,
+     "type": "row_list",
+     "header": "ACCIONES DE GESTIÓN",
+     "columns": [
+      "Acción / información a reportar",
+      "Evidencia / dónde verificar"
+     ],
+     "items": [
+      {
+       "n": "1",
+       "title": "Radiografia de coordinaciones",
+       "text": "Se identificaron siete grupos que no cumplen el mínimo de cuatro funcionarios requeridos para su conformación de los cuales solo dos son los que tienen derecho al pago de la prima del 20%",
+       "evidence": "Analisis de grupos",
+       "bar_color": "blue"
+      },
+      {
+       "n": "2",
+       "title": "No conformidad NCR1318",
+       "text": "Lider funcional: Fernando Montejo. Se levanto informacion, se elaboro la matriz de roles y responsabilidades, se ajusto el procedimiento de permisos y se produjo un video tutorial para lideres.",
+       "evidence": "Correos, matriz, procedimiento y video",
+       "bar_color": "blue"
+      },
+      {
+       "n": "3",
+       "title": "Cartera de incapacidades",
+       "text": "Corte al 6 de noviembre: $39.498.787. Mayor saldo: ARL Positiva, $12.178.300, por accidente de trabajo de un asesor grado 14 durante 15 dias.",
+       "evidence": "Reporte de cartera",
+       "bar_pct": 30.8,
+       "bar_color": "blue"
+      },
+      {
+       "n": "4",
+       "title": "OPS con alerta",
+       "text": "Seguimiento por incumplimiento de contrato",
+       "evidence": "Correos de seguimiento",
+       "bar_color": "blue"
+      },
+      {
+       "n": "5",
+       "title": "Pendientes prioritarios",
+       "text": "Liquidar prestaciones sociales de aproximadamente 68 exfuncionarios de octubre de 2026 y elaborar los actos administrativos; apoyar la respuesta a 3 recursos de reposicion; y generar las planillas de correccion de seguridad social de agosto y septiembre de 2026.",
+       "evidence": "Prestaciones, recursos y PILA",
+       "bar_color": "blue"
+      }
+     ]
+    }
+   ],
+   "tabs": []
+  },
+  {
+   "id": "bienestar",
+   "label": "Bienestar y Desarrollo",
+   "title": "Grupo de Bienestar y Desarrollo",
+   "subtitle": "Seguimiento Ejecutivo",
+   "icon": "heart",
+   "hidden": false,
+   "home": {
+    "title": "Grupo de Bienestar y Desarrollo",
+    "columns": 0,
+    "stats": [
+     {
+      "value": 550000000,
+      "label": "Proyección PAA de diciembre 2026",
+      "prefix": "$ ",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": true,
+      "bind": "act.total"
+     }
+    ],
+    "text": "",
+    "tag": "Presupuesto {act.budget}",
+    "tag_tone": "red"
+   },
+   "blocks": [],
+   "tabs": [
+    {
+     "id": "escucha",
+     "label": "Presidencia te escucha",
+     "blocks": [
+      {
+       "hidden": false,
+       "type": "step_cards",
+       "header": "PRESIDENCIA TE ESCUCHA",
+       "media": {
+        "kind": "image",
+        "slot": "presidencia-te-escucha.jpg",
+        "src": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/pr.jpg",
+        "poster": "",
+        "alt": "[IMAGEN: presidencia-te-escucha.jpg] Afiche La Presidencia ¡Te escucha!",
+        "caption": "Identidad gráfica de la campaña · clic para ampliar",
+        "zoom": true,
+        "height": 420,
+        "autoplay": false,
+        "loop": false,
+        "muted": true
+       },
+       "items": [
+        {
+         "n": "01",
+         "tag": "DIAGNÓSTICO",
+         "date": "10 – 17 de noviembre",
+         "title": "Diagnóstico:",
+         "text": "En esta primera etapa se remite la encuesta del PIC y el Plan de Bienestar de la vigencia 2026, una vez recopilada la información se realizará la tabulación y análisis de resultados logrando obtener el impacto, el nivel de satisfacción y oportunidades de mejora de cada plan."
+        },
+        {
+         "n": "02",
+         "tag": "MESAS DE DIÁLOGO",
+         "date": "18 – 20 de noviembre",
+         "title": "Diálogo Participativo:",
+         "text": "Corresponde a una estrategia institucional de diálogo y participación, que se desarrollará mediante grupos focales con enlaces de las diferentes áreas, con el propósito de lograr la identificación, deliberación y priorización de las necesidades de sus respectivos grupos, promoviendo la construcción colectiva."
+        },
+        {
+         "n": "03",
+         "tag": "SOCIALIZACIÓN",
+         "date": "24 – 27 de noviembre",
+         "title": "Socialización con Sindicatos y Comisión de Personal:",
+         "text": "Una vez realizada la tabulación, análisis y consolidación de la información recopilada en la etapa 2, se procede a elaborar la primera versión de los planes, la cual será presentada en un espacio de diálogo a las organizaciones sindicales y la comisión de personal, propiciando un espacio de revisión y retroalimentación."
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "actividades",
+     "label": "Actividades",
+     "blocks": [
+      {
+       "id": "act",
+       "title": "ACTIVIDADES",
+       "hidden": false,
+       "type": "activities",
+       "items": [
+        {
+         "measure": "18.70 - 2025",
+         "name": "Vacaciones recreativas",
+         "frequency": "3 VECES AL AÑO",
+         "pct": 67.0,
+         "date": "30 de noviembre al 04 de diciembre",
+         "note": "Se propone el programa para los hijos de los funcionarios de 0 a 5 años con pasaporte interactivo para Chuck and Cheeses. niños de 6 a 12 años vacaciones tecnológicas para visitar durante los cinco días del 30 de noviembre al 4 de diciembre distintos lugares en la ciudad de Bogotá y de 13 a 17 años se entregarán bonos para Escape room.",
+         "value": "$ 151.272.800"
+        },
+        {
+         "measure": "18.57-2025",
+         "name": "Actividades para funcionarios sin hijos ni pareja",
+         "frequency": "SEMESTRAL",
+         "pct": 100.0,
+         "date": "07 de noviembre",
+         "note": "Se realizó el sábado 07 de noviembre en el CUR Sede Compensar avenida 68 en el horario de 8:00 am a 11:30 am, para 18 funcionarios. Las actividades son taller terrario y 2 líneas de bolos para cada funcionario.",
+         "value": "$ 0"
+        },
+        {
+         "measure": "22 - 2023",
+         "name": "Kit Biciusuarios",
+         "frequency": "ANUAL",
+         "pct": 0.0,
+         "date": "30 de noviembre",
+         "note": "Se entregará kit a 3 funcionarios que cumplen con los parámetros de la resolución que implementa el incentivo.",
+         "value": "$ 0"
+        },
+        {
+         "measure": "27 - 2023",
+         "name": "Acuerdo Sindical (Bonos)",
+         "frequency": "MENSUAL",
+         "pct": 82.0,
+         "date": "30 de noviembre",
+         "note": "Se entregará un bono para cada uno de los funcionarios consumible  en restaurante seleccionado por valor de $90,000. ",
+         "value": "$ 89.535.600"
+        },
+        {
+         "measure": "18.58 y 18.55 2025",
+         "name": "Taller navideño familiar",
+         "frequency": "ANUAL",
+         "pct": 0.0,
+         "date": "05 de diciembre",
+         "note": "Se realizará taller navideño de tejido macramé de acuerdo a inscripciones para el 05 de diciembre en sede compensar.",
+         "value": "$ 0"
+        },
+        {
+         "measure": "EFR",
+         "name": "KIT velitas  para apertura a la navidad",
+         "frequency": "ANUAL",
+         "pct": 0.0,
+         "date": "03 y 04 de diciembre",
+         "note": "Se entregará kit de velitas (Ilumina la navidad) de acuerdo a elección por parte de la entidad.",
+         "value": "$  99.484.000"
+        },
+        {
+         "measure": "EFR",
+         "name": "Cierre de gestión (ancheta)",
+         "frequency": "ANUAL",
+         "pct": 0.0,
+         "date": "12 y 13 de diciembre",
+         "note": "Se entregará ancheta navideña del 9 al 11 de diciembre.",
+         "value": "$ 208.012.000"
+        },
+        {
+         "measure": "EFR",
+         "name": "Cine",
+         "frequency": "BIMENSUAL",
+         "pct": 67.0,
+         "date": "PENDIENTE",
+         "note": "Junto con Salones de Estado  se gestiona el uso del teatro y la posibilidad de proyectar una película (cine foro navideño) por parte de Cine Colombia. Adicionalmente compensar acompañara con un refrigerio para los participantes",
+         "value": "$ 0"
+        },
+        {
+         "measure": "18.55 - 2025",
+         "name": "Ciclopaseo",
+         "frequency": "SEMESTRAL",
+         "pct": 50.0,
+         "date": "28 de noviembre",
+         "note": "Pendiente por confirmar lugar por parte de la Caja de Compensación Compensar",
+         "value": "$ 0"
+        },
+        {
+         "measure": "EFR",
+         "name": "Cumpleaños del mes",
+         "frequency": "MENSUAL",
+         "pct": 83.0,
+         "date": "1 vez al mes",
+         "note": "Actualmente se lleva a cabo con el acompañamiento de la Caja de Compensación, para el mes de noviembre se hará el 25 de noviembre.",
+         "value": "$ 0"
+        },
+        {
+         "measure": "EFR",
+         "name": "Bienestar espiritual",
+         "frequency": "SEMANAL",
+         "pct": 64.0,
+         "date": "Todos los martes",
+         "note": "Bajo el contrato 617-26 con el padre Rodolfo Londoño se realizan las misas semanales.",
+         "value": "$ 0"
+        },
+        {
+         "measure": "EFR",
+         "name": "SPA para Cuidadores",
+         "frequency": "SEMESTRAL",
+         "pct": 50.0,
+         "date": "07 de noviembre",
+         "note": "04112026. Se hará en compensar el 7 Noviembre. (6 inscritos) medida EFR",
+         "value": "$ 0"
+        },
+        {
+         "measure": "18.8 - 2025",
+         "name": "Autoestima y Nutrición",
+         "frequency": "SEMESTRAL",
+         "pct": 50.0,
+         "date": "03 de noviembre",
+         "note": "Se realizó el taller de snack saludable con la participación de 11 funcionarios el 03 de noviembre de 2026.",
+         "value": "$ 0"
+        },
+        {
+         "measure": "EFR",
+         "name": "Grupo de Oración",
+         "frequency": "SEMANAL DE OCTUBRE A DICIEMBRE",
+         "pct": 33.0,
+         "date": "Todos los martes",
+         "note": "Se realiza todos los martes en el Auditorio Alejandría en el horario de 6:00 a 7:30 pm",
+         "value": "$ 0"
+        },
+        {
+         "measure": "34.10 - 2025",
+         "name": "Reconocimiento simbólico por antigüedad (Quinquenio)",
+         "frequency": "SEMESTRAL",
+         "pct": 50.0,
+         "date": "15 de diciembre",
+         "note": "Se estima para 30 funcionarios.  La caja de compensación apoyará con la actividad en la que corresponde a la parte logística del evento como es salón, refrigerio y detalle.",
+         "value": ""
+        }
+       ],
+       "budget": "$ 844.784.981",
+       "total": "",
+       "total_label": "Proyección PAA de diciembre 2026",
+       "efr_measure": "EFR"
+      }
+     ]
+    },
+    {
+     "id": "calendario",
+     "label": "Calendario",
+     "blocks": [
+      {
+       "title": "CALENDARIO · Actividades de Bienestar",
+       "hidden": false,
+       "type": "calendar",
+       "source": "act"
+      }
+     ]
+    },
+    {
+     "id": "presupuesto",
+     "label": "Presupuesto",
+     "blocks": [
+      {
+       "title": "PRESUPUESTO · Actividades pendientes",
+       "hidden": false,
+       "type": "budget",
+       "source": "act"
+      }
+     ]
+    },
+    {
+     "id": "propuestas",
+     "label": "Propuestas",
+     "blocks": [
+      {
+       "hidden": false,
+       "type": "proposals",
+       "show": [
+        "ancheta",
+        "velitas"
+       ],
+       "ancheta_title": "PROPUESTAS · Anchetas",
+       "velitas_title": "PROPUESTAS · Kit de velitas",
+       "vacations": [
+        [
+         "NIÑOS DE 0 - 5 AÑOS",
+         "",
+         "BONO",
+         "40"
+        ],
+        [
+         "NIÑOS DE 6 - 12 AÑOS",
+         "LUNES",
+         "BIENVENIDOS AL FUTURO",
+         "50"
+        ],
+        [
+         "NIÑOS DE 6 - 12 AÑOS",
+         "MARTES",
+         "PLANETARIO DE BOGOTÁ",
+         "50"
+        ],
+        [
+         "NIÑOS DE 6 - 12 AÑOS",
+         "MIERCOLES",
+         "MALOKA",
+         "50"
+        ],
+        [
+         "NIÑOS DE 6 - 12 AÑOS",
+         "JUEVES",
+         "ESCAPE ROOM",
+         "50"
+        ],
+        [
+         "NIÑOS DE 6 - 12 AÑOS",
+         "VIERNES",
+         "LASER PARK",
+         "50"
+        ],
+        [
+         "NIÑOS 13 - 17 AÑOS",
+         "",
+         "BONO",
+         "70"
+        ]
+       ],
+       "vacations_value": "",
+       "bonus": [
+        [
+         "Bonos físicos",
+         "650",
+         "$ 90.000",
+         "$ 58.500.000"
+        ],
+        [
+         "Gasto Administrativo",
+         "1",
+         "$ 5.850.000",
+         "$ 5.850.000"
+        ]
+       ],
+       "bonus_label": "TOTAL",
+       "bonus_total": "",
+       "ancheta": [
+        [
+         "760",
+         "$ 273.700 (con iva)",
+         "$ 208.012.000"
+        ]
+       ],
+       "ancheta_media": {
+        "kind": "image",
+        "slot": "ancheta-navidena.jpg",
+        "src": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/anchetas.jpeg",
+        "poster": "",
+        "alt": "[IMAGEN: ancheta-navidena.jpg] Propuesta de ancheta navideña",
+        "caption": "",
+        "zoom": true,
+        "height": 170,
+        "autoplay": false,
+        "loop": false,
+        "muted": true
+       },
+       "velitas": [
+        [
+         "760",
+         "$ 130.900 (con iva)",
+         "$ 99.484.000"
+        ]
+       ],
+       "velitas_media": {
+        "kind": "image",
+        "slot": "kit-velitas.jpg",
+        "src": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/velitas.jpeg",
+        "poster": "",
+        "alt": "[IMAGEN: kit-velitas.jpg] Propuesta de kit de velitas",
+        "caption": "",
+        "zoom": true,
+        "height": 170,
+        "autoplay": false,
+        "loop": false,
+        "muted": true
+       },
+       "velitas_note": "Se cambia la leche por un farol"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "comunicacion",
+   "label": "Comunicación Interna",
+   "title": "Comunicación Interna",
+   "subtitle": "Seguimiento Ejecutivo",
+   "icon": "radio",
+   "hidden": false,
+   "home": {
+    "title": "Comunicación Interna",
+    "columns": 0,
+    "stats": [],
+    "text": "Inducción · Chatbot Ofelio · Bitácora · Emisora online · Lector QR para eventos y capacitaciones",
+    "tag": "Bitácora: edición del 11 de noviembre publicada",
+    "tag_tone": "green"
+   },
+   "blocks": [
+    {
+     "hidden": false,
+     "type": "link_cards",
+     "items": [
+      {
+       "n": "01",
+       "title": "Inducción",
+       "text": "Muestra de la página de inducción para servidores.",
+       "button": {
+        "label": "Abrir inducción ↗",
+        "url": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/muestra-induccion-final.html",
+        "disabled": false,
+        "note": ""
+       }
+      },
+      {
+       "n": "02",
+       "title": "Chatbot Ofelio",
+       "text": "Enlace al chatbot Ofelio (muestra).",
+       "button": {
+        "label": "Abrir Ofelio ↗",
+        "url": "https://media.presidencia.gov.co/Intranet/th/OCTUBRE-2026/ofelio-muestra.html",
+        "disabled": false,
+        "note": ""
+       }
+      },
+      {
+       "n": "03",
+       "title": "Bitácora",
+       "text": "Nueva edición publicada el miércoles 11 de noviembre.",
+       "button": {
+        "label": "Abrir periódico ↗",
+        "url": "https://media.presidencia.gov.co/Intranet/th/Bitacora/bitacora_v9.html",
+        "disabled": false,
+        "note": "Falta pegar el enlace del periódico (Bitácora)"
+       }
+      },
+      {
+       "n": "04",
+       "title": "Emisora online · Sintonía",
+       "text": "Emisora online de la Intranet de Presidencia.",
+       "button": {
+        "label": "Abrir emisora ↗",
+        "url": "https://media.presidencia.gov.co/Intranet/th/EMISORA/emisora.html",
+        "disabled": false,
+        "note": ""
+       }
+      },
+      {
+       "n": "05",
+       "title": "Lector de código QR",
+       "text": "Aplicación para registrar ingresos y entregas en eventos y capacitaciones. Mira las capturas abajo.",
+       "button": {
+        "label": "Piloto con datos ficticios",
+        "url": "",
+        "disabled": true,
+        "note": ""
+       }
+      }
+     ]
+    },
+    {
+     "title": "Aplicación de lector de código QR para eventos y capacitaciones",
+     "hidden": false,
+     "type": "gallery",
+     "items": [
+      {
+       "kind": "image",
+       "slot": "qr-escaner.jpg",
+       "src": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/app1.jpeg",
+       "poster": "",
+       "alt": "[IMAGEN: qr-escaner.jpg] Captura de TH Control, pestaña Escáner (lector de código QR)",
+       "caption": "Escáner · clic para ampliar",
+       "zoom": true,
+       "height": 380,
+       "autoplay": false,
+       "loop": false,
+       "muted": true
+      },
+      {
+       "kind": "image",
+       "slot": "qr-recientes.jpg",
+       "src": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/app2.jpeg",
+       "poster": "",
+       "alt": "[IMAGEN: qr-recientes.jpg] Captura de TH Control, pestaña Recientes (fecha, tipo, funcionario, detalle)",
+       "caption": "Recientes · clic para ampliar",
+       "zoom": true,
+       "height": 380,
+       "autoplay": false,
+       "loop": false,
+       "muted": true
+      }
+     ],
+     "side_card": {
+      "title": "TH Control · Piloto con datos ficticios",
+      "items": [
+       "**Escáner:** lee con la cámara del celular el código QR de cada funcionario.",
+       "**Recientes:** historial con fecha, tipo (Ingreso o Entrega), funcionario y detalle.",
+       "**Eventos y capacitaciones:** por ejemplo, ingreso a una capacitación de inducción o entrega de un kit de bienestar.",
+       "**Acceso:** con usuario operador; los datos que se ven son de demostración."
+      ]
+     }
+    }
+   ],
+   "tabs": []
+  },
+  {
+   "id": "historias",
+   "label": "Historias Laborales",
+   "title": "GRUPO DE HISTORIAS LABORALES",
+   "subtitle": "Seguimiento Ejecutivo | 14 de octubre al 09 de noviembre de 2026",
+   "icon": "doc",
+   "hidden": false,
+   "home": {
+    "title": "Grupo de Historias Laborales",
+    "columns": 2,
+    "stats": [
+     {
+      "value": 868,
+      "label": "folios recibidos e incorporados",
+      "prefix": "",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": false
+     },
+     {
+      "value": 182,
+      "label": "certificaciones laborales expedidas",
+      "prefix": "",
+      "suffix": "",
+      "animate": true,
+      "color": "auto",
+      "long": false
+     }
+    ],
+    "text": "",
+    "tag": "",
+    "tag_tone": "red"
+   },
+   "blocks": [
+    {
+     "hidden": false,
+     "type": "stat_grid",
+     "items": [
+      {
+       "value": 868,
+       "label": "Folios recibidos e incorporados",
+       "prefix": "",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": false
+      },
+      {
+       "value": 182,
+       "label": "Certificaciones laborales expedidas en 15 días",
+       "prefix": "",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": false
+      },
+      {
+       "value": 171,
+       "label": "Expedientes sin entregar para custodia",
+       "prefix": "",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": false
+      },
+      {
+       "value": 96,
+       "label": "Solicitudes de certificaciones pendientes",
+       "prefix": "",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": false
+      },
+      {
+       "value": 499834,
+       "label": "Folios aproximados por actualizar",
+       "prefix": "",
+       "suffix": "",
+       "animate": true,
+       "color": "auto",
+       "long": true
+      }
+     ],
+     "min_width": 190
+    },
+    {
+     "hidden": false,
+     "type": "row_list",
+     "header": "ACCIONES DE GESTIÓN",
+     "columns": [
+      "Acción / información a reportar",
+      "Evidencia / dónde verificar"
+     ],
+     "items": [
+      {
+       "n": "1",
+       "title": "Actualización de historias laborales:",
+       "text": "Se realizó actualización de las vigencias 2012,2011,2010, se dio inicio a la vigencia 2009,2008 y 2007.",
+       "evidence": "Formato Único de Inventario Documental (FUID), hojas de control, rótulos de carpeta y matriz de organización en carpeta compartida.",
+       "bar_color": "blue"
+      },
+      {
+       "n": "2",
+       "title": "Riesgos documentales y plan de contingencia:",
+       "text": "Volumen de documentos para actualizar, un aproximado de 499.834 folios. Represamiento en actualización de historias laborales, riesgo de deterioro de los documentos por la manipulación de los mismos, se recomienda digitalización para garantizar la preservación a largo plazo.",
+       "evidence": "Registro en control de ingreso de documentos (carpeta compartida).",
+       "bar_color": "blue"
+      }
+     ]
+    },
+    {
+     "hidden": false,
+     "type": "note_list",
+     "header": "OBSERVACIONES",
+     "items": [
+      "Una vez se va culminando la actualización de cada vigencia, se va dando inicio a la siguiente, hasta llegar al año 1982.",
+      "A la fecha se han expedido 1.415 certificaciones laborales."
+     ]
+    }
+   ],
+   "tabs": []
+  },
+  {
+   "id": "sst",
+   "label": "Seguridad y Salud en el Trabajo",
+   "title": "GRUPO DE SEGURIDAD Y SALUD EN EL TRABAJO",
+   "subtitle": "Seguimiento Ejecutivo",
+   "icon": "shield",
+   "hidden": false,
+   "home": {
+    "title": "Grupo de Seguridad y Salud en el Trabajo",
+    "columns": 0,
+    "stats": [
+     {
+      "value": 80,
+      "label": "Cumplimiento del plan anual de trabajo hasta el 31 de octubre de 2026",
+      "prefix": "",
+      "suffix": " %",
+      "animate": true,
+      "color": "auto",
+      "long": false
+     }
+    ],
+    "text": "",
+    "tag": "",
+    "tag_tone": "red"
+   },
+   "blocks": [
+    {
+     "title": "Estado SG-SST 2026",
+     "hidden": false,
+     "type": "grid",
+     "ratio": [
+      1.0,
+      1.0
+     ],
+     "columns": [
+      [
+       {
+        "hidden": false,
+        "type": "ring_card",
+        "value": 80.0,
+        "text": "Cumplimiento del plan anual de trabajo del 80 % hasta el 31 de octubre de 2026.",
+        "color": "yellow"
+       }
+      ],
+      [
+       {
+        "title": "Seguimientos ARL (Casos críticos).",
+        "hidden": false,
+        "type": "status_list",
+        "items": [
+         {
+          "value": "1",
+          "text": "**AT Grave**\nplan de acción en proceso",
+          "color": "red"
+         },
+         {
+          "value": "2",
+          "text": "**presunto AT** por permiso sindical\n(en seguimiento)",
+          "color": "yellow"
+         },
+         {
+          "value": "3",
+          "text": "1 caso de Salud que presenta: incapacidad hasta el 5 de diciembre, concepto desfavorable de la eps para su rehabilitación, actualmente en proceso de calificación de PCL por parte de Colpensiones, en trámite solicitud a Colpensiones del estado del proceso de calificación.",
+          "color": "blue"
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "title": "Alertas del Grupo SST",
+     "hidden": false,
+     "type": "numbered_cards",
+     "items": [
+      {
+       "n": "01",
+       "text": "Agilizar la adquisición de los equipos de extinción contra incendios en los diferentes puntos (se proyecta entrega para fin de mes).",
+       "tone": "none"
+      },
+      {
+       "n": "02",
+       "text": "Consultorio odontológico: revisando el convenio de odontología, en los diez primeros meses del año se registraron 1.136 atenciones a funcionarios, con un promedio de 114 atenciones mensuales.",
+       "tone": "none"
+      },
+      {
+       "n": "03",
+       "text": "Mantenimiento y prueba de Gabinetes de manera prioritaria para la vigencia 2027.",
+       "tone": "none"
+      }
+     ],
+     "min_width": 280
+    },
+    {
+     "title": "ACUERDOS LABORALES PENDIENTES",
+     "hidden": false,
+     "type": "numbered_cards",
+     "items": [
+      {
+       "n": "",
+       "text": "**Mejoramiento de las cargas laborales** y equipos del Grupo de Trabajo de Atención a la Ciudadanía: Plan progresivo, presupuesto para próximos dos años. Solicitud de estudio de cargas en Escribe por funcionario del sindicato.",
+       "tone": "violet"
+      },
+      {
+       "n": "",
+       "text": "Ruta de protección y autoprotección ante **riesgo publico.**",
+       "tone": "violet"
+      },
+      {
+       "n": "",
+       "text": "**Protocolo** de riesgo publico en comisiones de servicio.",
+       "tone": "violet"
+      }
+     ],
+     "min_width": 300
+    }
+   ],
+   "tabs": []
+  },
+  {
+   "id": "graficos",
+   "label": "Gráficos",
+   "title": "Galería de gráficos",
+   "subtitle": "Todos los tipos disponibles, con datos de ejemplo",
+   "icon": "stock",
+   "blocks": [
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "bar",
+        "title": "Actos administrativos por mes",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Prestaciones",
+          "values": [
+           98,
+           110,
+           120,
+           105,
+           137,
+           150
+          ]
+         },
+         {
+          "name": "Otros",
+          "values": [
+           20,
+           18,
+           25,
+           22,
+           22,
+           19
+          ]
+         }
+        ],
+        "caption": "Barras agrupadas"
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "hbar",
+        "title": "Avance por grupo (%)",
+        "labels": [
+         "Personal",
+         "Nómina",
+         "Bienestar",
+         "Historias",
+         "SST"
+        ],
+        "series": [
+         {
+          "name": "Avance",
+          "values": [
+           78,
+           92,
+           64,
+           71,
+           80
+          ]
+         }
+        ],
+        "unit": "%"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "stacked",
+        "title": "Vinculaciones por tipo",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Planta",
+          "values": [
+           4,
+           6,
+           5,
+           8,
+           7,
+           9
+          ]
+         },
+         {
+          "name": "Temporal",
+          "values": [
+           2,
+           1,
+           3,
+           2,
+           4,
+           3
+          ]
+         },
+         {
+          "name": "OPS",
+          "values": [
+           10,
+           12,
+           9,
+           14,
+           11,
+           15
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "stacked100",
+        "title": "Composición de la planta (%)",
+        "labels": [
+         "2023",
+         "2024",
+         "2025",
+         "2026"
+        ],
+        "series": [
+         {
+          "name": "Provistos",
+          "values": [
+           780,
+           810,
+           850,
+           869
+          ]
+         },
+         {
+          "name": "Vacantes",
+          "values": [
+           120,
+           100,
+           90,
+           121
+          ]
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "line",
+        "title": "Folios incorporados con proyección",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Folios",
+          "values": [
+           520,
+           610,
+           640,
+           700,
+           790,
+           868
+          ]
+         }
+        ],
+        "forecast": 3,
+        "forecast_labels": [
+         "Dic",
+         "Ene",
+         "Feb"
+        ],
+        "caption": "Línea con tendencia lineal y banda de confianza (proyección punteada)"
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "area",
+        "title": "Ejecución acumulada (millones)",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Ejecutado",
+          "values": [
+           120,
+           260,
+           410,
+           540,
+           700,
+           844
+          ]
+         }
+        ],
+        "unit": "M",
+        "forecast": 2
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "stacked_area",
+        "title": "Solicitudes atendidas",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Certificaciones",
+          "values": [
+           30,
+           40,
+           35,
+           50,
+           60,
+           55
+          ]
+         },
+         {
+          "name": "Constancias",
+          "values": [
+           20,
+           25,
+           30,
+           28,
+           35,
+           40
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "combo",
+        "title": "Ingresos (barras) y tiempo de respuesta (línea)",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Ingresos",
+          "values": [
+           12,
+           18,
+           15,
+           22,
+           19,
+           25
+          ]
+         },
+         {
+          "name": "Días de respuesta",
+          "values": [
+           9,
+           8,
+           8,
+           6,
+           5,
+           4
+          ],
+          "kind": "line"
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "lollipop",
+        "title": "Capacitaciones por mes",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Capacitaciones",
+          "values": [
+           3,
+           5,
+           4,
+           7,
+           6,
+           8
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "pie",
+        "title": "Distribución de alertas",
+        "labels": [
+         "Alto",
+         "Medio",
+         "Bajo"
+        ],
+        "series": [
+         {
+          "name": "Alertas",
+          "values": [
+           7,
+           13,
+           3
+          ]
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "donut",
+        "title": "Presupuesto por línea",
+        "labels": [
+         "Bienestar",
+         "Capacitación",
+         "Salud",
+         "Cultura"
+        ],
+        "series": [
+         {
+          "name": "COP",
+          "values": [
+           320,
+           210,
+           180,
+           134
+          ]
+         }
+        ],
+        "unit": "M"
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "radialbar",
+        "title": "Cumplimiento por proceso",
+        "labels": [
+         "Personal",
+         "Nómina",
+         "Historias",
+         "SST"
+        ],
+        "series": [
+         {
+          "name": "%",
+          "values": [
+           78,
+           92,
+           71,
+           80
+          ]
+         }
+        ],
+        "max": 100,
+        "unit": "%"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "gauge",
+        "title": "Cumplimiento del plan anual",
+        "series": [
+         {
+          "name": "SG-SST",
+          "values": [
+           80
+          ]
+         }
+        ],
+        "unit": "%",
+        "max": 100
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "bullet",
+        "title": "Avance frente a la meta",
+        "labels": [
+         "Folios",
+         "Certificaciones",
+         "Posesiones",
+         "Capacitaciones"
+        ],
+        "series": [
+         {
+          "name": "Actual",
+          "values": [
+           868,
+           182,
+           60,
+           8
+          ]
+         }
+        ],
+        "target": [
+         1000,
+         200,
+         60,
+         12
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "radar",
+        "title": "Madurez por grupo",
+        "labels": [
+         "Planeación",
+         "Ejecución",
+         "Seguimiento",
+         "Riesgos",
+         "Comunicación"
+        ],
+        "series": [
+         {
+          "name": "Hoy",
+          "values": [
+           70,
+           85,
+           60,
+           55,
+           75
+          ]
+         },
+         {
+          "name": "Meta",
+          "values": [
+           90,
+           90,
+           85,
+           80,
+           85
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "scatter",
+        "title": "Antigüedad vs. días de capacitación",
+        "series": [
+         {
+          "name": "Funcionarios",
+          "points": [
+           {
+            "x": 1,
+            "y": 4
+           },
+           {
+            "x": 3,
+            "y": 6
+           },
+           {
+            "x": 5,
+            "y": 5
+           },
+           {
+            "x": 8,
+            "y": 9
+           },
+           {
+            "x": 12,
+            "y": 8
+           },
+           {
+            "x": 15,
+            "y": 12
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "bubble",
+        "title": "Procesos: costo, duración y volumen",
+        "series": [
+         {
+          "name": "Procesos",
+          "points": [
+           {
+            "x": 10,
+            "y": 30,
+            "r": 50,
+            "label": "Nómina"
+           },
+           {
+            "x": 25,
+            "y": 12,
+            "r": 20,
+            "label": "Posesiones"
+           },
+           {
+            "x": 40,
+            "y": 45,
+            "r": 80,
+            "label": "Historias"
+           },
+           {
+            "x": 15,
+            "y": 20,
+            "r": 10,
+            "label": "SST"
+           }
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "waterfall",
+        "title": "Planta: de vacantes a provistos",
+        "labels": [
+         "Inicio",
+         "Posesiones",
+         "Retiros",
+         "Traslados",
+         "Final"
+        ],
+        "series": [
+         {
+          "name": "Planta",
+          "values": [
+           850,
+           60,
+           -25,
+           -16,
+           869
+          ]
+         }
+        ],
+        "totals": [
+         0,
+         4
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "funnel",
+        "title": "Proceso de vinculación",
+        "labels": [
+         "Convocados",
+         "Con requisitos",
+         "Entrevistados",
+         "Seleccionados",
+         "Posesionados"
+        ],
+        "series": [
+         {
+          "name": "Personas",
+          "values": [
+           240,
+           120,
+           60,
+           24,
+           20
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "candles",
+        "title": "Rango de ejecución semanal",
+        "labels": [
+         "S1",
+         "S2",
+         "S3",
+         "S4",
+         "S5",
+         "S6"
+        ],
+        "series": [
+         {
+          "name": "Ejecución",
+          "ohlc": [
+           [
+            10,
+            18,
+            8,
+            15
+           ],
+           [
+            15,
+            22,
+            14,
+            20
+           ],
+           [
+            20,
+            24,
+            15,
+            17
+           ],
+           [
+            17,
+            21,
+            16,
+            21
+           ],
+           [
+            21,
+            30,
+            20,
+            28
+           ],
+           [
+            28,
+            31,
+            22,
+            24
+           ]
+          ]
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "heatmap",
+        "title": "Solicitudes por día y grupo",
+        "labels": [
+         "Lun",
+         "Mar",
+         "Mié",
+         "Jue",
+         "Vie"
+        ],
+        "series": [
+         {
+          "name": "Personal",
+          "values": [
+           12,
+           18,
+           9,
+           14,
+           7
+          ]
+         },
+         {
+          "name": "Nómina",
+          "values": [
+           30,
+           25,
+           28,
+           40,
+           35
+          ]
+         },
+         {
+          "name": "Historias",
+          "values": [
+           8,
+           10,
+           22,
+           12,
+           9
+          ]
+         },
+         {
+          "name": "SST",
+          "values": [
+           3,
+           5,
+           4,
+           9,
+           2
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "treemap",
+        "title": "Contratos por tipo",
+        "labels": [
+         "OPS",
+         "Planta",
+         "Temporal",
+         "Prácticas",
+         "Otros"
+        ],
+        "series": [
+         {
+          "name": "Contratos",
+          "values": [
+           140,
+           869,
+           60,
+           25,
+           12
+          ]
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "timeline",
+        "title": "Hitos del cierre de diciembre",
+        "events": [
+         {
+          "label": "Socialización sindicatos",
+          "start": "2026-11-18",
+          "text": "PIC y PDB"
+         },
+         {
+          "label": "Entrega de bonos",
+          "start": "2026-11-25",
+          "end": "2026-11-28"
+         },
+         {
+          "label": "Novena de aguinaldos",
+          "start": "2026-12-09"
+         },
+         {
+          "label": "Vacaciones recreativas",
+          "start": "2026-12-14",
+          "end": "2026-12-18"
+         },
+         {
+          "label": "Cierre de vigencia",
+          "start": "2026-12-30"
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "gantt",
+        "title": "Cronograma de actividades",
+        "events": [
+         {
+          "label": "Preparar PIC",
+          "start": "2026-10-20",
+          "end": "2026-11-20",
+          "done": 70
+         },
+         {
+          "label": "Socialización",
+          "start": "2026-11-18",
+          "end": "2026-11-30",
+          "done": 30
+         },
+         {
+          "label": "Ejecución diciembre",
+          "start": "2026-12-01",
+          "end": "2026-12-22",
+          "done": 0
+         },
+         {
+          "label": "Informe de cierre",
+          "start": "2026-12-23",
+          "end": "2026-12-31",
+          "done": 0
+         }
+        ]
+       }
+      ]
+     ]
+    }
+   ]
+  }
+ ],
+ "alerts": [
+  {
+   "group": "personal",
+   "level": "alto",
+   "text": "Mejora SIGEPRE NCR-1359 vencida, 80 % de avance: plan de mejoramiento cargado, pendiente aprobación (cierre 20/11/2026)."
+  },
+  {
+   "group": "personal",
+   "level": "medio",
+   "text": "Mejora SIGEPRE NCR-1315 vencida, 70 % de avance: evidencias cargadas, pendiente aprobación (cierre 20/11/2026)."
+  },
+  {
+   "group": "personal",
+   "level": "medio",
+   "text": "+30 % en las solicitudes de nombramiento: mayor carga operativa y más tiempo de gestión."
+  },
+  {
+   "group": "personal",
+   "level": "alto",
+   "text": "Planta transitoria: 5 de 12 pasos del flujo de prórroga están en espera (6, 7, 8, 11 y 12); Hacienda no tiene tiempo estimado de respuesta."
+  },
+  {
+   "group": "personal",
+   "level": "medio",
+   "text": "Planta transitoria: viabilidad técnica del DAFP en proceso; se espera respuesta en máximo 1 semana."
+  },
+  {
+   "group": "nomina",
+   "level": "medio",
+   "text": "Capacidad operativa: 8 grupos no cumplen la conformacion minima. Riesgo: MEDIO."
+  },
+  {
+   "group": "nomina",
+   "level": "alto",
+   "text": "Cartera: priorizar gestion con ARL Positiva, que concentra $12.178.300, equivalentes al 30,8 % del total."
+  },
+  {
+   "group": "nomina",
+   "level": "bajo",
+   "text": "NCR1318: formalizar aprobacion del procedimiento, socializar el video y conservar evidencias de implementacion."
+  },
+  {
+   "group": "nomina",
+   "level": "medio",
+   "text": "OPS: revisar la respuesta prevista para el 11 de noviembre y definir acciones frente a los entregables pendientes."
+  },
+  {
+   "group": "nomina",
+   "level": "alto",
+   "text": "Requerimiento: asignar personal de apoyo para atender 68 liquidaciones, 3 recursos de reposicion y planillas de correccion de agosto y septiembre de 2025."
+  },
+  {
+   "group": "bienestar",
+   "level": "medio",
+   "text": "Actividades de diciembre sin ejecutar (0 %): kit de velitas (3 y 4 dic), taller navideño (5 dic) y ancheta (12 y 13 dic)."
+  },
+  {
+   "group": "bienestar",
+   "level": "medio",
+   "text": "Ciclopaseo del 28 de noviembre: pendiente confirmar el lugar con la Caja de Compensación Compensar."
+  },
+  {
+   "group": "bienestar",
+   "level": "medio",
+   "text": "Cine: sin fecha definida; se gestiona el teatro con Salones de Estado."
+  },
+  {
+   "group": "bienestar",
+   "level": "medio",
+   "text": "Grupo de danza (Presidencia en movimiento) no se lleva a cabo: la actividad se realizaba con un contrato ya liquidado."
+  },
+  {
+   "group": "bienestar",
+   "level": "bajo",
+   "text": "Proyección PAA de diciembre 2026: $ 548.304.400 frente a un presupuesto de $ 844.784.981."
+  },
+  {
+   "group": "historias",
+   "level": "alto",
+   "text": "96 solicitudes de certificaciones laborales pendientes en ESCRIBE; los tiempos de respuesta superan los 15 días hábiles."
+  },
+  {
+   "group": "historias",
+   "level": "alto",
+   "text": "Aproximadamente 499.834 folios por actualizar: represamiento y riesgo de deterioro por manipulación; se recomienda digitalizar."
+  },
+  {
+   "group": "historias",
+   "level": "medio",
+   "text": "140 expedientes nuevos sin entregar para su custodia y organización en el archivo de gestión."
+  },
+  {
+   "group": "sst",
+   "level": "alto",
+   "text": "1 AT grave con plan de acción en proceso."
+  },
+  {
+   "group": "sst",
+   "level": "medio",
+   "text": "1 presunto AT por permiso sindical, en seguimiento."
+  },
+  {
+   "group": "sst",
+   "level": "medio",
+   "text": "Agilizar la adquisición de los equipos de extinción contra incendios (entrega proyectada para fin de mes)."
+  },
+  {
+   "group": "sst",
+   "level": "bajo",
+   "text": "Mantenimiento y prueba de gabinetes de manera prioritaria para la vigencia 2027."
+  },
+  {
+   "group": "sst",
+   "level": "medio",
+   "text": "Acuerdos laborales pendientes: cargas laborales de Atención a la Ciudadanía, ruta de protección y protocolo de riesgo público."
+  }
+ ]
+}

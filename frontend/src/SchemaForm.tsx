@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { BLOCK, LONG, OPT, label } from './labels'
+import { createContext, useContext, useState } from 'react'
+import { BLOCK, CHART_FIELDS, LONG, OPT, SERIES_FIELDS, label } from './labels'
 import { api } from './api'
 
 type S = any
@@ -104,11 +104,47 @@ function Inner({ k, s, value, set, parent }: { k: string; s: S; value: any; set:
 }
 
 const ORDER_LAST = new Set(['id', 'hidden'])
+const KindCtx = createContext('')
+
+const num = (s: string) => { const n = parseFloat(s.replace(/[%$\s]/g, '').replace(/\.(?=\d{3}(\D|$))/g, '').replace(',', '.')); return isNaN(n) ? 0 : n }
+const iso = (s: string) => { s = s.trim(); const m = s.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})$/); return m ? `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}` : s }
+
+/** Convierte celdas copiadas de Excel (separadas por tabulación) en datos del gráfico. */
+function applyPaste(c: any, text: string): any {
+  const rows = text.replace(/\r/g, '').split('\n').filter(r => r.trim()).map(r => r.split('\t'))
+  if (rows.length < 2) throw new Error('Pega al menos la fila de títulos y una fila de datos.')
+  const head = rows[0], body = rows.slice(1), k = c.kind
+  if (k === 'timeline' || k === 'gantt') return { ...c, events: body.map(r => ({ label: r[0] || '', start: iso(r[1] || ''), end: iso(r[2] || ''), text: '', color: 'auto', done: r[3] ? num(r[3]) : null })) }
+  if (k === 'scatter' || k === 'bubble') return { ...c, series: [{ ...(c.series[0] || { name: head[1] || 'Serie', color: 'auto', values: [], kind: null, ohlc: [] }), points: body.map(r => ({ x: num(r[0]), y: num(r[1]), r: num(r[2] || '0'), label: r[3] || '' })) }] }
+  if (k === 'candles') return { ...c, labels: body.map(r => r[0]), series: [{ ...(c.series[0] || { name: 'Serie', color: 'auto', values: [], kind: null, points: [] }), ohlc: body.map(r => [num(r[1]), num(r[2]), num(r[3]), num(r[4])]) }] }
+  const names = head.slice(1).filter(x => x.trim()), single = ['pie', 'donut', 'treemap', 'funnel', 'radialbar', 'gauge', 'bullet', 'waterfall'].includes(k)
+  const series = (single ? names.slice(0, 1) : names).map((n, i) => ({ ...(c.series[i] || { color: 'auto', kind: null, points: [], ohlc: [] }), name: n, values: body.map(r => num(r[i + 1] || '0')) }))
+  return { ...c, labels: k === 'gauge' ? c.labels : body.map(r => r[0]), series }
+}
+
+function ExcelPaste({ chart, set }: { chart: any; set: (v: any) => void }) {
+  const [on, setOn] = useState(false), [txt, setTxt] = useState(''), [err, setErr] = useState('')
+  const help: Record<string, string> = { timeline: 'Etiqueta · Inicio · Fin (opcional)', gantt: 'Etiqueta · Inicio · Fin · Avance %', scatter: 'x · y · tamaño · nombre', bubble: 'x · y · tamaño · nombre', candles: 'Etiqueta · Apertura · Máximo · Mínimo · Cierre' }
+  const cols = help[chart.kind] || 'Etiqueta · Serie 1 · Serie 2 … (la primera fila son los títulos)'
+  return <div className="card" style={{ background: '#F0F6FF' }}>
+    <button onClick={() => setOn(!on)}>📋 {on ? 'Cerrar' : 'Pegar datos desde Excel'}</button>
+    {on && <><p className="mut">Copia las celdas en Excel o Google Sheets y pégalas aquí. Columnas: {cols}</p>
+      <textarea value={txt} onChange={e => setTxt(e.target.value)} placeholder={'\tVentas\tMeta\nEnero\t10\t12\nFebrero\t14\t12'} style={{ minHeight: 110, fontFamily: 'ui-monospace,monospace', fontSize: 12 }} />
+      {err && <div className="issues">{err}</div>}
+      <button className="pri" onClick={() => { try { set(applyPaste(chart, txt)); setErr(''); setOn(false); setTxt('') } catch (e: any) { setErr(e.message) } }}>Reemplazar los datos del gráfico</button></>}
+  </div>
+}
+
 export function ObjectField({ s, value, set, bare }: { s: S; value: any; set: (v: any) => void; bare?: boolean }) {
-  const props = Object.entries<S>(s.properties || {}).filter(([k, p]) => k !== 'type' || norm(p).s.const === undefined)
+  const kind = useContext(KindCtx)
+  const isChart = s.title === 'Chart', isSeries = s.title === 'Series'
+  let props = Object.entries<S>(s.properties || {}).filter(([k, p]) => k !== 'type' || norm(p).s.const === undefined)
+  if (isChart) { const keep = CHART_FIELDS[value.kind]; if (keep) props = props.filter(([k]) => keep.includes(k)).sort((a, b) => keep.indexOf(a[0]) - keep.indexOf(b[0])) }
+  if (isSeries) { const keep = SERIES_FIELDS(kind); props = props.filter(([k]) => keep.includes(k)).sort((a, b) => keep.indexOf(a[0]) - keep.indexOf(b[0])) }
   const sorted = [...props.filter(([k]) => !ORDER_LAST.has(k)), ...props.filter(([k]) => ORDER_LAST.has(k))]
-  const body = sorted.map(([k, p]) => <Field key={k} k={k} schema={p} value={value[k]} parent={value} set={v => set({ ...value, [k]: v })} />)
-  return bare ? <>{body}</> : <div className="obj">{body}</div>
+  const fields = sorted.map(([k, p]) => <Field key={k} k={k} schema={p} value={value[k]} parent={value} set={v => set({ ...value, [k]: v })} />)
+  const body = isChart ? <KindCtx.Provider value={value.kind}>{fields.slice(0, 1)}<ExcelPaste chart={value} set={set} />{fields.slice(1)}</KindCtx.Provider> : <>{fields}</>
+  return bare ? body : <div className="obj">{body}</div>
 }
 
 function mv<T>(a: T[], i: number, d: number): T[] { const b = [...a], j = i + d; if (j < 0 || j >= b.length) return b;[b[i], b[j]] = [b[j], b[i]]; return b }

@@ -5,7 +5,9 @@ from typing import Iterator
 
 from pydantic import ValidationError
 
-from .schema import (Activities, Block, Budget, CalendarBlock, Grid, Report)
+from datetime import date
+
+from .schema import (Activities, Block, Budget, CalendarBlock, Chart, Grid, Report)
 
 
 def walk(blocks: list) -> Iterator:
@@ -23,6 +25,55 @@ def all_blocks(rep: Report) -> Iterator:
             yield from walk(t.blocks)
 
 
+def _d(s: str):
+    try:
+        return date.fromisoformat(s)
+    except ValueError:
+        return None
+
+
+def check_chart(c: Chart) -> list[str]:
+    n, k, w = len(c.labels), c.kind, f"Gráfico «{c.title or c.id or c.kind}»"
+    out: list[str] = []
+    if k in ("scatter", "bubble"):
+        if not any(s.points for s in c.series):
+            out.append(f"{w}: agrega puntos (x, y) a una serie.")
+    elif k == "candles":
+        s = c.series[0] if c.series else None
+        if not s or not s.ohlc or len(s.ohlc) != n:
+            out.append(f"{w}: las velas necesitan una serie con [apertura, máximo, mínimo, cierre] por cada etiqueta ({n}).")
+        elif any(len(x) != 4 or x[1] < max(x[0], x[3]) or x[2] > min(x[0], x[3]) for x in s.ohlc):
+            out.append(f"{w}: en cada vela el máximo debe ser el mayor y el mínimo el menor.")
+    elif k in ("timeline", "gantt"):
+        if not c.events:
+            out.append(f"{w}: agrega al menos un evento.")
+        for e in c.events:
+            a, b = _d(e.start), _d(e.end) if e.end else None
+            if a is None or (e.end and b is None):
+                out.append(f"{w}: la fecha de «{e.label}» debe ser AAAA-MM-DD.")
+            elif b and b < a:
+                out.append(f"{w}: «{e.label}» termina antes de empezar.")
+            if k == "gantt" and not e.end:
+                out.append(f"{w}: «{e.label}» necesita fecha de fin en el cronograma.")
+    else:
+        if not c.series or not any(s.values for s in c.series):
+            out.append(f"{w}: agrega al menos una serie con valores.")
+        need = 1 if k in ("gauge",) else n
+        for s in c.series:
+            if k != "gauge" and s.values and len(s.values) != n:
+                out.append(f"{w}: la serie «{s.name}» tiene {len(s.values)} valores y hay {n} etiquetas.")
+        if k == "bullet" and c.target and len(c.target) != n:
+            out.append(f"{w}: las metas deben ser {n}, una por etiqueta.")
+        if k == "waterfall" and any(i < 0 or i >= n for i in c.totals):
+            out.append(f"{w}: hay totales fuera del rango de etiquetas.")
+        if k in ("pie", "donut", "funnel", "treemap", "radialbar") and any(v < 0 for s in c.series[:1] for v in s.values):
+            out.append(f"{w}: este tipo de gráfico no admite valores negativos.")
+        if k == "radar" and n < 3:
+            out.append(f"{w}: el radar necesita al menos 3 etiquetas.")
+        _ = need
+    return out
+
+
 def check(rep: Report) -> list[str]:
     """Devuelve problemas de coherencia (lista vacía = todo bien)."""
     out: list[str] = []
@@ -37,6 +88,9 @@ def check(rep: Report) -> list[str]:
     for b in blocks:
         if isinstance(b, (Budget, CalendarBlock)) and b.source not in acts:
             out.append(f"El bloque '{b.type}' apunta a '{b.source}', que no es un bloque de actividades.")
+    for b in blocks:
+        if isinstance(b, Chart):
+            out += check_chart(b)
     for a in rep.alerts:
         if a.group not in ids:
             out.append(f"Alerta con grupo '{a.group}' que no existe como sección.")
