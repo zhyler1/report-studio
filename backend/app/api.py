@@ -6,9 +6,11 @@
 from __future__ import annotations
 
 import io
+from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, FastAPI, HTTPException, Query
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pydantic import BaseModel
 
@@ -170,6 +172,9 @@ def create_app() -> FastAPI:
     def health():
         return JSONResponse({"ok": True})
 
+    dist = Path(__file__).resolve().parents[2] / "frontend" / "dist"
+    if dist.is_dir():  # la interfaz compilada se sirve desde el mismo servidor
+        app.mount("/", StaticFiles(directory=dist, html=True), name="ui")
     return app
 
 

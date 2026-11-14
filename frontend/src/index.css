@@ -1,0 +1,22 @@
+:root{--bg:#F4F4F5;--card:#fff;--ink:#14213D;--mut:#667085;--line:#E4E7EC;--blue:#1F4E9C;--red:#C62828;--green:#2E7D32;font-family:Inter,system-ui,sans-serif;color:var(--ink)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg)}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 12px;color:var(--ink)}
+button.pri{background:var(--blue);border-color:var(--blue);color:#fff;font-weight:600}button.danger{color:var(--red)}button:disabled{opacity:.5;cursor:default}
+input,select,textarea{font:inherit;border:1px solid var(--line);border-radius:8px;padding:7px 10px;width:100%;background:#fff;color:var(--ink)}
+textarea{min-height:70px;resize:vertical}label{display:block;font-size:12px;font-weight:600;color:var(--mut);margin:10px 0 4px}
+.app{display:grid;grid-template-columns:260px 1fr;height:100vh}
+.side{background:var(--card);border-right:1px solid var(--line);padding:16px;overflow:auto}
+.side h1{font-size:17px;margin:0 0 14px}.item{padding:10px;border-radius:8px;cursor:pointer;margin-bottom:4px;font-size:14px}
+.item.on{background:#E8EEF8;font-weight:700}.item small{display:block;color:var(--mut);font-weight:400}
+.main{display:grid;grid-template-columns:minmax(380px,46%) 1fr;min-width:0;height:100vh}
+.edit{overflow:auto;padding:16px;border-right:1px solid var(--line)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;position:sticky;top:0;background:var(--bg);padding:4px 0 8px;z-index:2}
+.tabs{display:flex;gap:4px;margin-bottom:12px;flex-wrap:wrap}.tabs button{border-radius:999px;padding:5px 12px;font-size:13px}.tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+.prev{display:flex;flex-direction:column;min-width:0}.prev iframe{flex:1;border:0;width:100%;background:#fff}
+.issues{background:#FDECEA;border:1px solid #F5C2BE;color:#8A1C14;border-radius:8px;padding:8px 12px;font-size:13px;margin-bottom:10px}
+.ok{color:var(--green);font-size:13px;font-weight:600}.mut{color:var(--mut);font-size:13px}
+.json{font-family:ui-monospace,Menlo,monospace;font-size:12px;min-height:60vh;white-space:pre}
+table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.empty{display:grid;place-items:center;height:100vh;color:var(--mut)}

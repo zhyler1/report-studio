@@ -46,3 +46,12 @@ Uso: `cd backend && python3 -m app.render ../seed/report.seed.json salida.html`
 - [ ] Interfaz de administración (React/Vite)
 
 Desarrollo: `cd backend && uvicorn app.api:app --reload` (documentación en `/docs`). El PDF necesita `playwright install chromium`.
+
+## Estado hito 3 (interfaz de administración, primera parte)
+- [x] React + Vite + TypeScript en `frontend/`: lista de informes, importar JSON, duplicar, eliminar
+- [x] Pestañas General (encabezado, inicio, apariencia), Secciones (orden, textos, ocultar), Alertas (tabla), JSON, Versiones (restaurar)
+- [x] Vista previa en vivo con validación antes de guardar; exportar HTML/PDF
+- [ ] Formularios por bloque (actividades, calendario, presupuesto, plantas, tablas...), gráficos, audio/video
+
+Uso: `cd frontend && npm install && npm run build`; después el servidor (`cd backend && python -m uvicorn app.api:app`) sirve la interfaz en http://localhost:8000.
+Desarrollo con recarga: `npm run dev` (puerto 5173, redirige /api al 8000).
