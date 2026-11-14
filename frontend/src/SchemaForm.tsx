@@ -1,3 +1,4 @@
+import { STARTERS } from './starters'
 import { createContext, useContext, useState } from 'react'
 import { BLOCK, CHART_FIELDS, LONG, OPT, SERIES_FIELDS, label } from './labels'
 import { api } from './api'
@@ -144,9 +145,15 @@ export function ObjectField({ s, value, set, bare }: { s: S; value: any; set: (v
   let props = Object.entries<S>(s.properties || {}).filter(([k, p]) => k !== 'type' || norm(p).s.const === undefined)
   if (isChart) { const keep = CHART_FIELDS[value.kind]; if (keep) props = props.filter(([k]) => keep.includes(k)).sort((a, b) => keep.indexOf(a[0]) - keep.indexOf(b[0])) }
   if (isSeries) { const keep = SERIES_FIELDS(kind); props = props.filter(([k]) => keep.includes(k)).sort((a, b) => keep.indexOf(a[0]) - keep.indexOf(b[0])) }
+  const mixed = s.title === 'Section' && value.tabs?.length > 0
+  if (mixed) props = props.filter(([k]) => k !== 'blocks')
   const sorted = [...props.filter(([k]) => !ORDER_LAST.has(k)), ...props.filter(([k]) => ORDER_LAST.has(k))]
   const fields = sorted.map(([k, p]) => <Field key={k} k={k} schema={p} value={value[k]} parent={value} set={v => set({ ...value, [k]: v })} />)
-  const body = isChart ? <KindCtx.Provider value={value.kind}>{fields.slice(0, 1)}<ExcelPaste chart={value} set={set} />{fields.slice(1)}</KindCtx.Provider> : <>{fields}</>
+  const fix = mixed ? <div className="issues" style={{ background: '#fff8e6', borderColor: '#e8c36a', color: '#6b4e00' }}>
+    Esta sección usa pestañas internas: las casillas van dentro de cada pestaña (o con «+ Agregar casilla» en la vista previa).
+    {value.blocks?.length > 0 && <> Hay {value.blocks.length} casilla(s) sueltas que no deberían estar aquí. <button onClick={() => set({ ...value, blocks: [], tabs: value.tabs.map((t: any, i: number) => (i === 0 ? { ...t, blocks: [...t.blocks, ...value.blocks] } : t)) })}>Moverlas a la primera pestaña</button> <button className="danger" onClick={() => set({ ...value, blocks: [] })}>Borrarlas</button></>}</div> : null
+  const body0 = isChart ? <KindCtx.Provider value={value.kind}>{fields.slice(0, 1)}<ExcelPaste chart={value} set={set} />{fields.slice(1)}</KindCtx.Provider> : <>{fields}</>
+  const body = mixed ? <>{fix}{body0}</> : body0
   return bare ? body : <div className="obj">{body}</div>
 }
 
@@ -197,7 +204,7 @@ function BlockList({ s, value, set }: { s: S; value: any[]; set: (v: any[]) => v
   const [pick, setPick] = useState(Object.keys(map)[0])
   const def = (t: string) => Defs.current[map[t].split('/').pop()!]
   const [fresh, setFresh] = useState(-1)
-  const addT = (t: string) => { setFresh(value.length); set([...value, blank(def(t))]) }
+  const addT = (t: string) => { setFresh(value.length); set([...value, { ...blank(def(t)), ...(STARTERS[t] || {}) }]) }
   return <div>{value.map((b, i) => <Row key={i + ':' + (i === fresh ? 'n' : '')} defaultOpen={i === fresh} head={<><b>{BLOCK[b.type] || b.type}</b> <span className="mut">{short(b)}{b.hidden ? ' · oculto' : ''}</span></>}
     onUp={() => set(mv(value, i, -1))} onDown={() => set(mv(value, i, 1))} onDel={() => confirm('¿Eliminar este bloque?') && set(value.filter((_, j) => j !== i))}
     onDup={() => set([...value.slice(0, i + 1), JSON.parse(JSON.stringify(b)), ...value.slice(i + 1)])}>

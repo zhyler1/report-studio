@@ -150,7 +150,10 @@ def preview(rid: int, s: Store = Depends(get_store)):
 @router.post("/render", response_class=HTMLResponse)
 def render_draft(body: dict[str, Any] = Body(...), edit: bool = False):
     """Vista previa de un borrador sin guardarlo. edit=1 marca las casillas para edición directa."""
-    return HTMLResponse(render(_valid(body), edit=edit))
+    rep, _issues = load(body)  # el borrador se dibuja aunque tenga avisos; los avisos se ven en el editor
+    if rep is None:
+        raise HTTPException(422, {"message": "El informe tiene errores", "issues": _issues})
+    return HTMLResponse(render(rep, edit=edit))
 
 
 @router.get("/reports/{rid}/export.html")

@@ -3,20 +3,13 @@ import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './Sch
 import { attach, getAt, setAt, listOps } from './editLayer'
 import { BLOCK } from './labels'
 import Loader from './Loader'
+import { STARTERS } from './starters'
 import { api, type Json, type ReportRow, type Version } from './api'
 
 const LS = {
   get<T>(k: string, def: T): T { try { const v = localStorage.getItem('rs.' + k); return v === null ? def : JSON.parse(v) } catch { return def } },
   set(k: string, v: unknown) { try { localStorage.setItem('rs.' + k, JSON.stringify(v)) } catch { /* sin almacenamiento */ } },
   del(k: string) { try { localStorage.removeItem('rs.' + k) } catch { /* sin almacenamiento */ } },
-}
-const STARTERS: Record<string, any> = {
-  chart: { kind: 'bar', title: 'Nuevo gráfico', labels: ['A', 'B', 'C'], series: [{ name: 'Serie 1', values: [10, 20, 15], color: 'auto', points: [], ohlc: [] }] },
-  media: { title: '', media: { kind: 'video', slot: 'video.mp4', src: '', poster: '', alt: '', caption: '', zoom: true, height: 220, autoplay: false, loop: false, muted: true } },
-  stat_grid: { items: [{ label: 'Descripción de la cifra', value: 0 }] },
-  card_list: { title: 'Título', items: ['Primer punto'] },
-  table: { title: 'Nueva tabla', columns: [{ key: 'a', label: 'Columna A', format: 'text' }, { key: 'b', label: 'Columna B', format: 'text' }], rows: [{ a: 'Dato', b: 'Dato' }] },
-  grid: { columns: [[], []] },
 }
 type Prev = { tab: string; sub: (string | null)[]; y: number }
 const restoreJs = (p: Prev) => `<script>addEventListener('load',function(){setTimeout(function(){var g=document.getElementById('iGo');if(g)g.click();var t=document.querySelector('.tab[data-t="${p.tab}"]');if(t)t.click();${JSON.stringify(p.sub)}.forEach(function(s){var b=document.querySelector('.sbtn[data-s="'+s+'"]');if(b)b.click()});setTimeout(function(){scrollTo(0,${p.y})},200)},120)})</script>`
