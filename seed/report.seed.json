@@ -7,7 +7,7 @@
   "boss_role": "Jefe de Oficina",
   "boss": "William Andrés Molina Agudelo",
   "tagline": "Presidencia de la República · Reunión de seguimiento interno",
-  "hero_kicker": "Ábrelo en tu celular",
+  "hero_kicker": "OFICINA DE TALENTO HUMANO",
   "hero_title": "Reporte de gestión",
   "hero_text": "Elija un grupo para ver su información.",
   "footer": "www.presidencia.gov.co",
@@ -36,6 +36,8 @@
    "icon": "people",
    "hidden": false,
    "home": {
+    "title": "Grupo de Gestión de Personal",
+    "columns": 3,
     "stats": [
      {
       "value": 869,
@@ -184,6 +186,7 @@
         "hidden": false,
         "type": "workflow",
         "heading": "Planta transitoria",
+        "modal_title": "Planta transitoria · Flujo de trabajo de la prórroga",
         "subtitle": "Seguimiento de actividades",
         "teaser": "Flujo de trabajo para la prórroga de la planta transitoria.",
         "button_label": "Ver planta transitoria ↗",
@@ -308,7 +311,7 @@
      "heading": "Seguimiento al Acuerdo Colectivo Sectorial 2025-2027",
      "cutoff": "Corte 12 de noviembre de 2026",
      "avg": 81.9,
-     "color": "auto",
+     "color": "green",
      "summary": "81,9 % de avance promedio en los compromisos priorizados definidos en la mesa de seguimiento ante la Procuraduría Delegada para la Salud y el Trabajo. La gestión adelantada permitió reconstruir evidencia documental, validar soportes y consolidar acciones con las entidades del sector para avanzar en el cierre de los compromisos objeto de seguimiento.",
      "milestone_date": "26 de noviembre de 2026",
      "milestone": [
@@ -340,6 +343,8 @@
    "icon": "stock",
    "hidden": false,
    "home": {
+    "title": "Grupo de Nómina",
+    "columns": 1,
     "stats": [
      {
       "value": 159,
@@ -466,6 +471,8 @@
    "icon": "heart",
    "hidden": false,
    "home": {
+    "title": "Grupo de Bienestar y Desarrollo",
+    "columns": 0,
     "stats": [
      {
       "value": 550000000,
@@ -500,6 +507,7 @@
         "alt": "[IMAGEN: presidencia-te-escucha.jpg] Afiche La Presidencia ¡Te escucha!",
         "caption": "Identidad gráfica de la campaña · clic para ampliar",
         "zoom": true,
+        "height": 420,
         "autoplay": false,
         "loop": false,
         "muted": true
@@ -536,6 +544,7 @@
      "blocks": [
       {
        "id": "act",
+       "title": "ACTIVIDADES",
        "hidden": false,
        "type": "activities",
        "items": [
@@ -687,6 +696,7 @@
      "label": "Calendario",
      "blocks": [
       {
+       "title": "CALENDARIO · Actividades de Bienestar",
        "hidden": false,
        "type": "calendar",
        "source": "act"
@@ -794,6 +804,7 @@
         "alt": "[IMAGEN: ancheta-navidena.jpg] Propuesta de ancheta navideña",
         "caption": "",
         "zoom": true,
+        "height": 170,
         "autoplay": false,
         "loop": false,
         "muted": true
@@ -813,6 +824,7 @@
         "alt": "[IMAGEN: kit-velitas.jpg] Propuesta de kit de velitas",
         "caption": "",
         "zoom": true,
+        "height": 170,
         "autoplay": false,
         "loop": false,
         "muted": true
@@ -831,6 +843,8 @@
    "icon": "radio",
    "hidden": false,
    "home": {
+    "title": "Comunicación Interna",
+    "columns": 0,
     "stats": [],
     "text": "Inducción · Chatbot Ofelio · Bitácora · Emisora online · Lector QR para eventos y capacitaciones",
     "tag": "Bitácora: edición del 11 de noviembre publicada",
@@ -911,6 +925,7 @@
        "alt": "[IMAGEN: qr-escaner.jpg] Captura de TH Control, pestaña Escáner (lector de código QR)",
        "caption": "Escáner · clic para ampliar",
        "zoom": true,
+       "height": 380,
        "autoplay": false,
        "loop": false,
        "muted": true
@@ -923,6 +938,7 @@
        "alt": "[IMAGEN: qr-recientes.jpg] Captura de TH Control, pestaña Recientes (fecha, tipo, funcionario, detalle)",
        "caption": "Recientes · clic para ampliar",
        "zoom": true,
+       "height": 380,
        "autoplay": false,
        "loop": false,
        "muted": true
@@ -949,6 +965,8 @@
    "icon": "doc",
    "hidden": false,
    "home": {
+    "title": "Grupo de Historias Laborales",
+    "columns": 2,
     "stats": [
      {
       "value": 868,
@@ -1071,6 +1089,8 @@
    "icon": "shield",
    "hidden": false,
    "home": {
+    "title": "Grupo de Seguridad y Salud en el Trabajo",
+    "columns": 0,
     "stats": [
      {
       "value": 80,

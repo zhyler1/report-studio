@@ -92,7 +92,9 @@ def build(html: str, data: dict) -> Report:
         stats = [stat_of(s) for s in c.select(".stat")]
         txt = plain(c.select_one("p.muted")) if c.select_one("p.muted") else ""
         tag = c.select_one(".tag-v")
-        home[g] = HomeCard(stats=stats, text=txt, tag=plain(tag) if tag else "",
+        grid_el = c.select_one(".grid")
+        cols = len(re.findall(r"1fr", grid_el["style"])) if grid_el and grid_el.get("style") else 0
+        home[g] = HomeCard(title=plain(c.select_one("h3")), columns=cols, stats=stats, text=txt, tag=plain(tag) if tag else "",
                            tag_tone="green" if tag and "46,125,50" in tag.get("style", "") else "red")
     # valores calculados (el renderizador los recalcula desde los datos)
     home["personal"].stats[0].bind = "plants.first_total"
@@ -116,7 +118,7 @@ def build(html: str, data: dict) -> Report:
     ptc = right.select_one(".ptcard")
     plants = Plants(plants=[Plant(label=a, provistos=b, vacantes=c) for a, b, c in PER["plantas"]], procesos=PER["procesos"],
                     procesos_label=PER["procLabel"], posesiones=PER["posesiones"], posesiones_label=PER["posLabel"], logro=PER["logro"])
-    wf = Workflow(title=None, heading=plain(ptc.select_one("h3")), subtitle=soup.select_one("#pt .pt-top > p").get_text(strip=True),
+    wf = Workflow(heading=plain(ptc.select_one("h3")), modal_title=plain(soup.select_one("#pt .pt-title")), subtitle=soup.select_one("#pt .pt-top > p").get_text(strip=True),
                   teaser=plain(ptc.select_one("p.muted")), button_label=plain(ptc.select_one("button")),
                   steps=[WorkflowStep(n=r[0], title=r[1], owner=r[2], status=r[3], times=r[4], hours=r[5], other=r[6]) for r in PT])
     grid = Grid(ratio=[1, 1], columns=[
@@ -125,7 +127,7 @@ def build(html: str, data: dict) -> Report:
          CardList(title=plain(sit.select_one("h3")), style="plain", items=[rich(li) for li in sit.select("li")])],
         [CardList(title=plain(right.select_one("h3.st")), style="checks", items=[rich(li) for li in acc.select("li")]), wf],
     ])
-    agr = Agreement(heading=ACU["titulo"], cutoff=ACU["corte"], avg=ACU["prom"], color="auto", summary=ACU["texto"],
+    agr = Agreement(heading=ACU["titulo"], cutoff=ACU["corte"], avg=ACU["prom"], color="green", summary=ACU["texto"],
                     milestone_date=ACU["hitoFecha"], milestone=[x[0] for x in ACU["hito"]],
                     progress=[x[0] for x in ACU["avances"]], watch=[x[0] for x in ACU["aspectos"]])
     personal = Section(id="personal", label="Gestión de Personal", title=t, subtitle=st, icon="people", home=home["personal"],
@@ -146,19 +148,19 @@ def build(html: str, data: dict) -> Report:
     steps = [StepCard(n=plain(s.select_one(".big")), tag=plain(s.select_one(".tag")), date=plain(s.select_one(".date")),
                       title=plain(s.select_one("h4")), text=plain(s.select_one("p"))) for s in esc_.select(".step")]
     sc = StepCards(header=plain(esc_.select_one(".bar-h")), items=steps,
-                   media=Media(slot=im["data-slot"], src=im["src"], alt=im["alt"], caption=plain(esc_.select_one("figcaption"))))
-    acts = Activities(id="act", items=[Activity(measure=r[0], name=r[1], frequency=r[2], pct=r[3], date=r[4], note=r[5], value=r[6]) for r in BIEN],
+                   media=Media(slot=im["data-slot"], src=im["src"], alt=im["alt"], height=int(im["data-h"]), caption=plain(esc_.select_one("figcaption"))))
+    acts = Activities(id="act", title=plain(p.select_one('[data-sub="actividades"] .bar-h')), items=[Activity(measure=r[0], name=r[1], frequency=r[2], pct=r[3], date=r[4], note=r[5], value=r[6]) for r in BIEN],
                       budget=pres["data-budget"], total=pres.get("data-total", ""), total_label=pres["data-totlabel"])
     prop = p.select_one('[data-sub="propuestas"]')
     heads = [plain(b) for b in prop.select(".bar-h")]
     imgs = prop.select("img")
-    mk = lambda i: Media(slot=i["data-slot"], src=i["src"], alt=i["alt"], caption="")
+    mk = lambda i: Media(slot=i["data-slot"], src=i["src"], alt=i["alt"], height=int(i["data-h"]), caption="")
     prp = Proposals(ancheta_title=heads[0], velitas_title=heads[1], ancheta=DEV["anc"], velitas=DEV["vel"], vacations=DEV["vac"], bonus=DEV["bon"],
                     ancheta_media=mk(imgs[0]), velitas_media=mk(imgs[1]), velitas_note=plain(prop.select_one(".note")))
     bien = Section(id="bienestar", label="Bienestar y Desarrollo", title=t, subtitle=st, icon="heart", home=home["bienestar"], tabs=[
         Tab(id="escucha", label=plain(p.select_one('.sbtn[data-s="escucha"]')), blocks=[sc]),
         Tab(id="actividades", label="Actividades", blocks=[acts]),
-        Tab(id="calendario", label="Calendario", blocks=[CalendarBlock(source="act")]),
+        Tab(id="calendario", label="Calendario", blocks=[CalendarBlock(source="act", title="CALENDARIO · Actividades de Bienestar")]),
         Tab(id="presupuesto", label="Presupuesto", blocks=[Budget(title=plain(p.select_one('[data-sub="presupuesto"] .bar-h')), source="act")]),
         Tab(id="propuestas", label="Propuestas", blocks=[prp]),
     ])
@@ -173,7 +175,7 @@ def build(html: str, data: dict) -> Report:
         lcs.append(LinkCard(n=plain(c.select_one(".lnum")), title=plain(c.select_one("h3")), text=plain(c.select_one("p.muted")), button=btn))
     sec2 = p.select_one(".sec")
     gal = Gallery(title=plain(sec2.select_one("h3.st")),
-                  items=[Media(slot=f.select_one("img")["data-slot"], src=f.select_one("img")["src"], alt=f.select_one("img")["alt"], caption=plain(f.select_one("figcaption"))) for f in sec2.select("figure")],
+                  items=[Media(slot=f.select_one("img")["data-slot"], src=f.select_one("img")["src"], alt=f.select_one("img")["alt"], height=int(f.select_one("img")["data-h"]), caption=plain(f.select_one("figcaption"))) for f in sec2.select("figure")],
                   side_card=InfoCard(title=plain(sec2.select_one(".card h3")), items=[rich(li) for li in sec2.select(".card li")]))
     comu = Section(id="comunicacion", label="Comunicación Interna", title=t, subtitle=st, icon="radio", home=home["comunicacion"], blocks=[LinkCards(items=lcs), gal])
 
@@ -205,7 +207,7 @@ def build(html: str, data: dict) -> Report:
 
     meta = Meta(title="Seguimiento Interno", subtitle="Oficina de Talento Humano", org="Presidencia de la República",
                 tagline=plain(soup.select_one(".hsub")), boss=plain(soup.select_one(".i-boss b")), boss_role=plain(soup.select_one(".i-boss span")),
-                hero_kicker=plain(soup.select_one(".hero small")), hero_title=plain(soup.select_one(".hero h2")), hero_text=plain(soup.select_one(".hero p")),
+                hero_kicker=plain(soup.select_one(".hero > small")), hero_title=plain(soup.select_one(".hero h2")), hero_text=plain(soup.select_one(".hero p")),
                 footer=plain(soup.select_one("footer")), share_url=re.search(r"var ART='([^']+)'", html).group(1),
                 theme=Theme(logo_dark=soup.select_one(".hlogo img")["data-dark"], logo_light=soup.select_one(".hlogo img")["data-light"],
                             intro_word=soup.select_one("#iTitle")["data-word"],

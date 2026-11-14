@@ -57,7 +57,7 @@ def test_every_text_comes_from_the_original_report():
 
     walk(SEED)
     # los textos de plantilla (etiquetas fijas del esquema) no cuentan como faltantes
-    allowed = {"Presupuesto {act.budget}", "Código", "Estado", "Avance", "Fecha de cierre", "Calendario"}
+    allowed = {"Presupuesto {act.budget}", "Código", "Estado", "Avance", "Fecha de cierre", "Calendario", "CALENDARIO · Actividades de Bienestar"}
     missing = [m for m in missing if m[1] not in allowed]
     assert missing == [], missing
 

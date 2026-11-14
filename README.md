@@ -28,3 +28,13 @@ python scripts/migrate_seed.py seed/Informe_TH.original.html seed/datos_informe.
 - `Informe_TH.v9.html`: la plantilla visual actual (tema gris, fondos, calendario, modo presentación). Es el objetivo del renderizador.
 - `datos_informe.json`: datos semilla originales.
 - `report.seed.json`: el informe en el formato de Report Studio.
+
+
+## Estado hito 1
+- [x] Esquema por bloques + validación
+- [x] Migración HTML → JSON (`scripts/migrate_seed.py`)
+- [x] Shell derivado de la plantilla v9 (`scripts/make_shell.py`)
+- [x] Renderizador `backend/app/render.py`: JSON → HTML idéntico a v9 (texto de todos los paneles y datos, verificado en jsdom)
+- [ ] Verificación en navegador real
+
+Uso: `cd backend && python3 -m app.render ../seed/report.seed.json salida.html`

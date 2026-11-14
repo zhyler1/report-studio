@@ -826,6 +826,16 @@
   "HomeCard": {
    "additionalProperties": false,
    "properties": {
+    "title": {
+     "default": "",
+     "title": "Title",
+     "type": "string"
+    },
+    "columns": {
+     "default": 0,
+     "title": "Columns",
+     "type": "integer"
+    },
     "stats": {
      "default": [],
      "items": {
@@ -1001,6 +1011,11 @@
      "default": true,
      "title": "Zoom",
      "type": "boolean"
+    },
+    "height": {
+     "default": 0,
+     "title": "Height",
+     "type": "integer"
     },
     "autoplay": {
      "default": false,
@@ -2622,6 +2637,11 @@
     },
     "heading": {
      "title": "Heading",
+     "type": "string"
+    },
+    "modal_title": {
+     "default": "",
+     "title": "Modal Title",
      "type": "string"
     },
     "subtitle": {

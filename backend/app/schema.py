@@ -55,6 +55,7 @@ class Media(Base):
     alt: str = ""
     caption: str = ""
     zoom: bool = True
+    height: int = 0               # alto mínimo del marcador mientras no hay archivo
     autoplay: bool = False
     loop: bool = False
     muted: bool = True
@@ -213,6 +214,7 @@ class WorkflowStep(Base):
 class Workflow(BlockBase):
     type: Literal["workflow"] = "workflow"
     heading: str
+    modal_title: str = ""
     subtitle: str = ""
     teaser: str = ""
     button_label: str = "Ver planta transitoria ↗"
@@ -327,6 +329,8 @@ Block = Annotated[
 
 # ───────────────────────── secciones e informe ─────────────────────────
 class HomeCard(Base):
+    title: str = ""
+    columns: int = 0              # 0 = automático
     stats: list[Stat] = []
     text: str = ""
     tag: str = ""
