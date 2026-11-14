@@ -2129,6 +2129,636 @@
        }
       ]
      ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "hstacked",
+        "title": "Solicitudes por grupo y estado",
+        "labels": [
+         "Personal",
+         "Nómina",
+         "Bienestar",
+         "Historias",
+         "SST"
+        ],
+        "series": [
+         {
+          "name": "Atendidas",
+          "values": [
+           40,
+           120,
+           30,
+           55,
+           25
+          ]
+         },
+         {
+          "name": "En trámite",
+          "values": [
+           12,
+           30,
+           8,
+           20,
+           6
+          ]
+         },
+         {
+          "name": "Vencidas",
+          "values": [
+           2,
+           5,
+           1,
+           7,
+           0
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "step",
+        "title": "Vacantes de la planta (escalón)",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Vacantes",
+          "values": [
+           140,
+           140,
+           132,
+           128,
+           128,
+           121
+          ]
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "pareto",
+        "title": "Causas de devolución de documentos",
+        "labels": [
+         "Firma faltante",
+         "Folio ilegible",
+         "Dato errado",
+         "Sin soporte",
+         "Fecha vencida",
+         "Otros"
+        ],
+        "series": [
+         {
+          "name": "Casos",
+          "values": [
+           48,
+           31,
+           17,
+           9,
+           5,
+           3
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "histogram",
+        "title": "Antigüedad de los funcionarios (años)",
+        "series": [
+         {
+          "name": "Años",
+          "values": [
+           1,
+           1,
+           2,
+           2,
+           2,
+           3,
+           3,
+           4,
+           4,
+           4,
+           5,
+           5,
+           6,
+           6,
+           7,
+           8,
+           8,
+           9,
+           10,
+           11,
+           12,
+           12,
+           14,
+           15,
+           18,
+           20,
+           22,
+           25
+          ]
+         }
+        ],
+        "unit": "años"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "pyramid",
+        "title": "Planta por edad y sexo",
+        "labels": [
+         "60+",
+         "50-59",
+         "40-49",
+         "30-39",
+         "20-29"
+        ],
+        "series": [
+         {
+          "name": "Mujeres",
+          "values": [
+           60,
+           130,
+           170,
+           140,
+           40
+          ]
+         },
+         {
+          "name": "Hombres",
+          "values": [
+           70,
+           120,
+           150,
+           120,
+           30
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "rose",
+        "title": "Solicitudes por mes (rosa de los vientos)",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Solicitudes",
+          "values": [
+           30,
+           45,
+           38,
+           60,
+           52,
+           75
+          ]
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "waffle",
+        "title": "Cumplimiento del plan anual",
+        "labels": [
+         "Cumplido",
+         "En ejecución",
+         "Pendiente"
+        ],
+        "series": [
+         {
+          "name": "Actividades",
+          "values": [
+           58,
+           22,
+           20
+          ]
+         }
+        ],
+        "unit": "actividades"
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "pictogram",
+        "title": "Personas por tipo de vinculación",
+        "labels": [
+         "Planta",
+         "Temporal",
+         "OPS"
+        ],
+        "series": [
+         {
+          "name": "Personas",
+          "values": [
+           869,
+           60,
+           140
+          ]
+         }
+        ],
+        "unit": "personas"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "slope",
+        "title": "Cumplimiento 2025 vs 2026 (%)",
+        "labels": [
+         "2025",
+         "2026"
+        ],
+        "series": [
+         {
+          "name": "Personal",
+          "values": [
+           70,
+           78
+          ]
+         },
+         {
+          "name": "Nómina",
+          "values": [
+           88,
+           92
+          ]
+         },
+         {
+          "name": "Bienestar",
+          "values": [
+           72,
+           64
+          ]
+         },
+         {
+          "name": "Historias",
+          "values": [
+           55,
+           71
+          ]
+         },
+         {
+          "name": "SST",
+          "values": [
+           76,
+           80
+          ]
+         }
+        ],
+        "unit": "%"
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "dumbbell",
+        "title": "Antes y después del plan de choque",
+        "labels": [
+         "Folios pendientes",
+         "Certificaciones",
+         "Posesiones",
+         "Respuestas"
+        ],
+        "series": [
+         {
+          "name": "Octubre",
+          "values": [
+           420,
+           60,
+           30,
+           55
+          ]
+         },
+         {
+          "name": "Noviembre",
+          "values": [
+           250,
+           90,
+           45,
+           80
+          ]
+         }
+        ],
+        "lower_is_better": false
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "bump",
+        "title": "Ranking de cumplimiento por mes",
+        "labels": [
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Personal",
+          "values": [
+           70,
+           72,
+           78,
+           80
+          ]
+         },
+         {
+          "name": "Nómina",
+          "values": [
+           90,
+           88,
+           92,
+           91
+          ]
+         },
+         {
+          "name": "Bienestar",
+          "values": [
+           60,
+           75,
+           64,
+           66
+          ]
+         },
+         {
+          "name": "Historias",
+          "values": [
+           55,
+           58,
+           71,
+           85
+          ]
+         }
+        ]
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "hemicycle",
+        "title": "Planta: distribución por nivel",
+        "labels": [
+         "Directivo",
+         "Asesor",
+         "Profesional",
+         "Técnico",
+         "Asistencial"
+        ],
+        "series": [
+         {
+          "name": "Cargos",
+          "values": [
+           30,
+           90,
+           400,
+           200,
+           149
+          ]
+         }
+        ],
+        "unit": "cargos"
+       }
+      ]
+     ]
+    },
+    {
+     "type": "grid",
+     "ratio": [
+      1,
+      1
+     ],
+     "columns": [
+      [
+       {
+        "type": "chart",
+        "kind": "kpi",
+        "title": "Indicadores del periodo",
+        "labels": [
+         "Jun",
+         "Jul",
+         "Ago",
+         "Sep",
+         "Oct",
+         "Nov"
+        ],
+        "series": [
+         {
+          "name": "Posesiones",
+          "values": [
+           4,
+           6,
+           5,
+           8,
+           9,
+           12
+          ]
+         },
+         {
+          "name": "Folios",
+          "values": [
+           520,
+           610,
+           640,
+           700,
+           790,
+           868
+          ]
+         },
+         {
+          "name": "Días de respuesta",
+          "values": [
+           9,
+           8,
+           8,
+           6,
+           5,
+           4
+          ],
+          "color": "green"
+         }
+        ],
+        "lower_is_better": true
+       }
+      ],
+      [
+       {
+        "type": "chart",
+        "kind": "calendar",
+        "title": "Actividades por día (calendario)",
+        "events": [
+         {
+          "label": "Taller",
+          "start": "2026-09-08",
+          "value": 2
+         },
+         {
+          "label": "Capacitación",
+          "start": "2026-09-15"
+         },
+         {
+          "label": "Jornada",
+          "start": "2026-09-22",
+          "value": 3
+         },
+         {
+          "label": "Charla",
+          "start": "2026-10-06"
+         },
+         {
+          "label": "Taller",
+          "start": "2026-10-13",
+          "value": 2
+         },
+         {
+          "label": "Bono",
+          "start": "2026-10-20"
+         },
+         {
+          "label": "Charla",
+          "start": "2026-10-20"
+         },
+         {
+          "label": "Torneo",
+          "start": "2026-11-03",
+          "value": 4
+         },
+         {
+          "label": "Taller",
+          "start": "2026-11-10",
+          "value": 2
+         },
+         {
+          "label": "Examen",
+          "start": "2026-11-12",
+          "value": 1
+         }
+        ]
+       }
+      ]
+     ]
+    },
+    {
+     "type": "chart",
+     "kind": "sankey",
+     "title": "Flujo de la planta: de fuente a destino",
+     "links": [
+      {
+       "source": "Provistos",
+       "target": "Carrera",
+       "value": 300
+      },
+      {
+       "source": "Provistos",
+       "target": "Libre nombramiento",
+       "value": 120
+      },
+      {
+       "source": "Provistos",
+       "target": "Provisionales",
+       "value": 449
+      },
+      {
+       "source": "Vacantes",
+       "target": "En convocatoria",
+       "value": 70
+      },
+      {
+       "source": "Vacantes",
+       "target": "Sin proveer",
+       "value": 51
+      },
+      {
+       "source": "En convocatoria",
+       "target": "Posesionados",
+       "value": 40
+      },
+      {
+       "source": "En convocatoria",
+       "target": "Desiertas",
+       "value": 30
+      }
+     ],
+     "unit": "cargos",
+     "height": 380
     }
    ]
   }

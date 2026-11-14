@@ -82,7 +82,7 @@ function Media({ v, set }: { v: any; set: (v: any) => void }) {
 export function Field({ k, schema, value, set, parent }: { k: string; schema: S; value: any; set: (v: any) => void; parent?: any }) {
   const { s, nullable } = norm(schema)
   if (s?.const !== undefined) return null
-  const name = label(k)
+  const name = k === 'source' && parent && 'target' in parent ? 'Origen' : k === 'target' && parent && 'source' in parent && 'value' in parent ? 'Destino' : label(k)
   if (nullable) {
     const on = value !== null && value !== undefined
     return <div><label><input type="checkbox" style={{ width: 'auto' }} checked={on} onChange={e => set(e.target.checked ? blank(s) : null)} /> {name} <span className="mut">(opcional)</span></label>
@@ -114,6 +114,9 @@ function applyPaste(c: any, text: string): any {
   const rows = text.replace(/\r/g, '').split('\n').filter(r => r.trim()).map(r => r.split('\t'))
   if (rows.length < 2) throw new Error('Pega al menos la fila de títulos y una fila de datos.')
   const head = rows[0], body = rows.slice(1), k = c.kind
+  if (k === 'sankey') return { ...c, links: body.map(r => ({ source: r[0] || '', target: r[1] || '', value: num(r[2] || '0') })) }
+  if (k === 'calendar') return { ...c, events: body.map(r => ({ label: r[2] || r[0] || '', start: iso(r[0] || ''), end: '', text: '', color: 'auto', done: null, value: r[1] ? num(r[1]) : null })) }
+  if (k === 'histogram') { const v = rows.map(r => num(r[0] || '')).filter((_, i) => i > 0 || !isNaN(parseFloat((rows[0][0] || '').replace(',', '.')))); return { ...c, series: [{ ...(c.series[0] || { name: 'Datos', color: 'auto', kind: null, points: [], ohlc: [] }), values: v }] } }
   if (k === 'timeline' || k === 'gantt') return { ...c, events: body.map(r => ({ label: r[0] || '', start: iso(r[1] || ''), end: iso(r[2] || ''), text: '', color: 'auto', done: r[3] ? num(r[3]) : null })) }
   if (k === 'scatter' || k === 'bubble') return { ...c, series: [{ ...(c.series[0] || { name: head[1] || 'Serie', color: 'auto', values: [], kind: null, ohlc: [] }), points: body.map(r => ({ x: num(r[0]), y: num(r[1]), r: num(r[2] || '0'), label: r[3] || '' })) }] }
   if (k === 'candles') return { ...c, labels: body.map(r => r[0]), series: [{ ...(c.series[0] || { name: 'Serie', color: 'auto', values: [], kind: null, points: [] }), ohlc: body.map(r => [num(r[1]), num(r[2]), num(r[3]), num(r[4])]) }] }
@@ -124,7 +127,7 @@ function applyPaste(c: any, text: string): any {
 
 function ExcelPaste({ chart, set }: { chart: any; set: (v: any) => void }) {
   const [on, setOn] = useState(false), [txt, setTxt] = useState(''), [err, setErr] = useState('')
-  const help: Record<string, string> = { timeline: 'Etiqueta · Inicio · Fin (opcional)', gantt: 'Etiqueta · Inicio · Fin · Avance %', scatter: 'x · y · tamaño · nombre', bubble: 'x · y · tamaño · nombre', candles: 'Etiqueta · Apertura · Máximo · Mínimo · Cierre' }
+  const help: Record<string, string> = { sankey: 'Origen · Destino · Valor', calendar: 'Fecha · Valor (opcional) · Etiqueta', histogram: 'una sola columna con los datos', timeline: 'Etiqueta · Inicio · Fin (opcional)', gantt: 'Etiqueta · Inicio · Fin · Avance %', scatter: 'x · y · tamaño · nombre', bubble: 'x · y · tamaño · nombre', candles: 'Etiqueta · Apertura · Máximo · Mínimo · Cierre' }
   const cols = help[chart.kind] || 'Etiqueta · Serie 1 · Serie 2 … (la primera fila son los títulos)'
   return <div className="card" style={{ background: '#F0F6FF' }}>
     <button onClick={() => setOn(!on)}>📋 {on ? 'Cerrar' : 'Pegar datos desde Excel'}</button>

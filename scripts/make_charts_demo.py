@@ -36,6 +36,23 @@ blocks = [
     ch("timeline", "Hitos del cierre de diciembre", events=[{"label": "Socialización sindicatos", "start": "2026-11-18", "text": "PIC y PDB"}, {"label": "Entrega de bonos", "start": "2026-11-25", "end": "2026-11-28"}, {"label": "Novena de aguinaldos", "start": "2026-12-09"}, {"label": "Vacaciones recreativas", "start": "2026-12-14", "end": "2026-12-18"}, {"label": "Cierre de vigencia", "start": "2026-12-30"}]),
     ch("gantt", "Cronograma de actividades", events=[{"label": "Preparar PIC", "start": "2026-10-20", "end": "2026-11-20", "done": 70}, {"label": "Socialización", "start": "2026-11-18", "end": "2026-11-30", "done": 30}, {"label": "Ejecución diciembre", "start": "2026-12-01", "end": "2026-12-22", "done": 0}, {"label": "Informe de cierre", "start": "2026-12-23", "end": "2026-12-31", "done": 0}]),
 ]
+blocks += [
+    ch("hstacked", "Solicitudes por grupo y estado", labels=["Personal", "Nómina", "Bienestar", "Historias", "SST"], series=[s("Atendidas", [40, 120, 30, 55, 25]), s("En trámite", [12, 30, 8, 20, 6]), s("Vencidas", [2, 5, 1, 7, 0])]),
+    ch("step", "Vacantes de la planta (escalón)", labels=M, series=[s("Vacantes", [140, 140, 132, 128, 128, 121])]),
+    ch("pareto", "Causas de devolución de documentos", labels=["Firma faltante", "Folio ilegible", "Dato errado", "Sin soporte", "Fecha vencida", "Otros"], series=[s("Casos", [48, 31, 17, 9, 5, 3])]),
+    ch("histogram", "Antigüedad de los funcionarios (años)", series=[s("Años", [1, 1, 2, 2, 2, 3, 3, 4, 4, 4, 5, 5, 6, 6, 7, 8, 8, 9, 10, 11, 12, 12, 14, 15, 18, 20, 22, 25])], unit="años"),
+    ch("pyramid", "Planta por edad y sexo", labels=["60+", "50-59", "40-49", "30-39", "20-29"], series=[s("Mujeres", [60, 130, 170, 140, 40]), s("Hombres", [70, 120, 150, 120, 30])]),
+    ch("rose", "Solicitudes por mes (rosa de los vientos)", labels=M, series=[s("Solicitudes", [30, 45, 38, 60, 52, 75])]),
+    ch("waffle", "Cumplimiento del plan anual", labels=["Cumplido", "En ejecución", "Pendiente"], series=[s("Actividades", [58, 22, 20])], unit="actividades"),
+    ch("pictogram", "Personas por tipo de vinculación", labels=["Planta", "Temporal", "OPS"], series=[s("Personas", [869, 60, 140])], unit="personas"),
+    ch("slope", "Cumplimiento 2025 vs 2026 (%)", labels=["2025", "2026"], series=[s("Personal", [70, 78]), s("Nómina", [88, 92]), s("Bienestar", [72, 64]), s("Historias", [55, 71]), s("SST", [76, 80])], unit="%"),
+    ch("dumbbell", "Antes y después del plan de choque", labels=["Folios pendientes", "Certificaciones", "Posesiones", "Respuestas"], series=[s("Octubre", [420, 60, 30, 55]), s("Noviembre", [250, 90, 45, 80])], lower_is_better=False),
+    ch("bump", "Ranking de cumplimiento por mes", labels=M[2:], series=[s("Personal", [70, 72, 78, 80]), s("Nómina", [90, 88, 92, 91]), s("Bienestar", [60, 75, 64, 66]), s("Historias", [55, 58, 71, 85])]),
+    ch("hemicycle", "Planta: distribución por nivel", labels=["Directivo", "Asesor", "Profesional", "Técnico", "Asistencial"], series=[s("Cargos", [30, 90, 400, 200, 149])], unit="cargos"),
+    ch("kpi", "Indicadores del periodo", labels=M, series=[s("Posesiones", [4, 6, 5, 8, 9, 12]), s("Folios", [520, 610, 640, 700, 790, 868]), s("Días de respuesta", [9, 8, 8, 6, 5, 4], color="green")], lower_is_better=True),
+    ch("calendar", "Actividades por día (calendario)", events=[{"label": "Taller", "start": "2026-09-08", "value": 2}, {"label": "Capacitación", "start": "2026-09-15"}, {"label": "Jornada", "start": "2026-09-22", "value": 3}, {"label": "Charla", "start": "2026-10-06"}, {"label": "Taller", "start": "2026-10-13", "value": 2}, {"label": "Bono", "start": "2026-10-20"}, {"label": "Charla", "start": "2026-10-20"}, {"label": "Torneo", "start": "2026-11-03", "value": 4}, {"label": "Taller", "start": "2026-11-10", "value": 2}, {"label": "Examen", "start": "2026-11-12", "value": 1}]),
+    ch("sankey", "Flujo de la planta: de fuente a destino", links=[{"source": "Provistos", "target": "Carrera", "value": 300}, {"source": "Provistos", "target": "Libre nombramiento", "value": 120}, {"source": "Provistos", "target": "Provisionales", "value": 449}, {"source": "Vacantes", "target": "En convocatoria", "value": 70}, {"source": "Vacantes", "target": "Sin proveer", "value": 51}, {"source": "En convocatoria", "target": "Posesionados", "value": 40}, {"source": "En convocatoria", "target": "Desiertas", "value": 30}], unit="cargos", height=380),
+]
 rows = [{"type": "grid", "ratio": [1, 1], "columns": [[blocks[i]], [blocks[i + 1]]]} for i in range(0, len(blocks) - 1, 2)]
 if len(blocks) % 2:
     rows.append(blocks[-1])

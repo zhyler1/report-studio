@@ -69,7 +69,8 @@ def test_chart_validation(mut, frag):
 
 def test_all_kinds_draw_in_a_real_browser(tmp_path):
     pw = pytest.importorskip("playwright.sync_api")
-    rep, _ = load(demo())
+    d = demo()
+    rep, _ = load(d)
     f = tmp_path / "d.html"
     f.write_text(render(rep), encoding="utf-8")
     errs = []
@@ -85,8 +86,8 @@ def test_all_kinds_draw_in_a_real_browser(tmp_path):
         pg.evaluate("document.getElementById('iGo')&&document.getElementById('iGo').click()")
         pg.evaluate("document.querySelector('.tab[data-t=graficos]').click()")
         pg.wait_for_timeout(1500)
-        n = pg.locator(".rs-chart svg").count()
+        n = pg.locator(".rs-chart > svg, .rs-chart > .rs-kpis").count()
         bad = pg.locator(".rs-chart p").count()
-        empty = pg.evaluate("[...document.querySelectorAll('.rs-chart svg')].filter(s=>s.querySelectorAll('path,rect,circle,polygon,line,text').length<3).length")
+        empty = pg.evaluate("[...document.querySelectorAll('.rs-chart > svg')].filter(s=>s.querySelectorAll('path,rect,circle,polygon,line,text').length<3).length")
         b.close()
-    assert errs == [] and n == 24 and bad == 0 and empty == 0, (errs, n, bad, empty)
+    assert errs == [] and n == len(charts(d)) == len(get_args(ChartKind)) and bad == 0 and empty == 0, (errs, n, bad, empty)

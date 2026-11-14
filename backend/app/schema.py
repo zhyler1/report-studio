@@ -291,7 +291,9 @@ class Proposals(BlockBase):
 ChartKind = Literal[
     "bar", "hbar", "stacked", "stacked100", "line", "area", "stacked_area", "combo", "lollipop",
     "pie", "donut", "radialbar", "gauge", "bullet", "radar", "scatter", "bubble", "waterfall", "funnel",
-    "candles", "heatmap", "treemap", "timeline", "gantt"]
+    "candles", "heatmap", "treemap", "timeline", "gantt",
+    "hstacked", "step", "pareto", "histogram", "pyramid", "rose", "waffle", "pictogram", "slope", "dumbbell", "bump",
+    "hemicycle", "kpi", "calendar", "sankey"]
 
 
 class Point(Base):
@@ -317,6 +319,13 @@ class Event(Base):
     text: str = ""
     color: Color = "auto"
     done: Optional[float] = None   # avance 0-100 (cronograma)
+    value: Optional[float] = None  # intensidad (calendario de actividad); vacío = 1
+
+
+class Link(Base):
+    source: str
+    target: str
+    value: float
 
 
 class Chart(BlockBase):
@@ -325,7 +334,9 @@ class Chart(BlockBase):
     kind: ChartKind
     labels: list[str] = []
     series: list[Series] = []
-    events: list[Event] = []                 # línea de tiempo y cronograma
+    events: list[Event] = []                 # línea de tiempo, cronograma y calendario
+    links: list[Link] = []                   # flujos (sankey)
+    bins: int = 0                            # histograma: número de intervalos (0 = automático)
     unit: str = ""
     target: list[float] = []                 # metas (bullet) o meta única
     max: Optional[float] = None              # tope del medidor / anillos
@@ -336,6 +347,7 @@ class Chart(BlockBase):
     height: int = 320
     show_legend: bool = True
     show_values: bool = True
+    lower_is_better: bool = False            # indicadores/pendiente/mancuernas: bajar es bueno (verde)
     caption: str = ""
 
 

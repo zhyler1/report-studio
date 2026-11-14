@@ -22,6 +22,7 @@ export const FIELD: Record<string, string> = {
   velitas_media: 'Imagen de velitas', velitas_note: 'Nota de velitas', velitas_title: 'Título de velitas', watch: 'Aspectos a vigilar', zoom: 'Ampliar al hacer clic',
   forecast: 'Periodos a proyectar (tendencia lineal)', forecast_labels: 'Nombres de los periodos proyectados', events: 'Eventos', target: 'Metas (una por etiqueta)', max: 'Valor máximo de la escala',
   totals: 'Posiciones que son totales (0 = primera)', points: 'Puntos (x, y, tamaño)', ohlc: 'Apertura, máximo, mínimo, cierre', show_legend: 'Mostrar leyenda', show_values: 'Mostrar valores', done: 'Avance (%)',
+  lower_is_better: 'Menos es mejor (bajar se ve en verde)', links: 'Flujos (origen → destino)', bins: 'Intervalos (0 = automático)',
   x: 'Valor en x', y: 'Valor en y', r: 'Tamaño',
 }
 
@@ -38,7 +39,7 @@ export const OPT: Record<string, string> = {
   purple: 'Morado', navy: 'Azul oscuro', left: 'Izquierda', right: 'Derecha', center: 'Centro', text: 'Texto', money: 'Dinero', pct: 'Porcentaje', pct_bar: 'Porcentaje con barra',
   pill: 'Etiqueta', number: 'Número', image: 'Imagen', video: 'Video', audio: 'Audio', checks: 'Con vistos', plain: 'Viñetas', warn: 'Advertencia', violet: 'Violeta',
   ejecutado: 'Ejecutado', proceso: 'En proceso', espera: 'En espera', vacations: 'Vacaciones', bonus: 'Bonificación', ancheta: 'Ancheta', velitas: 'Velitas',
-  bar: 'Barras', hbar: 'Barras horizontales', stacked100: 'Barras apiladas al 100 %', stacked_area: 'Áreas apiladas', combo: 'Combinado (barras + línea)', lollipop: 'Paletas',
+  bar: 'Barras', hbar: 'Barras horizontales', hstacked: 'Barras horizontales apiladas', step: 'Escalón', pareto: 'Pareto', histogram: 'Histograma', pyramid: 'Pirámide', rose: 'Rosa polar', waffle: 'Cuadrícula de 100', pictogram: 'Pictograma de personas', slope: 'Pendiente (antes y después)', dumbbell: 'Mancuernas', bump: 'Ranking en el tiempo', hemicycle: 'Hemiciclo', kpi: 'Tarjetas de indicador', calendar: 'Calendario de actividad', sankey: 'Flujos (sankey)', stacked100: 'Barras apiladas al 100 %', stacked_area: 'Áreas apiladas', combo: 'Combinado (barras + línea)', lollipop: 'Paletas',
   radialbar: 'Anillos concéntricos', bullet: 'Avance frente a meta', scatter: 'Dispersión', bubble: 'Burbujas', waterfall: 'Cascada', funnel: 'Embudo', heatmap: 'Mapa de calor',
   treemap: 'Mapa de árbol', timeline: 'Línea de tiempo', gantt: 'Cronograma (Gantt)',
   line: 'Líneas', area: 'Área', pie: 'Torta', donut: 'Dona', radar: 'Radar', gauge: 'Medidor', stacked: 'Barras apiladas', candles: 'Velas (bolsa)',
@@ -54,6 +55,10 @@ export const CHART_FIELDS: Record<string, string[]> = {
   pie: [...COMMON, 'labels', 'series'], donut: [...COMMON, 'labels', 'series'], treemap: [...COMMON, 'labels', 'series'], funnel: [...COMMON, 'labels', 'series'],
   radialbar: [...COMMON, 'labels', 'series', 'max'], gauge: [...COMMON, 'series', 'max'], bullet: [...COMMON, 'labels', 'series', 'target', 'max'], radar: [...COMMON, 'labels', 'series', 'max'],
   scatter: [...COMMON, 'series'], bubble: [...COMMON, 'series'], waterfall: [...COMMON, 'labels', 'series', 'totals'], candles: [...COMMON, 'labels', 'series'],
-  heatmap: [...COMMON, 'labels', 'series'], timeline: [...COMMON, 'events'], gantt: [...COMMON, 'events'],
+  heatmap: [...COMMON, 'labels', 'series'],
+  hstacked: [...COMMON, 'labels', 'series'], step: [...COMMON, 'labels', 'series'], pareto: [...COMMON, 'labels', 'series'], histogram: [...COMMON, 'series', 'bins'], pyramid: [...COMMON, 'labels', 'series'],
+  rose: [...COMMON, 'labels', 'series'], waffle: [...COMMON, 'labels', 'series'], pictogram: [...COMMON, 'labels', 'series'], slope: [...COMMON, 'labels', 'series', 'lower_is_better'],
+  dumbbell: [...COMMON, 'labels', 'series', 'lower_is_better'], bump: [...COMMON, 'labels', 'series'], hemicycle: [...COMMON, 'labels', 'series'], kpi: [...COMMON, 'labels', 'series', 'lower_is_better'],
+  calendar: [...COMMON, 'events'], sankey: [...COMMON, 'links'], timeline: [...COMMON, 'events'], gantt: [...COMMON, 'events'],
 }
 export const SERIES_FIELDS = (kind: string) => ['name', 'color', ...(kind === 'combo' ? ['kind'] : []), ...(kind === 'scatter' || kind === 'bubble' ? ['points'] : kind === 'candles' ? ['ohlc'] : ['values'])]

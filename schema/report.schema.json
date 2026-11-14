@@ -531,7 +531,22 @@
       "heatmap",
       "treemap",
       "timeline",
-      "gantt"
+      "gantt",
+      "hstacked",
+      "step",
+      "pareto",
+      "histogram",
+      "pyramid",
+      "rose",
+      "waffle",
+      "pictogram",
+      "slope",
+      "dumbbell",
+      "bump",
+      "hemicycle",
+      "kpi",
+      "calendar",
+      "sankey"
      ],
      "title": "Kind",
      "type": "string"
@@ -559,6 +574,19 @@
      },
      "title": "Events",
      "type": "array"
+    },
+    "links": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Link"
+     },
+     "title": "Links",
+     "type": "array"
+    },
+    "bins": {
+     "default": 0,
+     "title": "Bins",
+     "type": "integer"
     },
     "unit": {
      "default": "",
@@ -631,6 +659,11 @@
     "show_values": {
      "default": true,
      "title": "Show Values",
+     "type": "boolean"
+    },
+    "lower_is_better": {
+     "default": false,
+     "title": "Lower Is Better",
      "type": "boolean"
     },
     "caption": {
@@ -734,6 +767,18 @@
      ],
      "default": null,
      "title": "Done"
+    },
+    "value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Value"
     }
    },
    "required": [
@@ -1027,6 +1072,30 @@
     "items"
    ],
    "title": "InfoCard",
+   "type": "object"
+  },
+  "Link": {
+   "additionalProperties": false,
+   "properties": {
+    "source": {
+     "title": "Source",
+     "type": "string"
+    },
+    "target": {
+     "title": "Target",
+     "type": "string"
+    },
+    "value": {
+     "title": "Value",
+     "type": "number"
+    }
+   },
+   "required": [
+    "source",
+    "target",
+    "value"
+   ],
+   "title": "Link",
    "type": "object"
   },
   "LinkCard": {
