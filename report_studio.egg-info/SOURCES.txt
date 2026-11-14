@@ -1,0 +1,14 @@
+README.md
+pyproject.toml
+backend/app/__init__.py
+backend/app/api.py
+backend/app/render.py
+backend/app/schema.py
+backend/app/store.py
+backend/app/validate.py
+backend/app/templates/shell.html
+report_studio.egg-info/PKG-INFO
+report_studio.egg-info/SOURCES.txt
+report_studio.egg-info/dependency_links.txt
+report_studio.egg-info/requires.txt
+report_studio.egg-info/top_level.txt
