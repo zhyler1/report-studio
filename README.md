@@ -38,3 +38,11 @@ python scripts/migrate_seed.py seed/Informe_TH.original.html seed/datos_informe.
 - [ ] Verificación en navegador real
 
 Uso: `cd backend && python3 -m app.render ../seed/report.seed.json salida.html`
+
+## Estado hito 2 (API)
+- [x] `backend/app/store.py`: SQLite, cada guardado crea una versión
+- [x] `backend/app/api.py`: esquema, validar, CRUD, versiones y restaurar, vista previa, exportar HTML/PDF (Playwright), QR en SVG
+- [x] `router` montable en Nexus: `app.include_router(router, prefix="/report-studio")`
+- [ ] Interfaz de administración (React/Vite)
+
+Desarrollo: `cd backend && uvicorn app.api:app --reload` (documentación en `/docs`). El PDF necesita `playwright install chromium`.
