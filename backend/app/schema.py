@@ -71,10 +71,16 @@ class Column(Base):
 
 
 # ───────────────────────── bloques ─────────────────────────
+Hex = Field("", pattern=r"^(#[0-9a-fA-F]{6})?$")
+
+
 class BlockBase(Base):
     id: Optional[str] = None
     title: Optional[str] = None
     hidden: bool = False
+    span: Literal["full", "1/2", "1/3", "2/3", "1/4", "3/4"] = "full"   # ancho; las casillas consecutivas con ancho parcial quedan lado a lado
+    bg: str = Hex          # color de fondo de la casilla (vacío = el del tema)
+    fg: str = Hex          # color del texto de la casilla (vacío = el del tema)
 
 
 class StatGrid(BlockBase):
@@ -416,6 +422,10 @@ class Theme(Base):
     logo_dark: str = ""
     logo_light: str = ""
     intro_word: str = "Presentación"
+    palette: Literal["presidencia", "oceano", "bosque", "vino", "grafito", "atardecer"] = "presidencia"
+    primary: str = Hex     # color principal propio (reemplaza al de la paleta)
+    accent: str = Hex      # color de acento propio
+    font: Literal["public", "sistema", "georgia", "verdana", "trebuchet", "mono"] = "public"
 
 
 class Meta(Base):

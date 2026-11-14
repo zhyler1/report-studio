@@ -40,7 +40,7 @@ def test_every_text_comes_from_the_original_report():
     """Ningún texto del seed se inventa: todo aparece en el HTML o en datos_informe.json."""
     text = norm(BeautifulSoup(HTML, "lxml").get_text(" ")) + " " + norm(DATA) + " " + norm(HTML)
     skip = {"type", "id", "url", "src", "slot", "poster", "icon", "color", "status", "style", "tone", "kind", "level", "group", "key", "format",
-            "align", "source", "bind", "tag_tone", "schema_version", "default", "cover", "palace_url", "logo_dark", "logo_light", "share_url", "show"}
+            "align", "source", "bind", "tag_tone", "schema_version", "default", "cover", "palace_url", "logo_dark", "logo_light", "share_url", "show", "span", "palette", "font", "primary", "accent", "bg", "fg"}
     missing = []
 
     def walk(v, k=""):

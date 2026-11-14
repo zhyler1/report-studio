@@ -306,7 +306,7 @@ def r_proposals(b: Proposals, ctx: Ctx) -> str:
 
 
 def r_chart(b: Chart, ctx: Ctx) -> str:
-    spec = b.model_dump(mode="json", exclude={"id", "title", "hidden", "type", "caption"})
+    spec = b.model_dump(mode="json", exclude={"id", "title", "hidden", "type", "caption", "span", "bg", "fg"})
     h = f"<h3>{esc(b.title)}</h3>" if b.title else ""
     cap = f'<p class="cap">{esc(b.caption)}</p>' if b.caption else ""
     return f'<div class="card chart-card" data-r>{h}<div class="rs-chart" data-spec="{attr(json.dumps(spec, ensure_ascii=False, separators=(",", ":")))}"></div>{cap}</div>'
@@ -322,7 +322,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
     t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
     cols = ""
     for ci, col in enumerate(b.columns):
-        inner = "".join(render_block(x, ctx, f"{ctx.path}.columns.{ci}.{bi}") for bi, x in enumerate(col)) + add_slot(ctx, f"{ctx.path}.columns.{ci}")
+        inner = render_list(col, ctx, f"{ctx.path}.columns.{ci}") + add_slot(ctx, f"{ctx.path}.columns.{ci}")
         cols += f"<div>{inner}</div>" if ci == 0 else f'<div class="stk">{inner}</div>'
     sec = " sec" if not b.title else ""
     return f'{t}<div class="grid g2{sec}">{cols}</div>'
@@ -334,6 +334,31 @@ R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList
      Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid}
 
 
+SPAN_W = {"1/2": "calc(50% - 10px)", "1/3": "calc(33.333% - 14px)", "2/3": "calc(66.666% - 7px)", "1/4": "calc(25% - 15px)", "3/4": "calc(75% - 5px)"}
+
+
+def render_list(blocks, ctx: Ctx, base: str) -> str:
+    """Dibuja una lista de casillas; las consecutivas con ancho parcial se agrupan en una fila."""
+    out, row = [], []
+
+    def flush():
+        nonlocal row
+        if row:
+            out.append('<div class="rs-row">' + "".join(row) + "</div>")
+            row = []
+    for i, b in enumerate(blocks):
+        h = render_block(b, ctx, f"{base}.{i}")
+        if not h:
+            continue
+        if b.span != "full":
+            row.append(f'<div class="rs-c" style="flex:0 0 {SPAN_W[b.span]}">{h}</div>')
+        else:
+            flush()
+            out.append(h)
+    flush()
+    return "".join(out)
+
+
 def render_block(b, ctx: Ctx, path: str = "") -> str:
     if b.hidden:
         return ""
@@ -342,6 +367,9 @@ def render_block(b, ctx: Ctx, path: str = "") -> str:
         out = R[type(b)](b, ctx)
     finally:
         ctx.path = prev
+    if b.bg or b.fg:
+        st = (f"background:{b.bg};" if b.bg else "") + (f"color:{b.fg};--text:{b.fg};--head:{b.fg};--muted:{b.fg};" if b.fg else "")
+        out = f'<div class="rs-sty" style="{st}">{out}</div>'
     if ctx.edit and path:  # modo edición: cada casilla se marca para poder seleccionarla en la vista previa
         out = f'<div class="rs-b" data-bp="{attr(path)}" data-bt="{b.type}" style="display:contents">{out}</div>'
     return out
@@ -358,9 +386,9 @@ def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
         h += f'<div class="subnav" id="sn-{s.id}">' + "".join(
             f'<button class="sbtn{" on" if i == 0 else ""}" data-s="{attr(t.id)}" type="button">{esc(t.label)}</button>' for i, t in enumerate(s.tabs)) + "</div>"
         for i, t in enumerate(s.tabs):
-            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + "".join(render_block(b, ctx, f"sections.{si}.tabs.{i}.blocks.{bi}") for bi, b in enumerate(t.blocks)) + add_slot(ctx, f"sections.{si}.tabs.{i}.blocks") + "</div>"
+            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + render_list(t.blocks, ctx, f"sections.{si}.tabs.{i}.blocks") + add_slot(ctx, f"sections.{si}.tabs.{i}.blocks") + "</div>"
     else:
-        h += "".join(render_block(b, ctx, f"sections.{si}.blocks.{bi}") for bi, b in enumerate(s.blocks)) + add_slot(ctx, f"sections.{si}.blocks")
+        h += render_list(s.blocks, ctx, f"sections.{si}.blocks") + add_slot(ctx, f"sections.{si}.blocks")
         if any(isinstance(b, Grid) and any(isinstance(x, Workflow) for c in b.columns for x in c) for b in s.blocks):
             h += '<div class="printonly" id="ptPrint"></div>'
     return h + "</section>"
@@ -480,6 +508,47 @@ def _has_chart(rep: Report) -> bool:
     return any(isinstance(b, Chart) and not b.hidden for s in rep.sections for b in _blocks(s))
 
 
+def _mix(h: str, k: float) -> str:
+    """Oscurece (k<0) o aclara (k>0) un color #rrggbb."""
+    r, g, b = (int(h[i:i + 2], 16) for i in (1, 3, 5))
+    f = (lambda c: round(c * (1 + k))) if k < 0 else (lambda c: round(c + (255 - c) * k))
+    return "#%02x%02x%02x" % tuple(max(0, min(255, f(c))) for c in (r, g, b))
+
+
+PALETTES = {
+    "oceano": ({"blue": "#0E7490", "navy": "#0B4F6C", "yellow": "#E39A0B", "gold": "#38BDF8"},
+               {"blue": "#38BDF8", "navy": "#0E7490", "yellow": "#F5A623", "gold": "#38BDF8", "bg1": "#06151C", "bg2": "#0C2A38", "panel": "#0B2230"}),
+    "bosque": ({"blue": "#2F7D4F", "navy": "#1F5A3A", "yellow": "#C98A0B", "gold": "#A3E635"},
+               {"blue": "#4ADE80", "navy": "#2F7D4F", "yellow": "#F5A623", "gold": "#A3E635", "bg1": "#07140D", "bg2": "#0F2A1A", "panel": "#0D2216"}),
+    "vino": ({"blue": "#9F1D3A", "navy": "#6E1226", "yellow": "#D9822B", "gold": "#F4B860"},
+             {"blue": "#F87191", "navy": "#B02A4D", "yellow": "#F5A623", "gold": "#F4B860", "bg1": "#1A0A10", "bg2": "#33121E", "panel": "#2A0F18"}),
+    "grafito": ({"blue": "#475569", "navy": "#1E293B", "yellow": "#D97706", "gold": "#FBBF24"},
+                {"blue": "#94A3B8", "navy": "#475569", "yellow": "#F5A623", "gold": "#FBBF24", "bg1": "#0B0F14", "bg2": "#1B2330", "panel": "#151C27"}),
+    "atardecer": ({"blue": "#7C3AED", "navy": "#4C1D95", "yellow": "#EA580C", "gold": "#FDBA74"},
+                  {"blue": "#A78BFA", "navy": "#6D28D9", "yellow": "#FB923C", "gold": "#FDBA74", "bg1": "#130A1F", "bg2": "#261444", "panel": "#1E0F36"}),
+}
+FONTS = {"sistema": "system-ui,-apple-system,'Segoe UI',Arial,sans-serif", "georgia": "Georgia,'Times New Roman',serif",
+         "verdana": "Verdana,Geneva,sans-serif", "trebuchet": "'Trebuchet MS',Helvetica,sans-serif", "mono": "ui-monospace,Menlo,Consolas,monospace"}
+
+
+def theme_css(th) -> str:
+    L, D = (dict(x) for x in PALETTES.get(th.palette, ({}, {})))
+    if th.primary:
+        L.update(blue=th.primary, navy=_mix(th.primary, -.3)); D.update(blue=_mix(th.primary, .25), navy=th.primary)
+    if th.accent:
+        L.update(yellow=th.accent, gold=_mix(th.accent, .25)); D.update(yellow=th.accent, gold=_mix(th.accent, .25))
+    for d in (L, D):
+        if "blue" in d:
+            d["k1"] = d["blue"]
+    if th.font in FONTS:
+        L["sans"] = D["sans"] = FONTS[th.font]
+    if not L and not D:
+        return ""
+    f = lambda d: ";".join(f"--{k}:{v}" for k, v in d.items())
+    return (f'<style id="rs-theme">html:root:not([data-theme="dark"]){{{f(L)}}}'
+            f'@media screen{{html:root[data-theme="dark"]{{{f({**L, **D})}}}}}</style>')
+
+
 def render(rep: Report, edit: bool = False) -> str:
     m = rep.meta
     ctx = Ctx(rep, edit)
@@ -510,6 +579,8 @@ def render(rep: Report, edit: bool = False) -> str:
     if not edit:  # el informe completo viaja dentro del HTML para poder reimportarlo sin pérdida
         blob = json.dumps(rep.model_dump(mode="json"), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
         out = out.replace("</body>", f'<script type="application/json" id="rs-report">{blob}</script></body>', 1)
+    css = theme_css(m.theme) + ".rs-row{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch;margin-bottom:24px}.rs-c{min-width:0}.rs-sty{border-radius:16px;padding:16px;margin-bottom:12px}@media(max-width:760px){.rs-c{flex-basis:100%!important}}"
+    out = out.replace("</head>", f"<style>{css[css.index('.rs-row'):]}</style>" + css[:css.index(".rs-row")] + "</head>", 1) if False else out.replace("</head>", css[:css.index(".rs-row")] + "<style>" + css[css.index(".rs-row"):] + "</style></head>", 1)
     left = re.findall(r"@@[A-Z_]+@@", out)
     assert not left, f"marcadores sin resolver: {left}"
     return out

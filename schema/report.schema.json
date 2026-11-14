@@ -32,6 +32,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "activities",
      "default": "activities",
@@ -149,6 +174,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "agreement",
@@ -298,6 +348,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "budget",
      "default": "budget",
@@ -376,6 +451,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "calendar",
      "default": "calendar",
@@ -436,6 +536,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "card_list",
@@ -499,6 +624,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "chart",
@@ -820,6 +970,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "gallery",
      "default": "gallery",
@@ -883,6 +1058,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "grid",
@@ -1158,6 +1358,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "link_cards",
      "default": "link_cards",
@@ -1302,6 +1527,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "media",
      "default": "media",
@@ -1381,7 +1631,11 @@
       "palace_url": "",
       "logo_dark": "",
       "logo_light": "",
-      "intro_word": "Presentación"
+      "intro_word": "Presentación",
+      "palette": "presidencia",
+      "primary": "",
+      "accent": "",
+      "font": "public"
      }
     },
     "show_alerts": {
@@ -1451,6 +1705,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "note_list",
@@ -1537,6 +1816,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "numbered_cards",
      "default": "numbered_cards",
@@ -1617,6 +1921,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "plants",
@@ -1724,6 +2053,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "proposals",
@@ -1880,6 +2234,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "ring_card",
      "default": "ring_card",
@@ -2011,6 +2390,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "row_list",
@@ -2412,6 +2816,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "stat_grid",
      "default": "stat_grid",
@@ -2510,6 +2939,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "status_list",
      "default": "status_list",
@@ -2595,6 +3049,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "step_cards",
@@ -2781,6 +3260,31 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
     "type": {
      "const": "table",
      "default": "table",
@@ -2865,6 +3369,44 @@
      "default": "Presentación",
      "title": "Intro Word",
      "type": "string"
+    },
+    "palette": {
+     "default": "presidencia",
+     "enum": [
+      "presidencia",
+      "oceano",
+      "bosque",
+      "vino",
+      "grafito",
+      "atardecer"
+     ],
+     "title": "Palette",
+     "type": "string"
+    },
+    "primary": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Primary",
+     "type": "string"
+    },
+    "accent": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Accent",
+     "type": "string"
+    },
+    "font": {
+     "default": "public",
+     "enum": [
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
     }
    },
    "title": "Theme",
@@ -2901,6 +3443,31 @@
      "default": false,
      "title": "Hidden",
      "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
     },
     "type": {
      "const": "workflow",

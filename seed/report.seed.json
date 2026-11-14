@@ -18,7 +18,11 @@
    "palace_url": "https://commons.wikimedia.org/wiki/Special:FilePath/Costado2_Casa_de_Nari%C3%B1o.jpg?width=1600",
    "logo_dark": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/LOGO%20BLANCO.png",
    "logo_light": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/LOGO%20COLOR.png",
-   "intro_word": "Presentación"
+   "intro_word": "Presentación",
+   "palette": "presidencia",
+   "primary": "",
+   "accent": "",
+   "font": "public"
   },
   "show_alerts": false,
   "thresholds": [
@@ -78,6 +82,9 @@
     {
      "title": "Planta de Personal",
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "plants",
      "plants": [
       {
@@ -104,6 +111,9 @@
     },
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "grid",
      "ratio": [
       1.0,
@@ -114,6 +124,9 @@
        {
         "title": "Alertas y Riesgos · Mejoras SIGEPRE",
         "hidden": false,
+        "span": "full",
+        "bg": "",
+        "fg": "",
         "type": "table",
         "columns": [
          {
@@ -159,6 +172,9 @@
        {
         "title": "Situación actual",
         "hidden": false,
+        "span": "full",
+        "bg": "",
+        "fg": "",
         "type": "card_list",
         "style": "plain",
         "items": [
@@ -172,6 +188,9 @@
        {
         "title": "Acciones Implementadas",
         "hidden": false,
+        "span": "full",
+        "bg": "",
+        "fg": "",
         "type": "card_list",
         "style": "checks",
         "items": [
@@ -184,6 +203,9 @@
        },
        {
         "hidden": false,
+        "span": "full",
+        "bg": "",
+        "fg": "",
         "type": "workflow",
         "heading": "Planta transitoria",
         "modal_title": "Planta transitoria · Flujo de trabajo de la prórroga",
@@ -307,6 +329,9 @@
     },
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "agreement",
      "heading": "Seguimiento al Acuerdo Colectivo Sectorial 2025-2027",
      "cutoff": "Corte 12 de noviembre de 2026",
@@ -372,6 +397,9 @@
    "blocks": [
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "stat_grid",
      "items": [
       {
@@ -415,6 +443,9 @@
     },
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "row_list",
      "header": "ACCIONES DE GESTIÓN",
      "columns": [
@@ -497,6 +528,9 @@
      "blocks": [
       {
        "hidden": false,
+       "span": "full",
+       "bg": "",
+       "fg": "",
        "type": "step_cards",
        "header": "PRESIDENCIA TE ESCUCHA",
        "media": {
@@ -546,6 +580,9 @@
        "id": "act",
        "title": "ACTIVIDADES",
        "hidden": false,
+       "span": "full",
+       "bg": "",
+       "fg": "",
        "type": "activities",
        "items": [
         {
@@ -698,6 +735,9 @@
       {
        "title": "CALENDARIO · Actividades de Bienestar",
        "hidden": false,
+       "span": "full",
+       "bg": "",
+       "fg": "",
        "type": "calendar",
        "source": "act"
       }
@@ -710,6 +750,9 @@
       {
        "title": "PRESUPUESTO · Actividades pendientes",
        "hidden": false,
+       "span": "full",
+       "bg": "",
+       "fg": "",
        "type": "budget",
        "source": "act"
       }
@@ -721,6 +764,9 @@
      "blocks": [
       {
        "hidden": false,
+       "span": "full",
+       "bg": "",
+       "fg": "",
        "type": "proposals",
        "show": [
         "ancheta",
@@ -853,6 +899,9 @@
    "blocks": [
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "link_cards",
      "items": [
       {
@@ -915,6 +964,9 @@
     {
      "title": "Aplicación de lector de código QR para eventos y capacitaciones",
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "gallery",
      "items": [
       {
@@ -994,6 +1046,9 @@
    "blocks": [
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "stat_grid",
      "items": [
       {
@@ -1046,6 +1101,9 @@
     },
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "row_list",
      "header": "ACCIONES DE GESTIÓN",
      "columns": [
@@ -1071,6 +1129,9 @@
     },
     {
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "note_list",
      "header": "OBSERVACIONES",
      "items": [
@@ -1110,6 +1171,9 @@
     {
      "title": "Estado SG-SST 2026",
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "grid",
      "ratio": [
       1.0,
@@ -1119,6 +1183,9 @@
       [
        {
         "hidden": false,
+        "span": "full",
+        "bg": "",
+        "fg": "",
         "type": "ring_card",
         "value": 80.0,
         "text": "Cumplimiento del plan anual de trabajo del 80 % hasta el 31 de octubre de 2026.",
@@ -1129,6 +1196,9 @@
        {
         "title": "Seguimientos ARL (Casos críticos).",
         "hidden": false,
+        "span": "full",
+        "bg": "",
+        "fg": "",
         "type": "status_list",
         "items": [
          {
@@ -1154,6 +1224,9 @@
     {
      "title": "Alertas del Grupo SST",
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "numbered_cards",
      "items": [
       {
@@ -1177,6 +1250,9 @@
     {
      "title": "ACUERDOS LABORALES PENDIENTES",
      "hidden": false,
+     "span": "full",
+     "bg": "",
+     "fg": "",
      "type": "numbered_cards",
      "items": [
       {

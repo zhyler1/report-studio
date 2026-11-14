@@ -3,6 +3,7 @@ import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './Sch
 import { attach, getAt, setAt, listOps } from './editLayer'
 import { BLOCK } from './labels'
 import Loader from './Loader'
+import Ribbon, { type RibTab } from './Ribbon'
 import { STARTERS } from './starters'
 import { api, type Json, type ReportRow, type Version } from './api'
 
@@ -18,8 +19,6 @@ const readPrev = (doc?: Document | null): Prev | null => {
   return { tab: a.getAttribute('data-t') || 'inicio', sub: Array.from(doc.querySelectorAll('.sbtn.on')).map(b => b.getAttribute('data-s')), y: doc.scrollingElement?.scrollTop || 0 }
 }
 
-type Tab = 'general' | 'secciones' | 'alertas' | 'json' | 'versiones' | 'casilla'
-const TABS: [Tab, string][] = [['general', 'General'], ['secciones', 'Secciones'], ['alertas', 'Alertas'], ['json', 'JSON'], ['versiones', 'Versiones']]
 
 function General({ d, set }: { d: Json; set: (d: Json) => void }) {
   return <div className="card"><MetaForm meta={d.meta} set={m => set({ ...d, meta: m })} /></div>
@@ -90,8 +89,9 @@ export default function App() {
   const [id, setId] = useState<number | null>(null)
   const [d, setD] = useState<Json | null>(null)
   const [saved, setSaved] = useState('')
-  const [tab, setTabS] = useState<Tab>(() => LS.get<Tab>('tab', 'general'))
-  const setTab = (k: Tab) => { setTabS(k); LS.set('tab', k) }
+  const [rib, setRib] = useState<RibTab>('inicio')
+  const [drawer, setDrawer] = useState<string | null>(() => LS.get<string | null>('drawer', null))
+  const openDrawer = (k: string | null) => { setDrawer(k); LS.set('drawer', k) }
   const [issues, setIssues] = useState<string[]>([])
   const [html, setHtml] = useState('')
   const [msg, setMsg] = useState('')
@@ -100,12 +100,12 @@ export default function App() {
   const frame = useRef<HTMLIFrameElement>(null)
   const seen = useRef(false)
   const [sel, setSelS] = useState<string | null>(null)
-  const [picker, setPicker] = useState<{ list: string; index: number } | null>(null)
+  const [picker, setPicker] = useState<{ list: string; index: number; side?: boolean } | null>(null)
   const [toast, setToast] = useState('')
   const [loader, setLoader] = useState<number | null>(null)
   const dRef = useRef<Json | null>(null); dRef.current = d
   const selRef = useRef<string | null>(null); selRef.current = sel
-  const select = useCallback((p: string | null) => { setSelS(p); if (p) setTabS('casilla'); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
+  const select = useCallback((p: string | null) => { setSelS(p); setRib(r => (p ? 'casilla' : r === 'casilla' ? 'inicio' : r)); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
   const flash = useCallback((m: string) => { setToast(m); setTimeout(() => setToast(''), 3500) }, [])
   const kinds = useMemo(() => { const k: any = Defs.current?.Chart?.properties?.kind; const r = k?.$ref ? Defs.current[k.$ref.split('/').pop()] : k; return (r?.enum || []) as string[] }, [id, ready])
   const onLoad = () => {
@@ -155,12 +155,39 @@ export default function App() {
     return () => clearTimeout(t)
   }, [d])
 
-  const insertBlock = (type: string) => {
-    if (!picker || !dRef.current) return
+  const doInsert = (list: string, index: number, type: string, side?: boolean) => {
+    const dd = dRef.current; if (!dd) return
     const def = blockTypes().find(x => x.type === type)?.def; if (!def) return
-    const b = { ...blank(def), ...(STARTERS[type] || {}) }
-    setD(listOps.insert(dRef.current, picker.list, picker.index, b)); setPicker(null)
-    select(picker.list + '.' + picker.index)
+    const b: Json = { ...blank(def), ...(STARTERS[type] || {}) }
+    let nd = dd
+    if (side) { b.span = '1/2'; const sp = selRef.current; if (sp && getAt(nd, sp)?.span === 'full') nd = setAt(nd, sp + '.span', '1/2') }
+    setD(listOps.insert(nd, list, index, b)); select(list + '.' + index)
+  }
+  const insertBlock = (type: string) => { if (!picker) return; doInsert(picker.list, picker.index, type, picker.side); setPicker(null) }
+  const where = (): { list: string; index: number; si: number } | null => {  // dónde cae una casilla nueva: debajo de la seleccionada o al final de la sección visible
+    const dd = dRef.current; if (!dd) return null
+    const sp = selRef.current
+    if (sp) { const k = sp.split('.'); const i = Number(k.pop()); return { list: k.join('.'), index: i + 1, si: Number(k[1]) || 0 } }
+    const doc = frame.current?.contentDocument; const pv = readPrev(doc)
+    const si = dd.sections.findIndex((s: Json) => s.id === pv?.tab); if (si < 0) return null
+    const s = dd.sections[si]
+    let list = `sections.${si}.blocks`
+    if (s.tabs?.length) { const sid = doc?.querySelector(`#sn-${s.id} .sbtn.on`)?.getAttribute('data-s'); const ti = Math.max(0, s.tabs.findIndex((x: Json) => x.id === sid)); list = `sections.${si}.tabs.${ti}.blocks` }
+    return { list, index: (getAt(dd, list) || []).length, si }
+  }
+  const insert = (type: string, side?: boolean) => {
+    const w = where()
+    if (!w) { flash('Abre una sección en la vista previa (o selecciona una casilla) y vuelve a intentarlo'); return }
+    if (type === '__doc') { setLoader(w.si); return }
+    if (type === '__pick') { setPicker({ list: w.list, index: w.index, side }); return }
+    doInsert(w.list, w.index, type, side)
+  }
+  const op = (a: string) => {
+    const sp = selRef.current, dd = dRef.current; if (!sp || !dd) return
+    const k = sp.split('.'); const i = Number(k.pop()); const list = k.join('.')
+    if (a === 'up' || a === 'down') { setD(listOps.move(dd, sp, a === 'up' ? -1 : 1)); select(list + '.' + Math.max(0, i + (a === 'up' ? -1 : 1))) }
+    else if (a === 'dup') { setD(listOps.dup(dd, sp)); select(list + '.' + (i + 1)) }
+    else if (a === 'del' && confirm('¿Quitar esta casilla?')) { setD(listOps.del(dd, sp)); select(null) }
   }
   const addLoaded = (si: number, blocks: Json[]) => {
     const dd = dRef.current; if (!dd) return
@@ -207,25 +234,23 @@ export default function App() {
       {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={() => open(r.id)}>{r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
       {!rows.length && <p className="mut">Aún no hay informes. Importa el JSON del seed para empezar.</p>}
     </aside>
-    {ready && d && id !== null ? <div className="main">
-      <div className="edit">
-        <div className="bar"><button className="pri" disabled={!dirty || issues.length > 0} onClick={save}>Guardar</button>
-          <button onClick={() => setLoader(Math.max(0, d.sections.findIndex((s: Json) => sel?.startsWith(`sections.${d.sections.indexOf(s)}.`))))}>📥 Cargar documento</button>
-          <a href={`/api/reports/${id}/export.html`}><button>HTML</button></a><a href={`/api/reports/${id}/export.pdf`}><button>PDF</button></a>
-          <button className="danger" onClick={remove}>Eliminar</button>
-          <span className="mut">{dirty ? 'Cambios sin guardar' : msg}</span></div>
-        {issues.length > 0 && <div className="issues"><b>Corrige antes de guardar:</b><ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{issues.map((x, i) => <li key={i}>{x}</li>)}</ul></div>}
-        <div className="tabs">{(sel ? [['casilla', 'Casilla seleccionada'] as [Tab, string], ...TABS] : TABS).map(([k, l]) => <button key={k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)}>{l}</button>)}</div>
-        {tab === 'casilla' && (sel && getAt(d, sel) ? <div className="card"><div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 8 }}><b style={{ flex: 1 }}>{BLOCK[getAt(d, sel).type] || getAt(d, sel).type}</b><button onClick={() => select(null)}>Deseleccionar</button></div>
-          <p className="mut" style={{ marginTop: 0 }}>Doble clic sobre cualquier texto de la vista previa para editarlo ahí mismo. Aquí están todas las opciones de esta casilla.</p>
-          <BlockForm block={getAt(d, sel)} set={v => setD(setAt(d, sel, v))} /></div> : <div className="card"><p className="mut">Haz clic en una casilla de la vista previa para editarla, o en «+ Agregar casilla» dentro de una sección.</p></div>)}
-        {tab === 'general' && <General d={d} set={setD} />}
-        {tab === 'secciones' && <Secciones d={d} set={setD} focus={goPreview} />}
-        {tab === 'alertas' && <Alertas d={d} set={setD} />}
-        {tab === 'json' && <JsonEditor d={d} set={setD} />}
-        {tab === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}
+    {ready && d && id !== null ? <div className="main2">
+      <Ribbon d={d} setD={setD} sel={sel} rib={rib} setRib={setRib} dirty={dirty} blocked={issues.length > 0} msg={msg} id={id} save={save} remove={remove}
+        openDrawer={openDrawer} insert={insert} op={op} kinds={kinds} />
+      {issues.length > 0 && <div className="issues" style={{ margin: '6px 12px' }}><b>Avisos (para guardar hay que corregirlos):</b><ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{issues.map((x, i) => <li key={i}>{x}</li>)}</ul></div>}
+      <div className="work">
+        <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
+        {drawer && <div className="drawer">
+          <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', secciones: 'Secciones', alertas: 'Alertas', json: 'JSON', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
+          {drawer === 'casilla' && (sel && getAt(d, sel) ? <div className="card"><p className="mut" style={{ marginTop: 0 }}>Doble clic sobre cualquier texto de la vista previa para editarlo ahí mismo.</p>
+            <BlockForm block={getAt(d, sel)} set={v => setD(setAt(d, sel, v))} /></div> : <div className="card"><p className="mut">Haz clic en una casilla de la vista previa.</p></div>)}
+          {drawer === 'general' && <General d={d} set={setD} />}
+          {drawer === 'secciones' && <Secciones d={d} set={setD} focus={goPreview} />}
+          {drawer === 'alertas' && <Alertas d={d} set={setD} />}
+          {drawer === 'json' && <JsonEditor d={d} set={setD} />}
+          {drawer === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}
+        </div>}
       </div>
-      <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
       {picker && <div className="modal" onClick={() => setPicker(null)}><div className="modal-b" onClick={e => e.stopPropagation()}>
         <h2 style={{ marginTop: 0 }}>¿Qué quieres poner aquí?</h2>
         <div className="tiles">{([['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video, audio o imagen'], ['stat_grid', '🔢', 'Cifras destacadas'], ['card_list', '📝', 'Texto con lista'], ['table', '▦', 'Tabla'], ['grid', '◫', 'Columnas (poner cosas lado a lado)'], ['__doc', '📥', 'Desde un documento o texto']] as const).map(([k, i, l]) =>
