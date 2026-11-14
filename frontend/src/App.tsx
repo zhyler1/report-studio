@@ -147,11 +147,11 @@ export default function App() {
   useEffect(() => {  // vista previa en vivo con retraso
     if (!d) return
     const t = setTimeout(async () => {
-      const v = await api.validate(d).catch(() => null)
+      const v = await api.validate(d).catch((e: any) => { setIssues(['No se pudo validar el informe: ' + e.message + '. Revisa la terminal donde corre el servidor.']); return null })
       if (!v) return
       setIssues(v.issues)
       if (v.ok) {
-        let h = await api.render(d, true).catch(() => '')
+        let h = await api.render(d, true).catch((e: any) => { setIssues(['No se pudo generar la vista previa: ' + e.message + '. Revisa la terminal donde corre el servidor.']); return '' })
         const doc = frame.current?.contentDocument
         const prev = (seen.current ? readPrev(doc) : null) || LS.get<Prev | null>('prev', null)
         if (h && prev) h = h.replace('</body>', restoreJs(prev) + '</body>')
