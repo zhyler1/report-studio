@@ -584,6 +584,99 @@
    "title": "CalendarBlock",
    "type": "object"
   },
+  "Callout": {
+   "additionalProperties": false,
+   "description": "Recuadro destacado (verde), p. ej. «Logro destacado».",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
+    "type": {
+     "const": "callout",
+     "default": "callout",
+     "title": "Type",
+     "type": "string"
+    },
+    "heading": {
+     "default": "Logro destacado:",
+     "title": "Heading",
+     "type": "string"
+    },
+    "text": {
+     "title": "Text",
+     "type": "string"
+    }
+   },
+   "required": [
+    "text"
+   ],
+   "title": "Callout",
+   "type": "object"
+  },
   "CardList": {
    "additionalProperties": false,
    "properties": {
@@ -1241,14 +1334,17 @@
          "agreement": "#/$defs/Agreement",
          "budget": "#/$defs/Budget",
          "calendar": "#/$defs/CalendarBlock",
+         "callout": "#/$defs/Callout",
          "card_list": "#/$defs/CardList",
          "chart": "#/$defs/Chart",
          "gallery": "#/$defs/Gallery",
          "grid": "#/$defs/Grid",
+         "heading": "#/$defs/Heading",
          "link_cards": "#/$defs/LinkCards",
          "media": "#/$defs/MediaBlock",
          "note_list": "#/$defs/NoteList",
          "numbered_cards": "#/$defs/NumberedCards",
+         "plant_card": "#/$defs/PlantCard",
          "plants": "#/$defs/Plants",
          "proposals": "#/$defs/Proposals",
          "ring_card": "#/$defs/RingCard",
@@ -1324,6 +1420,15 @@
         },
         {
          "$ref": "#/$defs/Grid"
+        },
+        {
+         "$ref": "#/$defs/PlantCard"
+        },
+        {
+         "$ref": "#/$defs/Callout"
+        },
+        {
+         "$ref": "#/$defs/Heading"
         }
        ]
       },
@@ -1337,6 +1442,87 @@
     "columns"
    ],
    "title": "Grid",
+   "type": "object"
+  },
+  "Heading": {
+   "additionalProperties": false,
+   "description": "Solo un título de sección (usa el campo Título).",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
+    "type": {
+     "const": "heading",
+     "default": "heading",
+     "title": "Type",
+     "type": "string"
+    }
+   },
+   "title": "Heading",
    "type": "object"
   },
   "HomeCard": {
@@ -2082,6 +2268,115 @@
    "title": "Plant",
    "type": "object"
   },
+  "PlantCard": {
+   "additionalProperties": false,
+   "description": "Una sola planta como casilla suelta (sale de «Separar en casillas» del bloque de plantas).",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
+    "type": {
+     "const": "plant_card",
+     "default": "plant_card",
+     "title": "Type",
+     "type": "string"
+    },
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "provistos": {
+     "title": "Provistos",
+     "type": "integer"
+    },
+    "vacantes": {
+     "title": "Vacantes",
+     "type": "integer"
+    },
+    "viz": {
+     "default": "bars",
+     "enum": [
+      "bars",
+      "donut",
+      "bar",
+      "kpi"
+     ],
+     "title": "Viz",
+     "type": "string"
+    }
+   },
+   "required": [
+    "label",
+    "provistos",
+    "vacantes"
+   ],
+   "title": "PlantCard",
+   "type": "object"
+  },
   "Plants": {
    "additionalProperties": false,
    "properties": {
@@ -2813,14 +3108,17 @@
         "agreement": "#/$defs/Agreement",
         "budget": "#/$defs/Budget",
         "calendar": "#/$defs/CalendarBlock",
+        "callout": "#/$defs/Callout",
         "card_list": "#/$defs/CardList",
         "chart": "#/$defs/Chart",
         "gallery": "#/$defs/Gallery",
         "grid": "#/$defs/Grid",
+        "heading": "#/$defs/Heading",
         "link_cards": "#/$defs/LinkCards",
         "media": "#/$defs/MediaBlock",
         "note_list": "#/$defs/NoteList",
         "numbered_cards": "#/$defs/NumberedCards",
+        "plant_card": "#/$defs/PlantCard",
         "plants": "#/$defs/Plants",
         "proposals": "#/$defs/Proposals",
         "ring_card": "#/$defs/RingCard",
@@ -2896,6 +3194,15 @@
        },
        {
         "$ref": "#/$defs/Grid"
+       },
+       {
+        "$ref": "#/$defs/PlantCard"
+       },
+       {
+        "$ref": "#/$defs/Callout"
+       },
+       {
+        "$ref": "#/$defs/Heading"
        }
       ]
      },
@@ -3452,14 +3759,17 @@
         "agreement": "#/$defs/Agreement",
         "budget": "#/$defs/Budget",
         "calendar": "#/$defs/CalendarBlock",
+        "callout": "#/$defs/Callout",
         "card_list": "#/$defs/CardList",
         "chart": "#/$defs/Chart",
         "gallery": "#/$defs/Gallery",
         "grid": "#/$defs/Grid",
+        "heading": "#/$defs/Heading",
         "link_cards": "#/$defs/LinkCards",
         "media": "#/$defs/MediaBlock",
         "note_list": "#/$defs/NoteList",
         "numbered_cards": "#/$defs/NumberedCards",
+        "plant_card": "#/$defs/PlantCard",
         "plants": "#/$defs/Plants",
         "proposals": "#/$defs/Proposals",
         "ring_card": "#/$defs/RingCard",
@@ -3535,6 +3845,15 @@
        },
        {
         "$ref": "#/$defs/Grid"
+       },
+       {
+        "$ref": "#/$defs/PlantCard"
+       },
+       {
+        "$ref": "#/$defs/Callout"
+       },
+       {
+        "$ref": "#/$defs/Heading"
        }
       ]
      },

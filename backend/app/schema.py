@@ -222,6 +222,27 @@ class Plants(BlockBase):
     viz: PlantViz = "bars"        # barra apilada (original) u otro gráfico por planta
 
 
+class PlantCard(BlockBase):
+    """Una sola planta como casilla suelta (sale de «Separar en casillas» del bloque de plantas)."""
+    type: Literal["plant_card"] = "plant_card"
+    label: str
+    provistos: int
+    vacantes: int
+    viz: PlantViz = "bars"
+
+
+class Callout(BlockBase):
+    """Recuadro destacado (verde), p. ej. «Logro destacado»."""
+    type: Literal["callout"] = "callout"
+    heading: str = "Logro destacado:"
+    text: Rich
+
+
+class Heading(BlockBase):
+    """Solo un título de sección (usa el campo Título)."""
+    type: Literal["heading"] = "heading"
+
+
 class WorkflowStep(Base):
     n: int
     title: str
@@ -391,7 +412,7 @@ Block = Annotated[
     Union[
         StatGrid, RowList, NoteList, CardList, RingCard, StatusList, NumberedCards, StepCards,
         LinkCards, Gallery, Table, Plants, Workflow, Agreement, Activities, Budget,
-        CalendarBlock, Proposals, Chart, MediaBlock, Grid,
+        CalendarBlock, Proposals, Chart, MediaBlock, Grid, PlantCard, Callout, Heading,
     ],
     Field(discriminator="type"),
 ]

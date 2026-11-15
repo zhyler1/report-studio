@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, LinkCards, Media, MediaBlock,
-                     NoteList, NumberedCards, Plants, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
+                     NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
                      StepCards, Table, Workflow)
 
 SHELL = Path(__file__).parent / "templates" / "shell.html"
@@ -98,8 +98,18 @@ class Ctx:
         self.th = tuple(rep.meta.thresholds)
         self.acts = {}
         self.plants = None
+        self.cards: list[PlantCard] = []      # plantas sueltas (si no hay un bloque de plantas completo)
+        self.sproc = self.spos = None         # cifras de procesos y posesiones sueltas (enlazadas con plants.procesos / plants.posesiones)
         for s in rep.sections:
             for b in _blocks(s):
+                if isinstance(b, PlantCard):
+                    self.cards.append(b)
+                if isinstance(b, StatGrid):
+                    for it in b.items:
+                        if it.bind == "plants.procesos" and self.sproc is None:
+                            self.sproc = it
+                        if it.bind == "plants.posesiones" and self.spos is None:
+                            self.spos = it
                 if isinstance(b, Activities) and b.id:
                     self.acts[b.id] = b
                 if isinstance(b, Plants) and self.plants is None:
@@ -109,6 +119,13 @@ class Ctx:
         return money_int(a.total) if a.total.strip() else sum(money_int(i.value) for i in a.items)
 
     def bind(self, key: str):
+        if not self.plants:
+            if key == "plants.first_total" and self.cards:
+                return self.cards[0].provistos + self.cards[0].vacantes
+            if key == "plants.procesos" and self.sproc is not None and isinstance(self.sproc.value, (int, float)):
+                return self.sproc.value
+            if key == "plants.posesiones" and self.spos is not None and isinstance(self.spos.value, (int, float)):
+                return self.spos.value
         if key == "plants.first_total" and self.plants:
             p = self.plants.plants[0]
             return p.provistos + p.vacantes
@@ -297,6 +314,34 @@ def r_plants(b: Plants, ctx: Ctx) -> str:
     return f'{t}<div id="perBox"></div>'
 
 
+def _plain(ctx, k: str) -> str:
+    return ctx.rep.meta.texts.get(k) or TEXTS[k][0]
+
+
+def r_plant_card(b: PlantCard, ctx: Ctx) -> str:
+    pr, va = b.provistos, b.vacantes
+    t = pr + va
+    a = pr / t * 100 if t else 0
+    if b.viz != "bars":
+        spec = {"kind": b.viz, "labels": [_plain(ctx, "per.prov"), _plain(ctx, "per.vac")], "series": [{"name": b.label, "values": [pr, va], "color": "auto"}], "unit": "", "max": None,
+                "height": 190, "show_legend": True, "show_values": True, "target": [], "events": [], "links": [], "totals": [], "forecast_labels": [], "bins": 0, "forecast": 0}
+        viz = f'<div class="rs-chart" data-spec="{attr(json.dumps(spec, ensure_ascii=False, separators=(",", ":")))}"></div>'
+    else:
+        viz = (f'<div class="bar stack" style="height:14px;margin:16px 0 14px"><i style="--w:{a:.2f}%;background:var(--blue)"></i>'
+               f'<i style="--w:{100 - a:.2f}%;background:var(--yellow)"></i></div>')
+    return (f'<div class="card stat" data-r style="--i:1"><span class="num" data-to="{t}">{t}</span><span class="lbl" style="font-weight:700;color:var(--head)">{esc(b.label)}</span>{viz}'
+            f'<div class="legend"><div><i style="background:var(--blue)"></i><b class="num" data-to="{pr}">{pr}</b> {T(ctx, "per.prov")}</div>'
+            f'<div><i style="background:var(--yellow)"></i><b class="num" data-to="{va}">{va}</b> {T(ctx, "per.vac")}</div></div></div>')
+
+
+def r_callout(b: Callout, ctx: Ctx) -> str:
+    return f'<div class="card win" data-r style="--i:1"><h3>{esc(b.heading)}</h3><p style="font-size:14px">{rich(b.text)}</p></div>'
+
+
+def r_heading(b: Heading, ctx: Ctx) -> str:
+    return f'<h3 class="st" data-r>{esc(b.title or "")}</h3>'
+
+
 def pt_counts(w: Workflow) -> dict:
     c = {"ejecutado": 0, "proceso": 0, "espera": 0}
     for s in w.steps:
@@ -374,7 +419,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
 
 
 R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList: r_card_list, RingCard: r_ring, StatusList: r_status_list,
-     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants,
+     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading,
      Workflow: r_workflow, Agreement: r_agreement, Activities: r_activities, Budget: r_budget, CalendarBlock: r_calendar,
      Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid}
 
@@ -438,7 +483,7 @@ def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
             h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + render_list(t.blocks, ctx, f"sections.{si}.tabs.{i}.blocks") + add_slot(ctx, f"sections.{si}.tabs.{i}.blocks") + "</div>"
     else:
         h += render_list(s.blocks, ctx, f"sections.{si}.blocks") + add_slot(ctx, f"sections.{si}.blocks")
-        if any(isinstance(b, Grid) and any(isinstance(x, Workflow) for c in b.columns for x in c) for b in s.blocks):
+        if any(isinstance(b, Workflow) for b in _blocks(s)):
             h += '<div class="printonly" id="ptPrint"></div>'
     return h + "</section>"
 
@@ -537,6 +582,10 @@ def js_data(rep: Report) -> dict:
                     "posesiones": pl.posesiones, "posLabel": pl.posesiones_label, "logro": pl.logro}
         if pl.viz != "bars":
             d["PER"]["viz"] = pl.viz
+    else:  # sin bloque de plantas completo: se arma con las plantas y cifras sueltas (o queda vacío, sin cifras de muestra)
+        sp, so = ctx.sproc, ctx.spos
+        d["PER"] = {"plantas": [[c.label, c.provistos, c.vacantes] for c in ctx.cards], "procesos": ctx.bind("plants.procesos") or 0, "procLabel": sp.label if sp else "",
+                    "posesiones": ctx.bind("plants.posesiones") or 0, "posLabel": so.label if so else "", "logro": ""}
     return d
 
 
@@ -559,7 +608,7 @@ def hours_text(w: Workflow | None) -> str:
 
 def _has_chart(rep: Report) -> bool:
     return any(not b.hidden and (isinstance(b, Chart) or (isinstance(b, (RingCard, Agreement)) and b.viz != "ring")
-                                 or (isinstance(b, Plants) and b.viz != "bars") or (isinstance(b, Budget) and b.viz != "donut"))
+                                 or (isinstance(b, (Plants, PlantCard)) and b.viz != "bars") or (isinstance(b, Budget) and b.viz != "donut"))
                for s in rep.sections for b in _blocks(s))
 
 

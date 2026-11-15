@@ -18,7 +18,7 @@ from pptx.util import Emu, Inches, Pt
 
 from .render import Ctx, _blocks, num_text
 from .schema import (Activities, Agreement, CalendarBlock, CardList, Chart, Gallery, Grid, LinkCards, MediaBlock, NoteList, NumberedCards,
-                     Plants, Proposals, Report, RingCard, RowList, StatGrid, StatusList, StepCards, Table, Workflow, Budget)
+                     Plants, PlantCard, Callout, Heading, Proposals, Report, RingCard, RowList, StatGrid, StatusList, StepCards, Table, Workflow, Budget)
 
 W, H = 13.333, 7.5
 MX, TOP, BOT = 0.55, 1.45, 7.1
@@ -236,6 +236,14 @@ class Deck:
             self.heading(b.title or "Planta de personal")
             self.table(["Planta", "Provistos", "Vacantes", "Total"], [[p.label, p.provistos, p.vacantes, p.provistos + p.vacantes] for p in b.plants], [5, 2, 2, 2])
             self.bullets([f"{b.procesos} · {b.procesos_label}", f"{b.posesiones} · {b.posesiones_label}", f"Logro destacado: {clean(b.logro)}"])
+        elif isinstance(b, PlantCard):
+            self.heading(b.label)
+            self.bullets([f"Provistos: {b.provistos}", f"Vacantes: {b.vacantes}", f"Total: {b.provistos + b.vacantes}"])
+        elif isinstance(b, Callout):
+            self.heading(b.heading)
+            self.bullets([clean(b.text)])
+        elif isinstance(b, Heading):
+            self.heading(b.title or "")
         elif isinstance(b, Workflow):
             self.heading(b.heading or b.title or "Flujo de trabajo")
             self.table(["#", "Actividad", "Responsable", "Estado", "Horas"], [[s.n, s.title, s.owner, s.status, s.hours] for s in b.steps], [0.5, 6, 3, 1.5, 1])

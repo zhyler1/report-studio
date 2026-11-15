@@ -32,6 +32,20 @@ export const lockedAt = (d: Json, p: string | null): boolean => {
   return false
 }
 
+/** Parte el bloque de plantas en casillas sueltas: título, una tarjeta por planta, procesos, posesiones y el logro. */
+export const splitPlants = (d: Json, p: string): Json => {
+  const b = getAt(d, p); if (!b || b.type !== 'plants') return d
+  const k = p.split('.'); const i = Number(k.pop()); const list = k.join('.')
+  const parts: Json[] = []
+  if (b.title) parts.push({ type: 'heading', title: b.title })
+  for (const pl of b.plants || []) parts.push({ type: 'plant_card', label: pl.label, provistos: pl.provistos, vacantes: pl.vacantes, viz: b.viz || 'bars', span: '1/3' })
+  parts.push({ type: 'stat_grid', span: '1/3', items: [{ value: b.procesos, label: b.procesos_label, bind: 'plants.procesos' }] })
+  parts.push({ type: 'stat_grid', span: '1/3', items: [{ value: b.posesiones, label: b.posesiones_label, bind: 'plants.posesiones' }] })
+  parts.push({ type: 'callout', heading: 'Logro destacado:', text: b.logro, span: '1/3' })
+  const a = [...getAt(d, list)]; a.splice(i, 1, ...parts)
+  return setAt(d, list, a)
+}
+
 export const listOps = {
   move(d: Json, p: string, dx: number): Json {
     const { list, i } = parentOf(p); const a = [...getAt(d, list)]; const j = i + dx
@@ -175,7 +189,7 @@ export function attach(doc: Document, h: Host) {
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button><button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${t === 'plants' ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada planta, procesos, posesiones y logro">⧉ Separar en casillas</button>' : ''}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
@@ -184,6 +198,7 @@ export function attach(doc: Document, h: Host) {
     const d = h.get()
     if (a === 'lock') { h.put(setAt(d, p + '.locked', !getAt(d, p)?.locked)); h.toast(getAt(d, p)?.locked ? 'Casilla desbloqueada' : 'Casilla bloqueada 🔒'); return }
     if (lockedAt(d, p)) { h.toast('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
+    if (a === 'split') { h.put(splitPlants(d, p)); h.select(null); h.toast('Separada en casillas: ahora cada parte se arrastra sola'); return }
     if (a === 'up') h.put(listOps.move(d, p, -1)); else if (a === 'down') h.put(listOps.move(d, p, 1))
     else if (a === 'dup') h.put(listOps.dup(d, p))
     else if (a === 'clr') h.put(setAt(setAt(d, p + '.bg', ''), p + '.fg', ''))

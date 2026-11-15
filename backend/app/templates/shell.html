@@ -806,10 +806,11 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
     var hs=document.getElementById('heroStats');if(!hs)return;
     var p0=PER.plantas[0]||[0,0,0],planta=(+p0[1]||0)+(+p0[2]||0);
     var bud=parseMoney(budgetTxt()),tot=totalBien(),pc=(bud?tot/bud*100:0).toFixed(1).replace('.',',')+' %';
-    var it=[['<span class="num" data-to="'+planta+'">'+fmt(planta)+'</span>',X('hero.planta','Planta permanente')],
-      ['<span class="num" data-to="'+(+PER.procesos||0)+'">'+fmt(+PER.procesos||0)+'</span>',esc(PER.procLabel)],
-      ['<span class="num" data-to="'+(+PER.posesiones||0)+'">'+fmt(+PER.posesiones||0)+'</span>',X('hero.pos','Posesiones realizadas')],
-      ['<span class="num">'+pc+'</span>',esc(totLbl())+X('pres.frente',' frente al presupuesto')]];
+    var it=[];
+    if(PER.plantas.length)it.push(['<span class="num" data-to="'+planta+'">'+fmt(planta)+'</span>',X('hero.planta','Planta permanente')]);
+    if(PER.procLabel)it.push(['<span class="num" data-to="'+(+PER.procesos||0)+'">'+fmt(+PER.procesos||0)+'</span>',esc(PER.procLabel)]);
+    if(PER.posLabel)it.push(['<span class="num" data-to="'+(+PER.posesiones||0)+'">'+fmt(+PER.posesiones||0)+'</span>',X('hero.pos','Posesiones realizadas')]);
+    it.push(['<span class="num">'+pc+'</span>',esc(totLbl())+X('pres.frente',' frente al presupuesto')]);
     hs.innerHTML=it.map(function(x){return '<div class="hstat">'+x[0]+'<span class="lbl">'+x[1]+'</span></div>'}).join('');
   }
   function renderHomeX(){
@@ -1054,7 +1055,7 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
   /* ===== tabla de planta transitoria para impresión ===== */
   function buildPtPrint(){var h='<h3 class="st">Planta transitoria · Flujo de trabajo de la prórroga</h3><div class="tw"><table class="pt-tb"><thead><tr><th>Orden</th><th>Actividad</th><th>Oficina responsable</th><th>Estado</th><th>Tiempos</th><th>Hora</th><th>Otros</th></tr></thead><tbody>';
     PT.forEach(function(r){h+='<tr class="s-'+r[3]+'"><td>'+r[0]+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td><td><span class="spill">'+PTL[r[3]]+'</span></td><td>'+dsh(r[4])+'</td><td>'+dsh(r[5])+'</td><td>'+dsh(r[6])+'</td></tr>'});
-    document.getElementById('ptPrint').innerHTML=h+'</tbody></table></div>'}
+    var pp=document.getElementById('ptPrint');if(pp)pp.innerHTML=h+'</tbody></table></div>'}
   buildPtPrint();
   function updPTMini(){var c={ejecutado:0,proceso:0,espera:0};PT.forEach(function(r){if(c[r[3]]!=null)c[r[3]]++});var m={'ptm-ej':'ejecutado','ptm-pr':'proceso','ptm-es':'espera'};Object.keys(m).forEach(function(k){document.querySelectorAll('.'+k).forEach(function(e){e.textContent=c[m[k]]})})}
   updPTMini();

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
-import { attach, getAt, setAt, listOps, lockedAt } from './editLayer'
+import { attach, getAt, setAt, listOps, lockedAt, splitPlants } from './editLayer'
 import { BLOCK, ICONOS } from './labels'
 import Loader from './Loader'
 import Templates from './Templates'
@@ -242,6 +242,7 @@ export default function App() {
     if (a === 'up' || a === 'down') { setD(listOps.move(dd, sp, a === 'up' ? -1 : 1)); select(list + '.' + Math.max(0, i + (a === 'up' ? -1 : 1))) }
     else if (a === 'dup') { setD(listOps.dup(dd, sp)); select(list + '.' + (i + 1)) }
     else if (a === 'del' && confirm('¿Quitar esta casilla?')) { setD(listOps.del(dd, sp)); select(null) }
+    else if (a === 'split') { setD(splitPlants(dd, sp)); flash('Separada en casillas: ahora cada parte se arrastra sola'); select(null) }
     else if (a === 'del!') { setD(listOps.del(dd, sp)); select(null); flash('Casilla quitada · Ctrl+Z para deshacer') }
   }
   keyAct.current = op
