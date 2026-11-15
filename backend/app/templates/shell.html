@@ -692,6 +692,9 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
   var BIEN=/*@BIEN*/[["18.70 - 2025","Vacaciones recreativas","3 VECES AL AÑO",67,"30 de noviembre al 04 de diciembre","Se propone el programa para los hijos de los funcionarios de 0 a 5 años con pasaporte interactivo para Chuck and Cheeses. niños de 6 a 12 años vacaciones tecnológicas para visitar durante los cinco días del 30 de noviembre al 4 de diciembre distintos lugares en la ciudad de Bogotá y de 13 a 17 años se entregarán bonos para Escape room.","$ 151.272.800"],["18.57-2025","Actividades para funcionarios sin hijos ni pareja","SEMESTRAL",100,"07 de noviembre","Se realizó el sábado 07 de noviembre en el CUR Sede Compensar avenida 68 en el horario de 8:00 am a 11:30 am, para 18 funcionarios. Las actividades son taller terrario y 2 líneas de bolos para cada funcionario.","$ 0"],["22 - 2023","Kit Biciusuarios","ANUAL",0,"30 de noviembre","Se entregará kit a 3 funcionarios que cumplen con los parámetros de la resolución que implementa el incentivo.","$ 0"],["27 - 2023","Acuerdo Sindical (Bonos)","MENSUAL",82,"30 de noviembre","Se entregará un bono para cada uno de los funcionarios consumible  en restaurante seleccionado por valor de $90,000. ","$ 89.535.600"],["18.58 y 18.55 2025","Taller navideño familiar","ANUAL",0,"05 de diciembre","Se realizará taller navideño de tejido macramé de acuerdo a inscripciones para el 05 de diciembre en sede compensar.","$ 0"],["EFR","KIT velitas  para apertura a la navidad","ANUAL",0,"03 y 04 de diciembre","Se entregará kit de velitas (Ilumina la navidad) de acuerdo a elección por parte de la entidad.","$  99.484.000"],["EFR","Cierre de gestión (ancheta)","ANUAL",0,"12 y 13 de diciembre","Se entregará ancheta navideña del 9 al 11 de diciembre.","$ 208.012.000"],["EFR","Cine","BIMENSUAL",67,"PENDIENTE","Junto con Salones de Estado  se gestiona el uso del teatro y la posibilidad de proyectar una película (cine foro navideño) por parte de Cine Colombia. Adicionalmente compensar acompañara con un refrigerio para los participantes","$ 0"],["18.55 - 2025","Ciclopaseo","SEMESTRAL",50,"28 de noviembre","Pendiente por confirmar lugar por parte de la Caja de Compensación Compensar","$ 0"],["EFR","Cumpleaños del mes","MENSUAL",83,"1 vez al mes","Actualmente se lleva a cabo con el acompañamiento de la Caja de Compensación, para el mes de noviembre se hará el 25 de noviembre.","$ 0"],["EFR","Bienestar espiritual","SEMANAL",64,"Todos los martes","Bajo el contrato 617-26 con el padre Rodolfo Londoño se realizan las misas semanales.","$ 0"],["EFR","SPA para Cuidadores","SEMESTRAL",50,"07 de noviembre","04112026. Se hará en compensar el 7 Noviembre. (6 inscritos) medida EFR","$ 0"],["18.8 - 2025","Autoestima y Nutrición","SEMESTRAL",50,"03 de noviembre","Se realizó el taller de snack saludable con la participación de 11 funcionarios el 03 de noviembre de 2026.","$ 0"],["EFR","Grupo de Oración","SEMANAL DE OCTUBRE A DICIEMBRE",33,"Todos los martes","Se realiza todos los martes en el Auditorio Alejandría en el horario de 6:00 a 7:30 pm","$ 0"],["34.10 - 2025","Reconocimiento simbólico por antigüedad (Quinquenio)","SEMESTRAL",50,"15 de diciembre","Se estima para 30 funcionarios.  La caja de compensación apoyará con la actividad en la que corresponde a la parte logística del evento como es salón, refrigerio y detalle.",""]]/*@/BIEN*/;
   var filt='all',q='';
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
+  var TX=/*@TX*/{}/*@/TX*/;
+  function tx(k,d){var v=TX[k];return v!=null&&String(v)!==''?v:d}
+  function X(k,d){return '<span data-tx="'+k+'">'+esc(tx(k,d))+'</span>'}
   var PAL=['#2563B0','#C62828','#2E7D32','#E39A0B','#8E63C8','#0E9AA7','#D2691E','#6B7A90'];
   function parseMoney(s){s=String(s==null?'':s);var c=s.indexOf(',');if(c>=0)s=s.slice(0,c);var d=s.replace(/\D/g,'');return d?parseInt(d,10):0}
   function money(n){return '$ '+fmt(n)}
@@ -706,21 +709,21 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     var box=document.getElementById('presBox');if(!box)return;updTotals();
     var bud=parseMoney(budgetTxt()),tot=totalBien(),sum=sumBien();
     var items=BIEN.map(function(r){return{n:r[1],v:parseMoney(r[6])}}).filter(function(x){return x.v>0}).sort(function(a,b){return b.v-a.v}),nval=items.length;
-    var rest=tot>sum?tot-sum:0;if(rest>0)items.push({n:'Sin desglosar por actividad (cálculo)',v:rest,g:1});
+    var rest=tot>sum?tot-sum:0;if(rest>0)items.push({n:tx('pres.resto','Sin desglosar por actividad (cálculo)'),v:rest,g:1});
     var pct=bud?tot/bud:0,diff=bud-tot,max=items.reduce(function(m,x){return Math.max(m,x.v)},1),over=diff<0;
     var ptxt=(pct*100).toFixed(1).replace('.',',')+' %',off=(439.82*(1-Math.min(pct,1))).toFixed(2);
     var h='<div class="grid g4" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin:18px 0">'+
-      '<div class="card stat" data-r style="--i:1;background:rgba(198,40,40,.14);border-color:rgba(198,40,40,.5)"><span class="num long" data-to="'+bud+'" data-pre="$ " style="color:var(--red)">0</span><span class="lbl">Presupuesto</span></div>'+
+      '<div class="card stat" data-r style="--i:1;background:rgba(198,40,40,.14);border-color:rgba(198,40,40,.5)"><span class="num long" data-to="'+bud+'" data-pre="$ " style="color:var(--red)">0</span><span class="lbl">'+X('pres.presupuesto','Presupuesto')+'</span></div>'+
       '<div class="card stat" data-r style="--i:2"><span class="num long" data-to="'+tot+'" data-pre="$ ">0</span><span class="lbl">'+esc(totLbl())+'</span></div>'+
-      '<div class="card stat" data-r style="--i:3"><span class="num long" data-to="'+Math.abs(diff)+'" data-pre="$ ">0</span><span class="lbl">'+(over?'Excede el presupuesto (cálculo)':'Diferencia frente al presupuesto (cálculo)')+'</span></div>'+
-      '<div class="card stat" data-r style="--i:4"><span class="num" data-to="'+BIEN.length+'">0</span><span class="lbl">Actividades pendientes ('+nval+' con valor, '+(BIEN.length-nval)+' sin costo)</span></div></div>';
-    h+='<div class="pres-grid"><div class="card" data-r style="--i:1;display:flex;flex-direction:column;align-items:center;gap:14px"><h3 style="align-self:flex-start">'+esc(totLbl())+' frente al presupuesto</h3>'+
-      '<div class="donut" data-r style="--i:2"><svg viewBox="0 0 180 180" width="220" height="220" role="img" aria-label="'+ptxt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+off+'"/></svg><div class="dc"><b>'+ptxt+'</b><span>del presupuesto</span></div></div>'+
-      '<div class="legend" style="justify-content:center"><div><i style="background:var(--yellow)"></i>'+esc(totLbl())+' '+money(tot)+'</div><div><i style="background:rgba(198,40,40,.45)"></i>Presupuesto '+esc(budgetTxt())+'</div></div></div>'+
-      '<div class="card" data-r style="--i:2"><h3>Desglose por actividad (valor pendiente)</h3><div class="hb" data-r>';
+      '<div class="card stat" data-r style="--i:3"><span class="num long" data-to="'+Math.abs(diff)+'" data-pre="$ ">0</span><span class="lbl">'+(over?X('pres.excede','Excede el presupuesto (cálculo)'):X('pres.dif','Diferencia frente al presupuesto (cálculo)'))+'</span></div>'+
+      '<div class="card stat" data-r style="--i:4"><span class="num" data-to="'+BIEN.length+'">0</span><span class="lbl">'+esc(tx('pres.pend','Actividades pendientes ({n} con valor, {m} sin costo)').replace('{n}',nval).replace('{m}',BIEN.length-nval))+'</span></div></div>';
+    h+='<div class="pres-grid"><div class="card" data-r style="--i:1;display:flex;flex-direction:column;align-items:center;gap:14px"><h3 style="align-self:flex-start">'+esc(totLbl())+X('pres.frente',' frente al presupuesto')+'</h3>'+
+      '<div class="donut" data-r style="--i:2"><svg viewBox="0 0 180 180" width="220" height="220" role="img" aria-label="'+ptxt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+off+'"/></svg><div class="dc"><b>'+ptxt+'</b><span>'+X('pres.del','del presupuesto')+'</span></div></div>'+
+      '<div class="legend" style="justify-content:center"><div><i style="background:var(--yellow)"></i>'+esc(totLbl())+' '+money(tot)+'</div><div><i style="background:rgba(198,40,40,.45)"></i>'+X('pres.presupuesto','Presupuesto')+' '+esc(budgetTxt())+'</div></div></div>'+
+      '<div class="card" data-r style="--i:2"><h3>'+X('pres.desglose','Desglose por actividad (valor pendiente)')+'</h3><div class="hb" data-r>';
     items.forEach(function(x,i){var p=tot?(x.v/tot*100).toFixed(1).replace('.',','):'0';
       h+='<div class="hb-r"><div class="hb-t"><b>'+esc(x.n)+'</b><span>'+money(x.v)+' · '+p+' %</span></div><div class="bar" style="--w:'+(x.v/max*100).toFixed(1)+'%"><i style="background:'+(x.g?'#6B7A90':PAL[i%PAL.length])+'"></i></div></div>'});
-    if(!items.length)h+='<p class="muted">Aún no hay actividades con valor.</p>';
+    if(!items.length)h+='<p class="muted">'+X('pres.sinvalor','Aún no hay actividades con valor.')+'</p>';
     h+='</div></div></div>';
     box.innerHTML=h;
     renderHomeX();
@@ -728,8 +731,8 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
   }
   var DEV=/*@DEV*/{"vac":[["NIÑOS DE 0 - 5 AÑOS","","BONO","40"],["NIÑOS DE 6 - 12 AÑOS","LUNES","BIENVENIDOS AL FUTURO","50"],["NIÑOS DE 6 - 12 AÑOS","MARTES","PLANETARIO DE BOGOTÁ","50"],["NIÑOS DE 6 - 12 AÑOS","MIERCOLES","MALOKA","50"],["NIÑOS DE 6 - 12 AÑOS","JUEVES","ESCAPE ROOM","50"],["NIÑOS DE 6 - 12 AÑOS","VIERNES","LASER PARK","50"],["NIÑOS 13 - 17 AÑOS","","BONO","70"]],"bon":[["Bonos físicos","650","$ 90.000","$ 58.500.000"],["Gasto Administrativo","1","$ 5.850.000","$ 5.850.000"]],"qui":[],"anc":[["760","$ 273.700 (con iva)","$ 208.012.000"]],"vel":[["760","$ 130.900 (con iva)","$ 99.484.000"]]}/*@/DEV*/;
   function numSpan(v){var d=parseInt(String(v==null?'':v).replace(/\D/g,''),10);return isNaN(d)?esc(v):'<span class="num" data-to="'+d+'">0</span>'}
-  function tblx(head,body){if(!body){var nn=(head.match(/<th/g)||[]).length;body='<tr><td colspan="'+nn+'" class="muted" style="text-align:center;padding:18px">Sin valores por ahora</td></tr>'}return '<div class="tw" style="border-radius:0 0 14px 14px"><table><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div>'}
-  function thx(t,r){return '<th'+(r?' style="text-align:right"':'')+'>'+esc(t)+'</th>'}
+  function tblx(head,body){if(!body){var nn=(head.match(/<th/g)||[]).length;body='<tr><td colspan="'+nn+'" class="muted" style="text-align:center;padding:18px">'+X('tbl.vacio','Sin valores por ahora')+'</td></tr>'}return '<div class="tw" style="border-radius:0 0 14px 14px"><table><thead><tr>'+head+'</tr></thead><tbody>'+body+'</tbody></table></div>'}
+  function thx(t,r){var k='th.'+t.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z]+/g,'');return '<th'+(r?' style="text-align:right"':'')+'>'+X(k,t)+'</th>'}
   function renderDev(){
     var vb=document.getElementById('vacBox');
     if(vb){var rows=DEV.vac,h='',i=0,n=rows.length,val=vb.getAttribute('data-val')||'$ 0';
@@ -766,11 +769,11 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     PER.plantas.forEach(function(p,i){var pr=+p[1]||0,va=+p[2]||0,t=pr+va,a=t?pr/t*100:0;
       h+='<div class="card stat" data-r style="--i:'+(i+1)+'"><span class="num" data-to="'+t+'">0</span><span class="lbl" style="font-weight:700;color:var(--head)">'+esc(p[0])+'</span>'+
         '<div class="bar stack" style="height:14px;margin:16px 0 14px"><i style="--w:'+a.toFixed(2)+'%;background:var(--blue)"></i><i style="--w:'+(100-a).toFixed(2)+'%;background:var(--yellow)"></i></div>'+
-        '<div class="legend"><div><i style="background:var(--blue)"></i><b class="num" data-to="'+pr+'">0</b> Provistos</div><div><i style="background:var(--yellow)"></i><b class="num" data-to="'+va+'">0</b> Vacantes</div></div></div>'});
+        '<div class="legend"><div><i style="background:var(--blue)"></i><b class="num" data-to="'+pr+'">0</b> '+X('per.prov','Provistos')+'</div><div><i style="background:var(--yellow)"></i><b class="num" data-to="'+va+'">0</b> '+X('per.vac','Vacantes')+'</div></div></div>'});
     h+='</div><div class="p-ind">'+
       '<div class="card stat" data-r style="--i:4"><span class="num" data-to="'+(+PER.procesos||0)+'">0</span><span class="lbl">'+esc(PER.procLabel)+'</span></div>'+
       '<div class="card stat" data-r style="--i:5"><span class="num" data-to="'+(+PER.posesiones||0)+'">0</span><span class="lbl">'+esc(PER.posLabel)+'</span></div>'+
-      '<div class="card win" data-r style="--i:6"><h3>Logro destacado:</h3><p style="font-size:14px">'+esc(PER.logro)+'</p></div></div>';
+      '<div class="card win" data-r style="--i:6"><h3>'+X('per.logro','Logro destacado:')+'</h3><p style="font-size:14px">'+esc(PER.logro)+'</p></div></div>';
     b.innerHTML=h;
     if(b.offsetParent){try{animate(b)}catch(e){}}
   }
@@ -778,10 +781,10 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     var hs=document.getElementById('heroStats');if(!hs)return;
     var p0=PER.plantas[0]||[0,0,0],planta=(+p0[1]||0)+(+p0[2]||0);
     var bud=parseMoney(budgetTxt()),tot=totalBien(),pc=(bud?tot/bud*100:0).toFixed(1).replace('.',',')+' %';
-    var it=[['<span class="num" data-to="'+planta+'">'+fmt(planta)+'</span>','Planta permanente'],
+    var it=[['<span class="num" data-to="'+planta+'">'+fmt(planta)+'</span>',X('hero.planta','Planta permanente')],
       ['<span class="num" data-to="'+(+PER.procesos||0)+'">'+fmt(+PER.procesos||0)+'</span>',esc(PER.procLabel)],
-      ['<span class="num" data-to="'+(+PER.posesiones||0)+'">'+fmt(+PER.posesiones||0)+'</span>','Posesiones realizadas'],
-      ['<span class="num">'+pc+'</span>',esc(totLbl())+' frente al presupuesto']];
+      ['<span class="num" data-to="'+(+PER.posesiones||0)+'">'+fmt(+PER.posesiones||0)+'</span>',X('hero.pos','Posesiones realizadas')],
+      ['<span class="num">'+pc+'</span>',esc(totLbl())+X('pres.frente',' frente al presupuesto')]];
     hs.innerHTML=it.map(function(x){return '<div class="hstat">'+x[0]+'<span class="lbl">'+x[1]+'</span></div>'}).join('');
   }
   function renderHomeX(){
@@ -789,10 +792,10 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     var p=document.getElementById('homePT');
     if(p){var cn={ejecutado:0,proceso:0,espera:0};PT.forEach(function(r){if(cn[r[3]]!=null)cn[r[3]]++});
       var ob=document.getElementById('ptBtn'),oh=ob?(ob.getAttribute('data-href')||''):'';
-      p.innerHTML='<div class="ptico">▤</div><h3>Planta transitoria</h3><p class="muted" style="font-size:14px">Flujo de trabajo para la prórroga de la planta transitoria.</p><div class="mini"><span class="s-ejecutado"><i class="sd"></i><b class="ptm-ej">'+cn.ejecutado+'</b> ejecutado</span><span class="s-proceso"><i class="sd"></i><b class="ptm-pr">'+cn.proceso+'</b> en proceso</span><span class="s-espera"><i class="sd"></i><b class="ptm-es">'+cn.espera+'</b> en espera</span></div><button class="lbtn" data-ptbtn type="button" data-href="'+esc(oh)+'">Ver planta transitoria ↗</button>'}
+      p.innerHTML='<div class="ptico">▤</div><h3>'+X('wf.titulo','Planta transitoria')+'</h3><p class="muted" style="font-size:14px">'+X('wf.texto','Flujo de trabajo para la prórroga de la planta transitoria.')+'</p><div class="mini"><span class="s-ejecutado"><i class="sd"></i><b class="ptm-ej">'+cn.ejecutado+'</b> '+X('wf.ejecutado','ejecutado')+'</span><span class="s-proceso"><i class="sd"></i><b class="ptm-pr">'+cn.proceso+'</b> '+X('wf.proceso','en proceso')+'</span><span class="s-espera"><i class="sd"></i><b class="ptm-es">'+cn.espera+'</b> '+X('wf.espera','en espera')+'</span></div><button class="lbtn" data-ptbtn type="button" data-href="'+esc(oh)+'">Ver planta transitoria ↗</button>'}
     var a=document.getElementById('homePRES');
     if(a){var bud=parseMoney(budgetTxt()),tot=totalBien(),pc=bud?tot/bud:0,pt=(pc*100).toFixed(1).replace('.',',')+' %',of=(439.82*(1-Math.min(pc,1))).toFixed(2);
-      a.innerHTML='<h3>'+esc(totLbl())+' frente al presupuesto</h3><div class="donut" data-r><svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="'+pt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+of+'"/></svg><div class="dc"><b>'+pt+'</b><span>del presupuesto</span></div></div><div class="legend"><div><i style="background:var(--yellow)"></i>'+esc(totLbl())+' '+money(tot)+'</div><div><i style="background:rgba(198,40,40,.45)"></i>Presupuesto '+esc(budgetTxt())+'</div></div><span class="go">Ver información →</span>'}
+      a.innerHTML='<h3>'+esc(totLbl())+X('pres.frente',' frente al presupuesto')+'</h3><div class="donut" data-r><svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="'+pt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+of+'"/></svg><div class="dc"><b>'+pt+'</b><span>'+X('pres.del','del presupuesto')+'</span></div></div><div class="legend"><div><i style="background:var(--yellow)"></i>'+esc(totLbl())+' '+money(tot)+'</div><div><i style="background:rgba(198,40,40,.45)"></i>'+X('pres.presupuesto','Presupuesto')+' '+esc(budgetTxt())+'</div></div><span class="go">Ver información →</span>'}
     var hc=document.getElementById('homeCards');if(hc&&hc.offsetParent&&document.readyState==='complete'){try{animate(hc)}catch(e){}}
   }
   var ACU=/*@ACU*/{"tabla":false,"titulo":"Seguimiento al Acuerdo Colectivo Sectorial 2025-2027","corte":"Corte 12 de noviembre de 2026","prom":81.9,"col":"g","texto":"81,9 % de avance promedio en los compromisos priorizados definidos en la mesa de seguimiento ante la Procuraduría Delegada para la Salud y el Trabajo. La gestión adelantada permitió reconstruir evidencia documental, validar soportes y consolidar acciones con las entidades del sector para avanzar en el cierre de los compromisos objeto de seguimiento.","rows":[],"avances":[["Cumplimiento y cierre de acciones asociadas a educación formal, capacitación institucional y compensación de tiempo por actividades de formación."],["Consolidación del seguimiento sectorial a los procesos de formalización laboral."],["Desarrollo de mesas técnicas para la actualización del Sistema Propio de Evaluación del Desempeño Laboral."],["Articulación entre el DAPRE y las entidades del sector para la validación de evidencias y cumplimiento de compromisos priorizados."]],"aspectos":[["Numeral 19: culminar ajustes y remitir la propuesta de actualización del Sistema Propio de Evaluación del Desempeño Laboral a la CNSC."],["Numerales 23 y 25: finalizar, validar y socializar los lineamientos sectoriales con las organizaciones sindicales."],["Numeral 27: fortalecer la instancia bipartita de seguimiento mediante sesión con la alta dirección."]],"hitoFecha":"26 de noviembre de 2026","hito":[["Reunión sectorial con las organizaciones sindicales."],["Consolidación definitiva de evidencias."],["Suscripción del acta de cumplimiento."],["Presentación de resultados ante la Procuraduría Delegada para la Salud y el Trabajo."]]}/*@/ACU*/;
@@ -801,15 +804,15 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     var b=document.getElementById('acuBox');if(!b)return;var A=ACU;
     var cc=function(c,p){return c||semc(p)};
     var h='<div class="acu-head" data-r><h3>'+esc(A.titulo)+'</h3><span class="chip">'+esc(A.corte)+'</span></div>';
-    h+='<div class="acu-top"><div class="card acu-res" data-r style="--i:1"><div class="ring big sg-'+cc(A.col,A.prom)+'" data-p="'+A.prom+'"><div><span>'+String(A.prom).replace('.',',')+' %</span></div></div><div><h3>Resultado General</h3><p>'+esc(A.texto)+'</p></div></div>';
-    h+='<div class="card acu-hito" data-r style="--i:2"><h3>Próximo Hito Estratégico</h3><div class="hito-d">'+esc(A.hitoFecha)+'</div><ul class="plain">'+A.hito.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div></div>';
-    if(A.tabla)h+='<h3 class="st" style="margin-top:22px" data-r>Estado de los Compromisos Priorizados</h3><div class="tw" data-r><table class="acu-tb"><thead><tr><th>Numeral</th><th>Estado</th><th>Situación actual</th></tr></thead><tbody>';
+    h+='<div class="acu-top"><div class="card acu-res" data-r style="--i:1"><div class="ring big sg-'+cc(A.col,A.prom)+'" data-p="'+A.prom+'"><div><span>'+String(A.prom).replace('.',',')+' %</span></div></div><div><h3>'+X('acu.resultado','Resultado General')+'</h3><p>'+esc(A.texto)+'</p></div></div>';
+    h+='<div class="card acu-hito" data-r style="--i:2"><h3>'+X('acu.hito','Próximo Hito Estratégico')+'</h3><div class="hito-d">'+esc(A.hitoFecha)+'</div><ul class="plain">'+A.hito.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div></div>';
+    if(A.tabla)h+='<h3 class="st" style="margin-top:22px" data-r>'+X('acu.estado','Estado de los Compromisos Priorizados')+'</h3><div class="tw" data-r><table class="acu-tb"><thead><tr><th>'+X('acu.numeral','Numeral')+'</th><th>'+X('acu.col_estado','Estado')+'</th><th>'+X('acu.situacion','Situación actual')+'</th></tr></thead><tbody>';
     if(A.tabla)A.rows.forEach(function(r){var c=cc(r[2],r[1]);h+='<tr class="sg-'+c+'"><td style="font-weight:800;white-space:nowrap"><i class="dsg"></i>'+esc(r[0])+'</td><td><div class="pc"><div class="bar sg-'+c+'" style="--w:'+r[1]+'%"><i></i></div><b class="sgt">'+r[1]+' %</b></div></td><td>'+esc(r[3])+'</td></tr>'});
-    h+=(A.tabla?'</tbody></table></div>':'')+'<div class="acu-bot"><div class="card" data-r><h3>Principales Avances Alcanzados</h3><ul class="checks">'+A.avances.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div><div class="card" data-r><h3>Aspectos que Requieren Seguimiento</h3><ul class="warnl">'+A.aspectos.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div></div>';
+    h+=(A.tabla?'</tbody></table></div>':'')+'<div class="acu-bot"><div class="card" data-r><h3>'+X('acu.avances','Principales Avances Alcanzados')+'</h3><ul class="checks">'+A.avances.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div><div class="card" data-r><h3>'+X('acu.aspectos','Aspectos que Requieren Seguimiento')+'</h3><ul class="warnl">'+A.aspectos.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div></div>';
     b.innerHTML=h;if(b.offsetParent){try{animate(b)}catch(e){}}
   }
   function renderTb(){
-    var h='',G=[['ACUERDO SINDICAL','sind',function(r){return r[0]!=='EFR'}],['MEDIDAS EFR','efr',function(r){return r[0]==='EFR'}]];
+    var h='',G=[[X('act.g1','ACUERDO SINDICAL'),'sind',function(r){return r[0]!=='EFR'}],[X('act.g2','MEDIDAS EFR'),'efr',function(r){return r[0]==='EFR'}]];
     G.forEach(function(g){var gh='';
       BIEN.forEach(function(r){
         if(!g[2](r))return;
@@ -821,8 +824,8 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
         gh+='<tr class="r-'+g[1]+'"><td class="m">'+esc(r[0])+'</td><td><b>'+esc(r[1])+'</b></td><td>'+esc(r[2])+'</td><td><div class="pc sg-'+c+'"><div class="bar sg-'+c+'" style="--w:'+r[3]+'%"><i></i></div><b class="sgt">'+r[3]+'%</b></div></td><td>'+esc(r[4])+'</td><td style="min-width:300px">'+esc(r[5])+'</td><td class="v">'+esc(r[6])+'</td></tr>';
       });
       if(gh)h+='<tr class="grp r-'+g[1]+'"><td colspan="7">'+g[0]+'</td></tr>'+gh});
-    if(!h)h='<tr><td colspan="7" class="muted" style="text-align:center;padding:26px">Sin resultados para este filtro.</td></tr>';
-    else if(filt==='all'&&!q)h+='<tr class="tot"><td colspan="6" style="text-align:right">TOTAL</td><td class="v">'+money(totalBien())+'</td></tr><tr class="bud"><td colspan="6" style="text-align:right">PRESUPUESTO</td><td class="v">'+esc(budgetTxt())+'</td></tr>';
+    if(!h)h='<tr><td colspan="7" class="muted" style="text-align:center;padding:26px">'+X('act.sinres','Sin resultados para este filtro.')+'</td></tr>';
+    else if(filt==='all'&&!q)h+='<tr class="tot"><td colspan="6" style="text-align:right">'+X('act.total','TOTAL')+'</td><td class="v">'+money(totalBien())+'</td></tr><tr class="bud"><td colspan="6" style="text-align:right">'+X('act.presupuesto','PRESUPUESTO')+'</td><td class="v">'+esc(budgetTxt())+'</td></tr>';
     var tb=document.getElementById('tb');tb.innerHTML=h;
     requestAnimationFrame(function(){requestAnimationFrame(function(){tb.querySelectorAll('.bar').forEach(function(b){b.classList.add('in')})})});
   }
@@ -1127,7 +1130,7 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
       else if(c.days.length){ev.push({i:i,days:c.days});c.days.forEach(function(d){keys[d.getFullYear()*12+d.getMonth()]=1})}
       else und.push(i)});
     var ks=Object.keys(keys).map(Number).sort(function(a,b){return a-b});
-    if(!ks.length){box.innerHTML='<p class="muted">Ninguna actividad tiene una fecha que se pueda ubicar en el calendario.</p>';return}
+    if(!ks.length){box.innerHTML='<p class="muted">'+X('cal.ninguna','Ninguna actividad tiene una fecha que se pueda ubicar en el calendario.')+'</p>';return}
     if(calMon==null||ks.indexOf(calMon)<0){var dic=ks.filter(function(k){return k%12===11});calMon=dic.length?dic[dic.length-1]:ks[ks.length-1]}
     var now=new Date(),h='<div class="cal-tabs">'+ks.map(function(k){var nm=MESN[k%12];return '<button type="button" class="sbtn'+(k===calMon?' on':'')+'" data-cm="'+k+'">'+nm.charAt(0).toUpperCase()+nm.slice(1)+' '+Math.floor(k/12)+'</button>'}).join('')+
       '<div class="legend"><span><i style="background:var(--green2)"></i>≥ 90 %</span><span><i style="background:var(--yellow)"></i>≥ 80 %</span><span><i style="background:var(--org)"></i>≥ 50 %</span><span><i style="background:var(--red)"></i>&lt; 50 %</span><span><i style="border:2px dashed var(--muted);background:none"></i>Se repite cada semana</span></div></div>';
@@ -1147,8 +1150,8 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
       }
       h+='</div></div>';
     });
-    if(und.length)h+='<div class="cal-und"><span>Sin fecha definida:</span>'+und.map(function(i){return calChip(i,'',true)}).join('')+'</div>';
-    h+='<div id="calDet">'+(calSel>=0&&BIEN[calSel]?calDet(calSel):'<p class="muted" style="margin-top:14px;font-size:13px;font-weight:600">Haz clic en una actividad para ver su detalle.</p>')+'</div>';
+    if(und.length)h+='<div class="cal-und"><span>'+X('cal.sinfecha','Sin fecha definida:')+'</span>'+und.map(function(i){return calChip(i,'',true)}).join('')+'</div>';
+    h+='<div id="calDet">'+(calSel>=0&&BIEN[calSel]?calDet(calSel):'<p class="muted" style="margin-top:14px;font-size:13px;font-weight:600">'+X('cal.clic','Haz clic en una actividad para ver su detalle.')+'</p>')+'</div>';
     box.innerHTML=h;
     box.onclick=function(e){
       var t=e.target.closest('[data-cm]'),c=e.target.closest('.cal-c');

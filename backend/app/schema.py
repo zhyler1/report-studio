@@ -443,6 +443,7 @@ class Meta(Base):
     theme: Theme = Theme()
     show_alerts: bool = False
     thresholds: tuple[int, int, int] = (90, 80, 50)   # verde, amarillo, naranja; menos = rojo
+    texts: dict[str, str] = {}      # rótulos fijos de las casillas especiales que la persona cambió (clave → texto)
 
 
 class Report(Base):

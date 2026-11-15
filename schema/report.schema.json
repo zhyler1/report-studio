@@ -1664,6 +1664,14 @@
      ],
      "title": "Thresholds",
      "type": "array"
+    },
+    "texts": {
+     "additionalProperties": {
+      "type": "string"
+     },
+     "default": {},
+     "title": "Texts",
+     "type": "object"
     }
    },
    "required": [

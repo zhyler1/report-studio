@@ -95,3 +95,15 @@ def test_export_embeds_media(c, tmp_path, monkeypatch):
     assert f"/media/{name}" in c.get(f"/api/reports/{rid}/preview").text
     h = c.get(f"/api/reports/{rid}/export.html").text
     assert f'src="/media/{name}"' not in h and "data:audio/mpeg;base64," in h
+
+
+def test_texts_override(c):
+    import json
+    from app.render import render
+    from app.schema import load
+    d = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    r = c.get("/api/texts")
+    assert r.status_code == 200 and "per.vac" in json.dumps(r.json())
+    d["meta"]["texts"] = {"per.vac": "Cargos por proveer"}
+    html = render(load(d))
+    assert "Cargos por proveer" in html

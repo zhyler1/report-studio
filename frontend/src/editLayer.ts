@@ -148,7 +148,23 @@ export function attach(doc: Document, h: Host) {
     const t = e.target as HTMLElement
     if (t.closest('svg') || t.closest('.rs-chart') || t.closest('#rsBar')) { if (t.closest('.rs-chart')) h.toast('Los datos del gráfico se editan en el panel de la derecha'); return }
     const blk = t.closest('.rs-b'); if (!blk || !t.textContent?.trim()) return
-    let el: HTMLElement = t
+    const fx = t.closest('[data-tx]') as HTMLElement | null
+    let el: HTMLElement = fx || t
+    if (fx) {
+      const key = fx.dataset.tx!, old0 = fx.textContent || ''
+      fx.contentEditable = 'true'; fx.focus(); win.getSelection()?.selectAllChildren(fx)
+      const fin = (ok: boolean) => {
+        fx.removeEventListener('blur', ob); fx.removeEventListener('keydown', ok2); fx.contentEditable = 'false'; fx.removeAttribute('contenteditable')
+        let neu = (fx.innerText || fx.textContent || '').replace(/\n+$/, '')
+        if (old0.startsWith(' ') && !neu.startsWith(' ')) neu = ' ' + neu
+        if (!ok || neu === old0) { fx.textContent = old0; return }
+        const d0 = h.get(); h.put({ ...d0, meta: { ...d0.meta, texts: { ...(d0.meta.texts || {}), [key]: neu } } })
+      }
+      const ob = () => fin(true)
+      const ok2 = (ev: KeyboardEvent) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); fx.blur() } else if (ev.key === 'Escape') { ev.preventDefault(); fin(false) } }
+      fx.addEventListener('blur', ob); fx.addEventListener('keydown', ok2)
+      return
+    }
     while (el !== blk && el.parentElement && el.parentElement !== blk && /^(B|I|STRONG|EM)$/.test(el.tagName) && !/^(DIV|TD|TH)$/.test(el.parentElement.tagName)) el = el.parentElement
     if (el.querySelector('div,p,li,table,figure,h3')) { h.toast('Haz doble clic directamente sobre el texto'); return }
     const old = el.textContent || ''

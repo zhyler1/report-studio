@@ -178,6 +178,13 @@ def export_pdf(rid: int, s: Store = Depends(get_store)):
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="informe-{rid}.pdf"'})
 
 
+@router.get("/texts")
+def fixed_texts():
+    """Rótulos fijos de las casillas especiales, con su texto original, para poder cambiarlos."""
+    from .render import TEXTS
+    return [{"key": k, "default": v[0], "group": v[1]} for k, v in TEXTS.items()]
+
+
 @router.get("/ingest/status")
 def ingest_status():
     return {"engine": llm.engine(), "formats": sorted(ingest.EXT)}

@@ -83,7 +83,7 @@ export default function Ribbon(p: RibProps) {
       </>}
       {rib === 'datos' && <>
         <Btn i="🧾" l="General" onClick={() => p.openDrawer('general')} /><Btn i="🗂" l="Secciones" onClick={() => p.openDrawer('secciones')} />
-        <Btn i="⚠" l="Alertas" onClick={() => p.openDrawer('alertas')} /><Btn i="{ }" l="JSON" onClick={() => p.openDrawer('json')} /><Btn i="🕘" l="Versiones" onClick={() => p.openDrawer('versiones')} />
+        <Btn i="🔤" l="Textos fijos" onClick={() => p.openDrawer('textos')} /><Btn i="⚠" l="Alertas" onClick={() => p.openDrawer('alertas')} /><Btn i="{ }" l="JSON" onClick={() => p.openDrawer('json')} /><Btn i="🕘" l="Versiones" onClick={() => p.openDrawer('versiones')} />
       </>}
     </div>
   </div>

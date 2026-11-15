@@ -50,6 +50,17 @@ function Secciones({ d, set, focus }: { d: Json; set: (d: Json) => void; focus: 
   </div>)}<button className="pri" onClick={add}>+ Agregar sección</button></>
 }
 
+function Textos({ d, set }: { d: Json; set: (d: Json) => void }) {
+  const [cat, setCat] = useState<{ key: string; default: string; group: string }[]>([])
+  useEffect(() => { api.texts().then(setCat) }, [])
+  const tx: Record<string, string> = d.meta.texts || {}
+  const put = (k: string, v: string) => { const n = { ...tx }; if (v) n[k] = v; else delete n[k]; set({ ...d, meta: { ...d.meta, texts: n } }) }
+  const groups = Array.from(new Set(cat.map(c => c.group)))
+  return <div className="card"><p className="mut" style={{ marginTop: 0 }}>Los rótulos que traen las casillas especiales (planta, presupuesto, acuerdo, actividades…). Escribe el que quieras; en blanco vuelve al original. También puedes darles doble clic en la vista previa.</p>
+    {groups.map(g => <div key={g}><h4 style={{ margin: '14px 0 6px' }}>{g}</h4>{cat.filter(c => c.group === g).map(c => <div key={c.key} style={{ marginBottom: 6 }}>
+      <input value={tx[c.key] ?? ''} placeholder={c.default} onChange={e => put(c.key, e.target.value)} /></div>)}</div>)}</div>
+}
+
 function Alertas({ d, set }: { d: Json; set: (d: Json) => void }) {
   const al: Json[] = d.alerts
   const groups = d.sections.map((s: Json) => s.id)
@@ -241,11 +252,12 @@ export default function App() {
       <div className="work">
         <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
         {drawer && <div className="drawer">
-          <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', secciones: 'Secciones', alertas: 'Alertas', json: 'JSON', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
+          <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', textos: 'Textos fijos', secciones: 'Secciones', alertas: 'Alertas', json: 'JSON', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
           {drawer === 'casilla' && (sel && getAt(d, sel) ? <div className="card"><p className="mut" style={{ marginTop: 0 }}>Doble clic sobre cualquier texto de la vista previa para editarlo ahí mismo.</p>
             <BlockForm block={getAt(d, sel)} set={v => setD(setAt(d, sel, v))} /></div> : <div className="card"><p className="mut">Haz clic en una casilla de la vista previa.</p></div>)}
           {drawer === 'general' && <General d={d} set={setD} />}
           {drawer === 'secciones' && <Secciones d={d} set={setD} focus={goPreview} />}
+          {drawer === 'textos' && <Textos d={d} set={setD} />}
           {drawer === 'alertas' && <Alertas d={d} set={setD} />}
           {drawer === 'json' && <JsonEditor d={d} set={setD} />}
           {drawer === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}

@@ -56,6 +56,40 @@ def num_text(v, prefix="", suffix="") -> str:
     return f"{prefix}{fmt(v)}{suffix}" if isinstance(v, (int, float)) else f"{prefix}{v}{suffix}"
 
 
+# Rótulos fijos de las casillas especiales (clave → (texto original, grupo)). Cada uno se puede cambiar con doble clic o en Datos → Textos fijos.
+TEXTS = {
+    "per.prov": ("Provistos", "Planta"), "per.vac": ("Vacantes", "Planta"), "per.logro": ("Logro destacado:", "Planta"),
+    "hero.planta": ("Planta permanente", "Inicio"), "hero.pos": ("Posesiones realizadas", "Inicio"),
+    "wf.titulo": ("Planta transitoria", "Inicio"), "wf.texto": ("Flujo de trabajo para la prórroga de la planta transitoria.", "Inicio"),
+    "wf.ejecutado": ("ejecutado", "Flujo de trabajo"), "wf.proceso": ("en proceso", "Flujo de trabajo"), "wf.espera": ("en espera", "Flujo de trabajo"),
+    "pres.presupuesto": ("Presupuesto", "Presupuesto"), "pres.excede": ("Excede el presupuesto (cálculo)", "Presupuesto"),
+    "pres.dif": ("Diferencia frente al presupuesto (cálculo)", "Presupuesto"), "pres.pend": ("Actividades pendientes ({n} con valor, {m} sin costo)", "Presupuesto"),
+    "pres.frente": (" frente al presupuesto", "Presupuesto"), "pres.del": ("del presupuesto", "Presupuesto"),
+    "pres.desglose": ("Desglose por actividad (valor pendiente)", "Presupuesto"), "pres.sinvalor": ("Aún no hay actividades con valor.", "Presupuesto"),
+    "pres.resto": ("Sin desglosar por actividad (cálculo)", "Presupuesto"),
+    "acu.resultado": ("Resultado General", "Acuerdo"), "acu.hito": ("Próximo Hito Estratégico", "Acuerdo"), "acu.estado": ("Estado de los Compromisos Priorizados", "Acuerdo"),
+    "acu.numeral": ("Numeral", "Acuerdo"), "acu.col_estado": ("Estado", "Acuerdo"), "acu.situacion": ("Situación actual", "Acuerdo"),
+    "acu.avances": ("Principales Avances Alcanzados", "Acuerdo"), "acu.aspectos": ("Aspectos que Requieren Seguimiento", "Acuerdo"),
+    "act.h_medida": ("Medida", "Actividades"), "act.h_actividad": ("Actividad", "Actividades"), "act.h_period": ("Periodicidad", "Actividades"),
+    "act.h_pct": ("% Cumplimiento", "Actividades"), "act.h_fecha": ("Fecha de realización", "Actividades"), "act.h_obs": ("Observación", "Actividades"), "act.h_valor": ("Valor", "Actividades"),
+    "act.buscar": ("Buscar actividad, medida u observación…", "Actividades"), "act.f_todas": ("Todas", "Actividades"), "act.f_cero": ("0% de cumplimiento", "Actividades"), "act.f_val": ("Con valor", "Actividades"),
+    "act.g1": ("ACUERDO SINDICAL", "Actividades"), "act.g2": ("MEDIDAS EFR", "Actividades"), "act.total": ("TOTAL", "Actividades"), "act.presupuesto": ("PRESUPUESTO", "Actividades"),
+    "act.sinres": ("Sin resultados para este filtro.", "Actividades"),
+    "cal.sinfecha": ("Sin fecha definida:", "Calendario"), "cal.clic": ("Haz clic en una actividad para ver su detalle.", "Calendario"),
+    "cal.ninguna": ("Ninguna actividad tiene una fecha que se pueda ubicar en el calendario.", "Calendario"),
+    "th.rangos": ("Rangos", "Tablas de propuestas"), "th.dias": ("Días", "Tablas de propuestas"), "th.actividad": ("Actividad", "Tablas de propuestas"),
+    "th.cuposaprox": ("Cupos aprox.", "Tablas de propuestas"), "th.valoraprox": ("Valor aprox.", "Tablas de propuestas"), "th.bonos": ("Bonos", "Tablas de propuestas"),
+    "th.cantidad": ("Cantidad", "Tablas de propuestas"), "th.valorunitario": ("Valor unitario", "Tablas de propuestas"), "th.valortotal": ("Valor total", "Tablas de propuestas"),
+    "th.opcion": ("Opción", "Tablas de propuestas"), "tbl.vacio": ("Sin valores por ahora", "Tablas de propuestas"),
+}
+
+
+def T(ctx, k: str) -> str:
+    """Rótulo fijo con su posible cambio; en modo edición queda marcado para editarlo con doble clic."""
+    v = ctx.rep.meta.texts.get(k) or TEXTS[k][0]
+    return f'<span data-tx="{k}">{esc(v)}</span>' if ctx.edit else esc(v)
+
+
 class Ctx:
     def __init__(self, rep: Report, edit: bool = False):
         self.rep = rep
@@ -265,8 +299,8 @@ def pt_counts(w: Workflow) -> dict:
 def r_workflow(b: Workflow, ctx: Ctx) -> str:
     c = pt_counts(b)
     return (f'<div class="card ptcard" data-r style="--i:1"><div class="ptico">▤</div><h3 class="st" style="margin-bottom:8px">{esc(b.heading)}</h3>'
-            f'<p class="muted" style="font-size:14px">{esc(b.teaser)}</p><div class="mini"><span class="s-ejecutado"><i class="sd"></i><b class="ptm-ej">{c["ejecutado"]}</b> ejecutado</span>'
-            f'<span class="s-proceso"><i class="sd"></i><b class="ptm-pr">{c["proceso"]}</b> en proceso</span><span class="s-espera"><i class="sd"></i><b class="ptm-es">{c["espera"]}</b> en espera</span></div>'
+            f'<p class="muted" style="font-size:14px">{esc(b.teaser)}</p><div class="mini"><span class="s-ejecutado"><i class="sd"></i><b class="ptm-ej">{c["ejecutado"]}</b> {T(ctx, "wf.ejecutado")}</span>'
+            f'<span class="s-proceso"><i class="sd"></i><b class="ptm-pr">{c["proceso"]}</b> {T(ctx, "wf.proceso")}</span><span class="s-espera"><i class="sd"></i><b class="ptm-es">{c["espera"]}</b> {T(ctx, "wf.espera")}</span></div>'
             f'<button class="lbtn" id="ptBtn" data-ptbtn type="button" data-href="{attr(b.link)}">{esc(b.button_label)}</button></div>')
 
 
@@ -275,11 +309,13 @@ def r_agreement(b: Agreement, ctx: Ctx) -> str:
 
 
 def r_activities(b: Activities, ctx: Ctx) -> str:
+    ph = attr(ctx.rep.meta.texts.get("act.buscar") or TEXTS["act.buscar"][0])
+    th = "".join(f"<th{s}>{T(ctx, k)}</th>" for k, s in (("act.h_medida", ""), ("act.h_actividad", ""), ("act.h_period", ""), ("act.h_pct", ""), ("act.h_fecha", ""), ("act.h_obs", ""), ("act.h_valor", ' style="text-align:right"')))
     return (f'<div class="bar-h">{esc(b.title or "ACTIVIDADES")}</div>'
-            '<div class="tools" style="padding-top:16px"><input class="srch" id="srch" type="search" placeholder="Buscar actividad, medida u observación…" aria-label="Buscar actividad">'
-            '<button class="fbtn on" data-f="all" type="button">Todas</button><button class="fbtn" data-f="zero" type="button">0% de cumplimiento</button>'
-            '<button class="fbtn" data-f="val" type="button">Con valor</button></div>'
-            '<div class="tw"><table class="act-tb"><thead><tr><th>Medida</th><th>Actividad</th><th>Periodicidad</th><th>% Cumplimiento</th><th>Fecha de realización</th><th>Observación</th><th style="text-align:right">Valor</th></tr></thead>'
+            f'<div class="tools" style="padding-top:16px"><input class="srch" id="srch" type="search" placeholder="{ph}" aria-label="Buscar actividad">'
+            f'<button class="fbtn on" data-f="all" type="button">{T(ctx, "act.f_todas")}</button><button class="fbtn" data-f="zero" type="button">{T(ctx, "act.f_cero")}</button>'
+            f'<button class="fbtn" data-f="val" type="button">{T(ctx, "act.f_val")}</button></div>'
+            f'<div class="tw"><table class="act-tb"><thead><tr>{th}</tr></thead>'
             '<tbody id="tb"></tbody></table></div>')
 
 
@@ -468,7 +504,7 @@ def ji(v):
 
 def js_data(rep: Report) -> dict:
     ctx = Ctx(rep)
-    d = {}
+    d = {"TX": dict(rep.meta.texts)}
     a = next(iter(ctx.acts.values()), None)
     d["BIEN"] = [[i.measure, i.name, i.frequency, ji(i.pct), i.date, i.note, i.value] for i in a.items] if a else []
     wf = next((x for s in rep.sections for x in _blocks(s) if isinstance(x, Workflow)), None)
