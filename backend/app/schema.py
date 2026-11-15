@@ -89,6 +89,7 @@ class BlockBase(Base):
     id: Optional[str] = None
     title: Optional[str] = None
     hidden: bool = False
+    locked: bool = False   # bloqueada: no se mueve, edita ni borra (los líderes no pueden cambiarla)
     span: Literal["full", "1/2", "1/3", "2/3", "1/4", "3/4"] = "full"   # ancho; las casillas consecutivas con ancho parcial quedan lado a lado
     bg: str = Hex          # color de fondo de la casilla (vacío = el del tema)
     fg: str = Hex          # color del texto de la casilla (vacío = el del tema)

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
-import { attach, getAt, setAt, listOps } from './editLayer'
+import { attach, getAt, setAt, listOps, lockedAt } from './editLayer'
 import { BLOCK, ICONOS } from './labels'
 import Loader from './Loader'
+import Templates from './Templates'
 import Ribbon, { type RibTab } from './Ribbon'
 import { STARTERS } from './starters'
 import { api, type Json, type ReportRow, type Version } from './api'
@@ -137,12 +138,17 @@ export default function App() {
   const undo = () => { const u = past.current.pop(); if (!u) return; if (dRef.current) future.current.push(dRef.current); lastPush.current = 0; dRef.current = u; setDRaw(u); sync(); flash('Cambio deshecho') }
   const redo = () => { const u = future.current.pop(); if (!u) return; if (dRef.current) past.current.push(dRef.current); lastPush.current = 0; dRef.current = u; setDRaw(u); sync(); flash('Cambio rehecho') }
   const undoRef = useRef({ undo, redo }); undoRef.current = { undo, redo }
+  const keyAct = useRef<(a: string) => void>(() => { })
   const onKey = useCallback((e: KeyboardEvent) => {
     const el = e.target as HTMLElement | null
     if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return
     const k = e.key.toLowerCase()
     if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? undoRef.current.redo() : undoRef.current.undo() }
     else if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); undoRef.current.redo() }
+    else if (selRef.current && (e.ctrlKey || e.metaKey) && k === 'd') { e.preventDefault(); keyAct.current('dup') }
+    else if (selRef.current && (k === 'delete' || k === 'backspace') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); keyAct.current('del!') }
+    else if (selRef.current && e.altKey && (k === 'arrowup' || k === 'arrowdown')) { e.preventDefault(); keyAct.current(k === 'arrowup' ? 'up' : 'down') }
+    else if (selRef.current && k === 'escape') { keyAct.current('desel') }
   }, [])
   useEffect(() => { window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey) }, [onKey])
   const selRef = useRef<string | null>(null); selRef.current = sel
@@ -227,9 +233,23 @@ export default function App() {
   const op = (a: string) => {
     const sp = selRef.current, dd = dRef.current; if (!sp || !dd) return
     const k = sp.split('.'); const i = Number(k.pop()); const list = k.join('.')
+    if (a === 'desel') { select(null); return }
+    if (a === 'lock') { const cur = !!getAt(dd, sp)?.locked; setD(setAt(dd, sp + '.locked', !cur)); flash(cur ? 'Casilla desbloqueada' : 'Casilla bloqueada 🔒'); return }
+    if (lockedAt(dd, sp)) { flash('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
     if (a === 'up' || a === 'down') { setD(listOps.move(dd, sp, a === 'up' ? -1 : 1)); select(list + '.' + Math.max(0, i + (a === 'up' ? -1 : 1))) }
     else if (a === 'dup') { setD(listOps.dup(dd, sp)); select(list + '.' + (i + 1)) }
     else if (a === 'del' && confirm('¿Quitar esta casilla?')) { setD(listOps.del(dd, sp)); select(null) }
+    else if (a === 'del!') { setD(listOps.del(dd, sp)); select(null); flash('Casilla quitada · Ctrl+Z para deshacer') }
+  }
+  keyAct.current = op
+  const [tpl, setTpl] = useState<{ si: number } | null>(null)
+  const openTpl = () => { const w = where(); setTpl({ si: w ? w.si : -1 }) }
+  const newSection = (sec: Json, name: string) => {
+    const dd = dRef.current; if (!dd) return
+    const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'seccion'
+    const ids: string[] = dd.sections.map((x: Json) => x.id); let nid = slug, n = 2; while (ids.includes(nid)) nid = slug + '-' + n++
+    setD({ ...dd, sections: [...dd.sections, { ...sec, id: nid, label: sec.label || name, hidden: false }] })
+    flash('Sección «' + (sec.label || name) + '» creada · cámbiale nombre en Datos › Secciones'); setTimeout(() => goPreview(nid), 1400)
   }
   const addLoaded = (si: number, blocks: Json[]) => {
     const dd = dRef.current; if (!dd) return
@@ -278,7 +298,7 @@ export default function App() {
     </aside>
     {ready && d && id !== null ? <div className="main2">
       <Ribbon d={d} setD={setD} undo={undo} redo={redo} nu={hn.u} nr={hn.r} sel={sel} rib={rib} setRib={setRib} dirty={dirty} blocked={issues.length > 0} msg={msg} id={id} save={save} remove={remove}
-        openDrawer={openDrawer} insert={insert} op={op} kinds={kinds} />
+        openDrawer={openDrawer} insert={insert} openTpl={openTpl} op={op} kinds={kinds} />
       {issues.length > 0 && <div className="issues" style={{ margin: '6px 12px' }}><b>Avisos (para guardar hay que corregirlos):</b><ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{issues.map((x, i) => <li key={i}>{x}</li>)}</ul></div>}
       <div className="work">
         <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
@@ -294,6 +314,8 @@ export default function App() {
           {drawer === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}
         </div>}
       </div>
+      {tpl && <Templates current={tpl.si >= 0 ? d.sections[tpl.si] : null} flash={flash} onClose={() => setTpl(null)}
+        onAdd={blocks => { const si = tpl.si >= 0 ? tpl.si : 0; addLoaded(si, blocks) }} onNew={newSection} />}
       {picker && <div className="modal" onClick={() => setPicker(null)}><div className="modal-b" onClick={e => e.stopPropagation()}>
         <h2 style={{ marginTop: 0 }}>¿Qué quieres poner aquí?</h2>
         <div className="tiles">{([['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video, audio o imagen'], ['stat_grid', '🔢', 'Cifras destacadas'], ['card_list', '📝', 'Texto con lista'], ['table', '▦', 'Tabla'], ['grid', '◫', 'Columnas (poner cosas lado a lado)'], ['__doc', '📥', 'Desde un documento o texto']] as const).map(([k, i, l]) =>

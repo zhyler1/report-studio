@@ -40,7 +40,7 @@ const P: Record<string, string> = {
   sliders: 'M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6', plus: 'M12 5v14M5 12h14', side: 'M3 5h8v14H3zM13 5h8v14h-8z',
   layers: 'M12 3 3 8l9 5 9-5zM3 13l9 5 9-5', alert: 'M12 3 2 20h20zM12 10v4M12 17v.5', braces: 'M8 4C5 4 6 9 4 12c2 3 1 8 4 8M16 4c3 0 2 5 4 8-2 3-1 8-4 8',
   history: 'M4 12a8 8 0 1 0 3-6.2M4 4v4h4M12 8v5l3 2', info: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8v.5',
-  type: 'M4 7V5h16v2M12 5v14M9 19h6', save2: 'M12 4v10m0 0-4-4m4 4 4-4M5 20h14',
+  type: 'M4 7V5h16v2M12 5v14M9 19h6', lock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3', unlock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 7.5-1.5', save2: 'M12 4v10m0 0-4-4m4 4 4-4M5 20h14',
 }
 const Ic = ({ n }: { n: string }) => <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={P[n] || P.file} /></svg>
 
@@ -49,7 +49,7 @@ export type RibProps = {
   undo: () => void; redo: () => void; nu: number; nr: number
   dirty: boolean; blocked: boolean; msg: string; id: number
   save: () => void; remove: () => void; openDrawer: (t: string) => void
-  insert: (type: string, side?: boolean) => void; op: (a: string) => void; kinds: string[]
+  insert: (type: string, side?: boolean) => void; openTpl: () => void; op: (a: string) => void; kinds: string[]
 }
 
 const Btn = ({ i, l, onClick, cls, title, disabled }: { i: string; l: string; onClick: () => void; cls?: string; title?: string; disabled?: boolean }) =>
@@ -95,6 +95,7 @@ export default function Ribbon(p: RibProps) {
       {rib === 'insertar' && <>
         <Grp t="Casillas">{INSERTAR.map(([k, i, l]) => <Btn key={k} i={i} l={l} onClick={() => p.insert(k)} />)}</Grp>
         <Grp t="Desde archivo"><Btn i="import" l="Desde documento" onClick={() => p.insert('__doc')} /></Grp>
+        <Grp t="Plantillas"><Btn i="layers" l="Plantillas de sección" title="Inserta un arreglo de casillas listo o guarda la sección actual como plantilla" onClick={p.openTpl} /></Grp>
         <span className="rmut"><Ic n="info" /> {sel ? 'Se agrega debajo de la casilla seleccionada.' : 'Se agrega al final de la sección que estás viendo.'}</span>
       </>}
       {rib === 'diseno' && <>
@@ -111,15 +112,19 @@ export default function Ribbon(p: RibProps) {
           <div className="fld"><label>Al abrir</label><select value={th.default} onChange={e => setTh({ default: e.target.value })}><option value="light">Claro</option><option value="dark">Oscuro</option></select></div></Grp>
         <Grp t="Secciones"><Btn i="layers" l="Íconos de sección" title="Elige entre 20 íconos animados para cada sección" onClick={() => p.openDrawer('secciones')} /></Grp>
       </>}
-      {rib === 'casilla' && b && <>
+      {rib === 'casilla' && b && b.locked && <>
+        <Grp t="Bloqueo"><Btn i="unlock" l="Desbloquear" title="Quita el bloqueo para poder cambiarla" onClick={() => p.op('lock')} /></Grp>
+        <span className="rmut"><Ic n="lock" /> Esta casilla está bloqueada: no se mueve, edita ni borra, y los líderes no pueden cambiarla.</span>
+      </>}
+      {rib === 'casilla' && b && !b.locked && <>
         <Grp t="Tamaño"><div className="fld"><label>Ancho</label><select value={b.span || 'full'} onChange={e => putB({ span: e.target.value })}>{ANCHOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
           <Btn i="side" l="Casilla al lado" title="Agrega otra casilla a la derecha de esta" onClick={() => p.insert('__pick', true)} /></Grp>
         <Grp t="Color de la casilla"><Color label="Fondo" value={b.bg} fallback="#ffffff" onChange={v => putB({ bg: v })} /><Color label="Texto" value={b.fg} fallback="#14243f" onChange={v => putB({ fg: v })} /></Grp>
         {b.type === 'chart' && <Grp t="Gráfico"><div className="fld"><label>Tipo</label><select value={b.kind} onChange={e => putB({ kind: e.target.value })}>{p.kinds.map(k => <option key={k} value={k}>{k}</option>)}</select></div></Grp>}
         {(b.type === 'ring_card' || b.type === 'agreement') && <Grp t="Visualización"><div className="fld"><label>Cómo se dibuja</label>
           <select value={b.viz || 'ring'} onChange={e => putB({ viz: e.target.value })}>{VIZ.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>}
-        <Grp t="Organizar"><Btn i="left" l="Antes" onClick={() => p.op('up')} /><Btn i="right" l="Después" onClick={() => p.op('down')} /><Btn i="copy" l="Duplicar" onClick={() => p.op('dup')} /></Grp>
-        <Grp t="Más"><Btn i="sliders" l="Todas las opciones" onClick={() => p.openDrawer('casilla')} /><Btn i="trash" l="Quitar" cls="danger" onClick={() => p.op('del')} /></Grp>
+        <Grp t="Organizar"><Btn i="left" l="Antes" title="Alt + ↑" onClick={() => p.op('up')} /><Btn i="right" l="Después" title="Alt + ↓" onClick={() => p.op('down')} /><Btn i="copy" l="Duplicar" title="Ctrl/Cmd + D" onClick={() => p.op('dup')} /></Grp>
+        <Grp t="Más"><Btn i="sliders" l="Todas las opciones" onClick={() => p.openDrawer('casilla')} /><Btn i="lock" l="Bloquear" title="Nadie la mueve, edita ni borra por accidente" onClick={() => p.op('lock')} /><Btn i="trash" l="Quitar" cls="danger" title="Supr" onClick={() => p.op('del')} /></Grp>
       </>}
       {rib === 'datos' && <>
         <Grp t="Informe"><Btn i="info" l="General" onClick={() => p.openDrawer('general')} /><Btn i="layers" l="Secciones" onClick={() => p.openDrawer('secciones')} /><Btn i="type" l="Textos fijos" onClick={() => p.openDrawer('textos')} /></Grp>

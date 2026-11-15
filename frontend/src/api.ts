@@ -1,5 +1,6 @@
 export type Json = Record<string, any>
 export type ReportRow = { id: number; title: string; updated: string; version: number }
+export type Tpl = { id: string; name: string; desc?: string; builtin: boolean; section: Json }
 export type Version = { n: number; created: string; note: string }
 
 async function req(url: string, init?: RequestInit) {
@@ -30,5 +31,8 @@ export const api = {
   ingestStatus: (): Promise<{ engine: string | null }> => req('/api/ingest/status').then(r => r.json()),
   extract: (f: File): Promise<{ name: string; text: string; report: Json | null }> => { const fd = new FormData(); fd.append('file', f); return req('/api/ingest/extract', { method: 'POST', body: fd }).then(r => r.json()) },
   propose: (text: string, hint: string): Promise<{ engine: string | null; blocks: Json[]; issues: string[] }> => req('/api/ingest/propose', J({ text, hint })).then(r => r.json()),
+  templates: (): Promise<Tpl[]> => req('/api/templates').then(r => r.json()),
+  addTemplate: (name: string, section: Json) => req('/api/templates', J({ name, section })).then(r => r.json()),
+  delTemplate: (id: string) => req('/api/templates/' + id.split(':')[1], { method: 'DELETE' }),
   render: (data: Json, edit = false): Promise<string> => req('/api/render' + (edit ? '?edit=1' : ''), J(data)).then(r => r.text()),
 }

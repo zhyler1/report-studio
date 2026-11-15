@@ -26,6 +26,7 @@ class Store:
         CREATE TABLE IF NOT EXISTS versions(id INTEGER PRIMARY KEY AUTOINCREMENT, report_id INTEGER NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
             n INTEGER NOT NULL, created TEXT, note TEXT DEFAULT '', data TEXT NOT NULL, UNIQUE(report_id, n));
         CREATE TABLE IF NOT EXISTS users(name TEXT PRIMARY KEY, pw TEXT NOT NULL, role TEXT NOT NULL, sections TEXT NOT NULL DEFAULT '[]');
+        CREATE TABLE IF NOT EXISTS templates(id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, created TEXT, data TEXT NOT NULL);
         PRAGMA foreign_keys=ON;
         """)
 
@@ -95,3 +96,21 @@ class Store:
     def del_user(self, name: str) -> bool:
         with self.lock, self.db:
             return self.db.execute("DELETE FROM users WHERE name=?", (name,)).rowcount > 0
+
+    # ── plantillas de sección ──
+    def list_templates(self) -> list[dict]:
+        with self.lock:
+            return [{"id": f"u:{r['id']}", "name": r["name"], "created": r["created"], "section": json.loads(r["data"])}
+                    for r in self.db.execute("SELECT * FROM templates ORDER BY id DESC")]
+
+    def put_template(self, name: str, section: dict) -> str:
+        with self.lock:
+            cur = self.db.execute("INSERT INTO templates(name,created,data) VALUES(?,?,?)", (name, _now(), json.dumps(section, ensure_ascii=False)))
+            self.db.commit()
+            return f"u:{cur.lastrowid}"
+
+    def del_template(self, tid: int) -> bool:
+        with self.lock:
+            cur = self.db.execute("DELETE FROM templates WHERE id=?", (tid,))
+            self.db.commit()
+            return cur.rowcount > 0

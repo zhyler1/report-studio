@@ -71,6 +71,21 @@ def require_admin(user: dict | None):
         raise HTTPException(403, "Solo el administrador puede hacer esto")
 
 
+def _locked(o, out=None) -> list[str]:
+    """Todas las casillas bloqueadas del informe (en cualquier nivel), como texto estable para compararlas."""
+    import json
+    out = [] if out is None else out
+    if isinstance(o, dict):
+        if o.get("locked") is True and "type" in o:
+            out.append(json.dumps(o, sort_keys=True, ensure_ascii=False))
+        for v in o.values():
+            _locked(v, out)
+    elif isinstance(o, list):
+        for v in o:
+            _locked(v, out)
+    return sorted(out)
+
+
 def check_leader_edit(user: dict | None, old: dict, new: dict):
     """Un líder solo cambia sus secciones y las alertas de su grupo; todo lo demás debe quedar idéntico."""
     if user is None or user["role"] == "admin":
@@ -85,6 +100,9 @@ def check_leader_edit(user: dict | None, old: dict, new: dict):
     for a, b in zip(old["sections"], new["sections"]):
         if a["id"] not in mine and a != b:
             raise HTTPException(403, f"No tienes permiso para cambiar la sección «{a.get('label', a['id'])}»")
+    lo, ln = _locked(old), _locked(new)
+    if lo != ln:
+        raise HTTPException(403, "Hay casillas bloqueadas: solo el administrador puede moverlas, cambiarlas, borrarlas o desbloquearlas")
     keep = lambda L: [x for x in L if x["group"] not in mine]  # noqa: E731
     if keep(old.get("alerts", [])) != keep(new.get("alerts", [])):
         raise HTTPException(403, "Solo puedes cambiar las alertas de tu grupo")

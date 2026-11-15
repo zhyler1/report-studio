@@ -32,6 +32,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -181,6 +186,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -378,6 +388,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -502,6 +517,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -594,6 +614,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -690,6 +715,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -1045,6 +1075,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -1140,6 +1175,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -1449,6 +1489,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -1624,6 +1669,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -1822,6 +1872,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -1940,6 +1995,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -2052,6 +2112,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -2203,6 +2268,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -2393,6 +2463,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -2570,6 +2645,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -3019,6 +3099,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -3150,6 +3235,11 @@
      "title": "Hidden",
      "type": "boolean"
     },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
     "span": {
      "default": "full",
      "enum": [
@@ -3267,6 +3357,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -3485,6 +3580,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {
@@ -3718,6 +3818,11 @@
     "hidden": {
      "default": false,
      "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
      "type": "boolean"
     },
     "span": {

@@ -84,6 +84,7 @@
         {
           "title": "Planta de Personal",
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -115,6 +116,7 @@
         },
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -129,6 +131,7 @@
               {
                 "title": "Alertas y Riesgos · Mejoras SIGEPRE",
                 "hidden": false,
+                "locked": false,
                 "span": "full",
                 "bg": "",
                 "fg": "",
@@ -178,6 +181,7 @@
               {
                 "title": "Situación actual",
                 "hidden": false,
+                "locked": false,
                 "span": "full",
                 "bg": "",
                 "fg": "",
@@ -195,6 +199,7 @@
               {
                 "title": "Acciones Implementadas",
                 "hidden": false,
+                "locked": false,
                 "span": "full",
                 "bg": "",
                 "fg": "",
@@ -211,6 +216,7 @@
               },
               {
                 "hidden": false,
+                "locked": false,
                 "span": "full",
                 "bg": "",
                 "fg": "",
@@ -338,6 +344,7 @@
         },
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -408,6 +415,7 @@
       "blocks": [
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -455,6 +463,7 @@
         },
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -541,6 +550,7 @@
           "blocks": [
             {
               "hidden": false,
+              "locked": false,
               "span": "full",
               "bg": "",
               "fg": "",
@@ -594,6 +604,7 @@
               "id": "act",
               "title": "ACTIVIDADES",
               "hidden": false,
+              "locked": false,
               "span": "full",
               "bg": "",
               "fg": "",
@@ -750,6 +761,7 @@
             {
               "title": "CALENDARIO · Actividades de Bienestar",
               "hidden": false,
+              "locked": false,
               "span": "full",
               "bg": "",
               "fg": "",
@@ -766,6 +778,7 @@
             {
               "title": "PRESUPUESTO · Actividades pendientes",
               "hidden": false,
+              "locked": false,
               "span": "full",
               "bg": "",
               "fg": "",
@@ -782,6 +795,7 @@
           "blocks": [
             {
               "hidden": false,
+              "locked": false,
               "span": "full",
               "bg": "",
               "fg": "",
@@ -918,6 +932,7 @@
       "blocks": [
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -984,6 +999,7 @@
         {
           "title": "Aplicación de lector de código QR para eventos y capacitaciones",
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -1067,6 +1083,7 @@
       "blocks": [
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -1123,6 +1140,7 @@
         },
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -1152,6 +1170,7 @@
         },
         {
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -1195,6 +1214,7 @@
         {
           "title": "Estado SG-SST 2026",
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -1208,6 +1228,7 @@
             [
               {
                 "hidden": false,
+                "locked": false,
                 "span": "full",
                 "bg": "",
                 "fg": "",
@@ -1223,6 +1244,7 @@
               {
                 "title": "Seguimientos ARL (Casos críticos).",
                 "hidden": false,
+                "locked": false,
                 "span": "full",
                 "bg": "",
                 "fg": "",
@@ -1252,6 +1274,7 @@
         {
           "title": "Alertas del Grupo SST",
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",
@@ -1279,6 +1302,7 @@
         {
           "title": "ACUERDOS LABORALES PENDIENTES",
           "hidden": false,
+          "locked": false,
           "span": "full",
           "bg": "",
           "fg": "",

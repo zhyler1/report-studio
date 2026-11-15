@@ -110,6 +110,41 @@ def del_user(name: str, user=Depends(guard), s: Store = Depends(get_store)):
     return Response(status_code=204)
 
 
+class TplIn(BaseModel):
+    name: str
+    section: dict[str, Any]
+
+
+def _tpl_section(sec: dict) -> dict:
+    from .schema import Section
+    try:
+        m = Section.model_validate({"id": "plantilla", **{k: v for k, v in sec.items() if k not in ("id", "home")}})
+    except Exception as e:  # noqa: BLE001
+        raise HTTPException(422, {"message": "La plantilla no es válida", "issues": [str(e)[:400]]})
+    return m.model_dump(mode="json", exclude_none=True, exclude={"id", "home"})
+
+
+@router.get("/templates")
+def templates(user=Depends(guard), s: Store = Depends(get_store)):
+    from .templates_lib import BUILTIN
+    return [{**b, "builtin": True} for b in BUILTIN] + [{**t, "builtin": False} for t in s.list_templates()]
+
+
+@router.post("/templates", status_code=201)
+def add_template(body: TplIn, user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
+    if not body.name.strip():
+        raise HTTPException(422, "Ponle nombre a la plantilla")
+    return {"id": s.put_template(body.name.strip(), _tpl_section(body.section))}
+
+
+@router.delete("/templates/{tid}", status_code=204)
+def del_template(tid: int, user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
+    s.del_template(tid)
+    return Response(status_code=204)
+
+
 class Save(BaseModel):
     data: dict[str, Any]
     note: str = ""

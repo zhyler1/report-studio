@@ -24,6 +24,14 @@ export const setAt = (d: Json, p: string, v: Json): Json => {
 }
 const parentOf = (p: string) => { const k = p.split('.'); const i = Number(k.pop()); return { list: k.join('.'), i } }
 
+/** ¿La casilla `p` está bloqueada, o está dentro de otra bloqueada? */
+export const lockedAt = (d: Json, p: string | null): boolean => {
+  if (!p) return false
+  const k = p.split('.'); let acc = ''
+  for (const x of k) { acc = acc ? acc + '.' + x : x; if (getAt(d, acc)?.locked === true) return true }
+  return false
+}
+
 export const listOps = {
   move(d: Json, p: string, dx: number): Json {
     const { list, i } = parentOf(p); const a = [...getAt(d, list)]; const j = i + dx
@@ -107,6 +115,8 @@ const CSS = `
 #rsHov,#rsSel{position:absolute;pointer-events:none;border-radius:10px;z-index:99990;display:none}
 #rsHov{outline:2px dashed #2160b0;outline-offset:2px}#rsSel{outline:3px solid #E8711A;outline-offset:2px}
 #rsHov b{pointer-events:auto;cursor:grab;touch-action:none;user-select:none;position:absolute;top:8px;left:8px;background:#2160b0;color:#fff;font:700 12px Inter,system-ui,sans-serif;padding:6px 12px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.3);white-space:nowrap}
+#rsHov b.lk{background:#475569}
+.rs-b[data-lk]{}
 #rsBar{position:absolute;z-index:99999;display:none;gap:4px;background:#0f1b33;padding:5px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center}
 #rsBar button,#rsBar select{font:600 12px Inter,system-ui,sans-serif;border:0;border-radius:6px;padding:5px 8px;background:#26385c;color:#fff;cursor:pointer}
 #rsBar button:hover{background:#3a5288}#rsBar .x{background:#a82a2a}
@@ -143,28 +153,37 @@ export function attach(doc: Document, h: Host) {
     const r = el && rectOf(el)
     if (!r) { box.style.display = 'none'; return null }
     Object.assign(box.style, { display: 'block', left: r.l + 'px', top: r.t + 'px', width: r.w + 'px', height: r.h + 'px' })
-    if (label !== undefined) box.innerHTML = `<b title="Agarra y arrastra para mover la casilla">⠿ Mover · ${label}</b>`
+    if (label !== undefined) box.innerHTML = `<b title="Agarra y arrastra para mover la casilla">${label.startsWith('🔒') ? label + ' · bloqueada' : '⠿ Mover · ' + label}</b>`
     return r
   }
   let hovP: string | null = null
   const blockAt = (p: string | null) => (p ? doc.querySelector(`.rs-b[data-bp="${p}"]`) : null)
-  const label = (el: Element) => BLOCK[el.getAttribute('data-bt') || ''] || el.getAttribute('data-bt') || ''
+  const label = (el: Element) => (el.hasAttribute('data-lk') ? '🔒 ' : '') + (BLOCK[el.getAttribute('data-bt') || ''] || el.getAttribute('data-bt') || '')
 
   const drawSel = () => {
     const p = h.sel(); const el = blockAt(p)
     const r = place(sel, el)
     if (!r || !p || !el) { bar.style.display = 'none'; return }
     const t = el.getAttribute('data-bt'); const b = getAt(h.get(), p)
+    if (lockedAt(h.get(), p)) {
+      bar.innerHTML = b?.locked
+        ? `<span style="color:#fff;font:600 12px Inter,system-ui,sans-serif;padding:0 6px">🔒 Casilla bloqueada</span><button data-a="lock" title="Quitar el bloqueo">🔓 Desbloquear</button>`
+        : `<span style="color:#fff;font:600 12px Inter,system-ui,sans-serif;padding:0 6px">🔒 Dentro de una casilla bloqueada</span>`
+      bar.style.display = 'flex'; bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
+      return
+    }
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button><button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
   const act = (a: string) => {
     const p = h.sel(); if (!p) return
     const d = h.get()
+    if (a === 'lock') { h.put(setAt(d, p + '.locked', !getAt(d, p)?.locked)); h.toast(getAt(d, p)?.locked ? 'Casilla desbloqueada' : 'Casilla bloqueada 🔒'); return }
+    if (lockedAt(d, p)) { h.toast('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
     if (a === 'up') h.put(listOps.move(d, p, -1)); else if (a === 'down') h.put(listOps.move(d, p, 1))
     else if (a === 'dup') h.put(listOps.dup(d, p))
     else if (a === 'clr') h.put(setAt(setAt(d, p + '.bg', ''), p + '.fg', ''))
@@ -229,7 +248,7 @@ export function attach(doc: Document, h: Host) {
       const r = s.getRangeAt(0)
       const n = r.commonAncestorContainer; let el = (n.nodeType === 3 ? n.parentElement : n) as HTMLElement | null
       if (!el || el.closest('[contenteditable=true],svg,.rs-chart,#rsBar,#rsTx')) return
-      const blk = el.closest('.rs-b') as HTMLElement | null; if (!blk) return
+      const blk = el.closest('.rs-b') as HTMLElement | null; if (!blk || lockedAt(h.get(), blk.getAttribute('data-bp'))) return
       while (el !== blk && el.parentElement && el.parentElement !== blk && !el.hasAttribute('data-to') && (/^(B|I|STRONG|EM)$/.test(el.tagName) || el.hasAttribute('data-rc'))) el = el.parentElement
       if (el === blk || !isLeaf(el)) { if (el === blk || el.querySelector('div,p,li,table,figure,h3,h4,ul')) return }
       const text = (el.textContent || '').trim(); if (!text) return
@@ -253,6 +272,7 @@ export function attach(doc: Document, h: Host) {
     const t = e.target as HTMLElement
     if (t.closest('svg') || t.closest('.rs-chart') || t.closest('#rsBar')) { if (t.closest('.rs-chart')) h.toast('Los datos del gráfico se editan en el panel de la derecha'); return }
     const blk = t.closest('.rs-b'); if (!blk || !t.textContent?.trim()) return
+    if (lockedAt(h.get(), blk.getAttribute('data-bp'))) { h.toast('Casilla bloqueada 🔒: desbloquéala para editarla'); return }
     const fx = t.closest('[data-tx]') as HTMLElement | null
     let el: HTMLElement = fx || t
     if (fx) {
@@ -345,6 +365,7 @@ export function attach(doc: Document, h: Host) {
     if (from && at) applyDrop(from, at)
   }
   const startDrag = (p: string, e: PointerEvent) => {
+    if (lockedAt(h.get(), p)) { h.toast('Casilla bloqueada 🔒: desbloquéala para moverla'); return }
     dragP = p; last = { x: e.clientX, y: e.clientY }
     const el = blockAt(p); el?.classList.add('rs-dragging')
     ghost.textContent = '⠿ ' + (el ? label(el) : 'Casilla'); ghost.style.display = 'block'
@@ -357,6 +378,8 @@ export function attach(doc: Document, h: Host) {
   }
   const applyDrop = (from: string, at: Drop) => {
     const d0 = h.get(); const sp = parentOf(from)
+    const tgtPath = at.kind === 'block' ? parentOf(at.to).list : at.kind === 'list' ? at.list : ''
+    if (tgtPath && lockedAt(d0, tgtPath)) { h.toast('Esa casilla está bloqueada: no se puede soltar dentro'); return }
     if (at.kind === 'tab' || at.kind === 'list') {
       let tl: string, name = ''
       if (at.kind === 'tab') {
