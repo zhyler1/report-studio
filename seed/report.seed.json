@@ -345,6 +345,7 @@
           "cutoff": "Corte 12 de noviembre de 2026",
           "avg": 81.9,
           "color": "green",
+          "viz": "ring",
           "summary": "81,9 % de avance promedio en los compromisos priorizados definidos en la mesa de seguimiento ante la Procuraduría Delegada para la Salud y el Trabajo. La gestión adelantada permitió reconstruir evidencia documental, validar soportes y consolidar acciones con las entidades del sector para avanzar en el cierre de los compromisos objeto de seguimiento.",
           "milestone_date": "26 de noviembre de 2026",
           "milestone": [
@@ -1211,7 +1212,8 @@
                 "type": "ring_card",
                 "value": 80.0,
                 "text": "Cumplimiento del plan anual de trabajo del 80 % hasta el 31 de octubre de 2026.",
-                "color": "yellow"
+                "color": "yellow",
+                "viz": "ring"
               }
             ],
             [

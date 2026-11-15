@@ -819,12 +819,12 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     var b=document.getElementById('acuBox');if(!b)return;var A=ACU;
     var cc=function(c,p){return c||semc(p)};
     var h='<div class="acu-head" data-r><h3>'+esc(A.titulo)+'</h3><span class="chip">'+esc(A.corte)+'</span></div>';
-    h+='<div class="acu-top"><div class="card acu-res" data-r style="--i:1"><div class="ring big sg-'+cc(A.col,A.prom)+'" data-p="'+A.prom+'"><div><span>'+String(A.prom).replace('.',',')+' %</span></div></div><div><h3>'+X('acu.resultado','Resultado General')+'</h3><p>'+esc(A.texto)+'</p></div></div>';
+    h+='<div class="acu-top"><div class="card acu-res" data-r style="--i:1">'+(A.vizSpec?'<div class="rs-ch'+'art" style="width:min(100%,260px);flex:none" data-spec="'+A.vizSpec.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></div>':'<div class="ring big sg-'+cc(A.col,A.prom)+'" data-p="'+A.prom+'"><div><span>'+String(A.prom).replace('.',',')+' %</span></div></div>')+'<div><h3>'+X('acu.resultado','Resultado General')+'</h3><p>'+esc(A.texto)+'</p></div></div>';
     h+='<div class="card acu-hito" data-r style="--i:2"><h3>'+X('acu.hito','Próximo Hito Estratégico')+'</h3><div class="hito-d">'+esc(A.hitoFecha)+'</div><ul class="plain">'+A.hito.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div></div>';
     if(A.tabla)h+='<h3 class="st" style="margin-top:22px" data-r>'+X('acu.estado','Estado de los Compromisos Priorizados')+'</h3><div class="tw" data-r><table class="acu-tb"><thead><tr><th>'+X('acu.numeral','Numeral')+'</th><th>'+X('acu.col_estado','Estado')+'</th><th>'+X('acu.situacion','Situación actual')+'</th></tr></thead><tbody>';
     if(A.tabla)A.rows.forEach(function(r){var c=cc(r[2],r[1]);h+='<tr class="sg-'+c+'"><td style="font-weight:800;white-space:nowrap"><i class="dsg"></i>'+esc(r[0])+'</td><td><div class="pc"><div class="bar sg-'+c+'" style="--w:'+r[1]+'%"><i></i></div><b class="sgt">'+r[1]+' %</b></div></td><td>'+esc(r[3])+'</td></tr>'});
     h+=(A.tabla?'</tbody></table></div>':'')+'<div class="acu-bot"><div class="card" data-r><h3>'+X('acu.avances','Principales Avances Alcanzados')+'</h3><ul class="checks">'+A.avances.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div><div class="card" data-r><h3>'+X('acu.aspectos','Aspectos que Requieren Seguimiento')+'</h3><ul class="warnl">'+A.aspectos.map(function(x){return '<li>'+esc(x[0])+'</li>'}).join('')+'</ul></div></div>';
-    b.innerHTML=h;if(b.offsetParent){try{animate(b)}catch(e){}}
+    b.innerHTML=h;var RC2=window['RS'+'Charts'];if(RC2){try{RC2.init()}catch(e){}}if(b.offsetParent){try{animate(b)}catch(e){}}
   }
   function renderTb(){
     var h='',G=[[X('act.g1','ACUERDO SINDICAL'),'sind',function(r){return r[0]!=='EFR'}],[X('act.g2','MEDIDAS EFR'),'efr',function(r){return r[0]==='EFR'}]];

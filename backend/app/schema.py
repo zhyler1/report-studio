@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field
 SCHEMA_VERSION = "1.0"
 
 Rich = str  # texto con **negrilla**
+Viz = Literal["ring", "gauge", "radialbar", "donut", "bullet", "bar", "kpi"]   # cómo se dibuja un porcentaje principal
 Color = Literal["auto", "blue", "red", "green", "orange", "yellow", "purple", "navy"]
 Level = Literal["alto", "medio", "bajo"]
 Status = Literal["ejecutado", "proceso", "espera"]
@@ -130,6 +131,7 @@ class RingCard(BlockBase):
     value: float
     text: Rich
     color: Color = "auto"         # auto = semáforo por umbrales
+    viz: Viz = "ring"             # anillo (original) u otro gráfico
 
 
 class StatusItem(Base):
@@ -246,6 +248,7 @@ class Agreement(BlockBase):
     cutoff: str
     avg: float
     color: Color = "auto"
+    viz: Viz = "ring"             # anillo (original) u otro gráfico
     summary: Rich
     milestone_date: str
     milestone: list[str]

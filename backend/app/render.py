@@ -201,12 +201,20 @@ def r_card_list(b: CardList, ctx: Ctx) -> str:
     return f'<div class="card" data-r style="margin-top:18px">{t}<ul class="{cls}">{li}</ul></div>'
 
 
+def viz_spec(viz: str, value: float, label: str) -> str:
+    """Un porcentaje dibujado con el motor de gráficos (en vez del anillo original)."""
+    spec = {"kind": viz, "labels": [label or "Avance"], "series": [{"name": label or "Avance", "values": [value], "color": "auto"}], "unit": "%", "max": 100,
+            "height": 190, "show_legend": False, "show_values": True, "target": [], "events": [], "links": [], "totals": [], "forecast_labels": [], "bins": 0, "forecast": 0}
+    return json.dumps(spec, ensure_ascii=False, separators=(",", ":"))
+
+
 def r_ring(b: RingCard, ctx: Ctx) -> str:
     c = CLS.get(b.color) or semc(b.value, ctx.th)
     v = f"{b.value:g}"
     return (f'<div class="card" data-r style="--i:1;display:flex;gap:22px;align-items:center;flex-wrap:wrap">'
-            f'<div class="ring big sg-{c}" data-p="{v}"><div><span class="num" data-to="{int(b.value)}" data-suf="%">{int(b.value)}%</span></div></div>'
-            f'<p style="flex:1;min-width:180px;font-weight:700;font-size:16px">{esc(b.text)}</p></div>')
+            + (f'<div class="rs-chart" style="width:min(100%,260px);flex:none" data-spec="{attr(viz_spec(b.viz, b.value, ""))}"></div>' if b.viz != "ring" else
+               f'<div class="ring big sg-{c}" data-p="{v}"><div><span class="num" data-to="{int(b.value)}" data-suf="%">{int(b.value)}%</span></div></div>')
+            + f'<p style="flex:1;min-width:180px;font-weight:700;font-size:16px">{esc(b.text)}</p></div>')
 
 
 def r_status_list(b: StatusList, ctx: Ctx) -> str:
@@ -342,7 +350,7 @@ def r_proposals(b: Proposals, ctx: Ctx) -> str:
 
 
 def r_chart(b: Chart, ctx: Ctx) -> str:
-    spec = b.model_dump(mode="json", exclude={"id", "title", "hidden", "type", "caption", "span", "bg", "fg"})
+    spec = b.model_dump(mode="json", exclude={"id", "title", "hidden", "type", "caption", "span", "bg", "fg", "tints"})
     h = f"<h3>{esc(b.title)}</h3>" if b.title else ""
     cap = f'<p class="cap">{esc(b.caption)}</p>' if b.caption else ""
     return f'<div class="card chart-card" data-r>{h}<div class="rs-chart" data-spec="{attr(json.dumps(spec, ensure_ascii=False, separators=(",", ":")))}"></div>{cap}</div>'
@@ -519,6 +527,8 @@ def js_data(rep: Report) -> dict:
     if ag:
         d["ACU"] = {"tabla": ag.table is not None, "titulo": ag.heading, "corte": ag.cutoff, "prom": ag.avg, "col": {"auto": ""}.get(ag.color, CLS.get(ag.color, "")),
                     "texto": ag.summary, "rows": [], "avances": [[x] for x in ag.progress], "aspectos": [[x] for x in ag.watch], "hitoFecha": ag.milestone_date, "hito": [[x] for x in ag.milestone]}
+        if ag.viz != "ring":
+            d["ACU"]["vizSpec"] = viz_spec(ag.viz, ag.avg, "")
     pl = ctx.plants
     if pl:
         d["PER"] = {"plantas": [[p.label, p.provistos, p.vacantes] for p in pl.plants], "procesos": pl.procesos, "procLabel": pl.procesos_label,
@@ -544,7 +554,7 @@ def hours_text(w: Workflow | None) -> str:
 
 
 def _has_chart(rep: Report) -> bool:
-    return any(isinstance(b, Chart) and not b.hidden for s in rep.sections for b in _blocks(s))
+    return any(not b.hidden and (isinstance(b, Chart) or (isinstance(b, (RingCard, Agreement)) and b.viz != "ring")) for s in rep.sections for b in _blocks(s))
 
 
 def _mix(h: str, k: float) -> str:

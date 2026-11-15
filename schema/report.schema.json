@@ -249,6 +249,20 @@
      "title": "Color",
      "type": "string"
     },
+    "viz": {
+     "default": "ring",
+     "enum": [
+      "ring",
+      "gauge",
+      "radialbar",
+      "donut",
+      "bullet",
+      "bar",
+      "kpi"
+     ],
+     "title": "Viz",
+     "type": "string"
+    },
     "summary": {
      "title": "Summary",
      "type": "string"
@@ -2414,6 +2428,20 @@
       "navy"
      ],
      "title": "Color",
+     "type": "string"
+    },
+    "viz": {
+     "default": "ring",
+     "enum": [
+      "ring",
+      "gauge",
+      "radialbar",
+      "donut",
+      "bullet",
+      "bar",
+      "kpi"
+     ],
+     "title": "Viz",
      "type": "string"
     }
    },

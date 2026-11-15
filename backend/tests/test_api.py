@@ -125,3 +125,24 @@ def test_tints_and_covers():
     assert 'class="rs-t"' in html and "data-tint=" in html and 'data-bg="ondas"' in html
     d["meta"]["theme"]["cover"] = "no-existe"
     assert load(d)[0] is None
+
+
+def test_viz_swaps_ring_for_chart():
+    import json
+    from app.render import render
+    from app.validate import load
+    d = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    def walk(o):
+        if isinstance(o, dict):
+            if o.get("type") == "agreement":
+                o["viz"] = "gauge"
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(d)
+    rep, errs = load(d)
+    assert rep is not None, errs
+    html = render(rep)
+    assert '"vizSpec"' in html and "RSCharts" in html

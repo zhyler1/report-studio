@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getAt, setAt } from './editLayer'
+import { getAt, setAt, VIZ } from './editLayer'
 import type { Json } from './api'
 
 export type RibTab = 'inicio' | 'insertar' | 'diseno' | 'casilla' | 'datos'
@@ -93,6 +93,8 @@ export default function Ribbon(p: RibProps) {
         <div className="rgrp"><div className="rgl">Color de la casilla</div><div style={{ display: 'flex', gap: 12 }}>
           <Color label="Fondo" value={b.bg} fallback="#ffffff" onChange={v => putB({ bg: v })} />
           <Color label="Texto" value={b.fg} fallback="#14243f" onChange={v => putB({ fg: v })} /></div></div>
+        {(b.type === 'ring_card' || b.type === 'agreement') && <><span className="rsep" /><div className="rgrp"><div className="rgl">Visualización</div>
+          <select value={b.viz || 'ring'} onChange={e => putB({ viz: e.target.value })}>{VIZ.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></>}
         {b.type === 'chart' && <><span className="rsep" /><div className="rgrp"><div className="rgl">Tipo de gráfico</div>
           <select value={b.kind} onChange={e => putB({ kind: e.target.value })}>{p.kinds.map(k => <option key={k} value={k}>{k}</option>)}</select></div></>}
         <span className="rsep" />
