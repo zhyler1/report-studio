@@ -68,8 +68,9 @@ def embedded_report(name: str, data: bytes) -> dict | None:
     if Path(name).suffix.lower() not in (".html", ".htm"):
         return None
     m = re.search(rb'<script type="application/json" id="rs-report">(.*?)</script>', data, re.S)
-    if not m:
-        return None
+    if not m:  # informe HTML escrito a mano (la plantilla original): se reconstruye desde su estructura y sus datos
+        from .legacy import from_html
+        return from_html(data.decode("utf-8", "ignore"))
     try:
         return json.loads(m.group(1).decode("utf-8").replace("<\\/", "</"))
     except ValueError:

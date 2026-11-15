@@ -88,3 +88,13 @@ def test_exported_html_reimports_losslessly(c):
     r = c.post("/api/ingest/extract", files={"file": ("informe.html", html.encode(), "text/html")}).json()
     assert r["report"] and load(r["report"])[1] == [] and r["report"]["meta"]["title"] == SEED["meta"]["title"]
     assert "rs-report" not in render(rep, edit=True)
+
+
+def test_legacy_handwritten_html_rebuilds_full_report():
+    """El HTML escrito a mano (plantilla original) se importa completo, sin IA."""
+    from app.ingest import embedded_report
+    from app.validate import load
+    for f in ("Informe_TH.original.html", "Informe_TH.v9.html"):
+        doc = embedded_report(f, (Path(__file__).resolve().parents[2] / "seed" / f).read_bytes())
+        assert doc is not None and len(doc["sections"]) == 6 and len(doc["alerts"]) == 23
+        assert load(doc)[0] is not None
