@@ -98,3 +98,28 @@ def test_legacy_handwritten_html_rebuilds_full_report():
         doc = embedded_report(f, (Path(__file__).resolve().parents[2] / "seed" / f).read_bytes())
         assert doc is not None and len(doc["sections"]) == 6 and len(doc["alerts"]) == 23
         assert load(doc)[0] is not None
+
+
+def test_lectura_basica_sigue_la_guia():
+    from app import ingest
+    t = ("ALERTAS Y DECISIONES REQUERIDAS\nCapacidad operativa: 8 grupos no cumplen la conformacion minima del equipo.\n"
+         "Compromisos próximos\nLiquidar prestaciones sociales de aproximadamente 68 exfuncionarios de octubre.\n")
+    b = ingest.basic_blocks(t)
+    assert [x["title"] for x in b if x["type"] == "card_list"] == ["Alertas Y Decisiones Requeridas", "Compromisos próximos"]
+    assert b[0]["style"] == "warn" and b[1]["style"] == "checks"
+
+
+def test_tabla_de_diseno_se_descarta():
+    from app import ingest
+    assert ingest._noisy([["", "", "x"], ["", "", ""]]) is True
+    assert ingest._noisy([["a", "b"], ["c", "d"]]) is False
+
+
+def test_administrador_con_plantilla_en_base64():
+    """El HTML del editor viejo ('Administrador') lleva la plantilla en base64: también se importa."""
+    import base64
+    from app.ingest import embedded_report
+    src = (Path(__file__).resolve().parents[2] / "seed" / "Informe_TH.v9.html").read_bytes()
+    wrap = ("<html><body><script>var TPL='" + base64.b64encode(src).decode() + "'; function dec(b){}</script></body></html>").encode()
+    doc = embedded_report("Administrador.html", wrap)
+    assert doc is not None and len(doc["sections"]) == 6

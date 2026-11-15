@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import re
 from pathlib import Path
 
@@ -19,6 +20,25 @@ def _tsv(rows) -> str:
     return "\n".join("\t".join((c or "").replace("\n", " ").strip() for c in r) for r in rows if any(c for c in r))
 
 
+def _ocr_page(data: bytes, idx: int) -> str:
+    """OCR local (Tesseract) para páginas sin texto. Sin Tesseract instalado devuelve vacío."""
+    if os.environ.get("RS_OCR", "1") == "0":
+        return ""
+    try:
+        import pypdfium2 as pdfium
+        import pytesseract
+        img = pdfium.PdfDocument(data)[idx].render(scale=4).to_pil()
+        try:
+            langs = set(pytesseract.get_languages())
+            lang = "spa+eng" if {"spa", "eng"} <= langs else "eng"
+        except Exception:
+            lang = "eng"
+        t = pytesseract.image_to_string(img, lang=lang, config="--psm 6")
+        return t if len(t.strip()) > 10 else ""
+    except Exception:
+        return ""
+
+
 def extract_text(name: str, data: bytes) -> str:
     ext = Path(name).suffix.lower()
     if ext == ".pdf":
@@ -27,8 +47,12 @@ def extract_text(name: str, data: bytes) -> str:
         with pdfplumber.open(io.BytesIO(data)) as pdf:
             for i, pg in enumerate(pdf.pages, 1):
                 out.append(f"--- Página {i} ---")
-                out.append(pg.extract_text() or "")
-                for t in pg.extract_tables() or []:
+                txt = pg.extract_text() or ""
+                tabs = pg.extract_tables() or []
+                if len(txt.strip()) < 30 and not tabs and pg.images:
+                    txt = _ocr_page(data, i - 1)  # página que es solo imagen
+                out.append(txt)
+                for t in tabs:
                     out.append("[TABLA]\n" + _tsv(t) + "\n[/TABLA]")
         return "\n".join(out)
     if ext == ".docx":
@@ -70,7 +94,12 @@ def embedded_report(name: str, data: bytes) -> dict | None:
     m = re.search(rb'<script type="application/json" id="rs-report">(.*?)</script>', data, re.S)
     if not m:  # informe HTML escrito a mano (la plantilla original): se reconstruye desde su estructura y sus datos
         from .legacy import from_html
-        return from_html(data.decode("utf-8", "ignore"))
+        html = data.decode("utf-8", "ignore")
+        w = re.search(r"var TPL='([A-Za-z0-9+/=]{200,})'", html)  # el "Administrador" trae la plantilla en base64
+        if w:
+            import base64
+            html = base64.b64decode(w.group(1)).decode("utf-8", "ignore")
+        return from_html(html)
     try:
         return json.loads(m.group(1).decode("utf-8").replace("<\\/", "</"))
     except ValueError:
@@ -78,11 +107,47 @@ def embedded_report(name: str, data: bytes) -> dict | None:
 
 
 # ───────────── lectura básica (sin IA) ─────────────
+# Encabezados de la guía de la reunión → estilo de lista
+GUIA = [
+    (r"alertas? (nuevas?|emergentes?)|riesgos?|alertas?", "warn", "Alertas y riesgos"),
+    (r"requerimientos?|decisiones|apoyo requerido|necesidades", "warn", "Requerimientos y decisiones"),
+    (r"compromisos?|pr[oó]ximos?|pendientes? prioritarios?", "checks", "Compromisos próximos"),
+    (r"logros?|resultados?|avances?|estado general|acciones? de gesti[oó]n|procesos generales", "checks", "Estado general y logros"),
+]
+
+
+def _guide_blocks(plain: str) -> list[dict]:
+    """Parte el texto por encabezados de la guía (líneas cortas, en mayúsculas o que coinciden con la guía)."""
+    cur, sections = None, []
+    for raw in plain.split("\n"):
+        l = raw.strip()
+        if not l or l.startswith("---"):
+            continue
+        head = None
+        if len(l) <= 60 and (l.isupper() or re.match(r"^\d+[.)]?\s+\S", l) is None):
+            for rx, st, name in GUIA:
+                if (re.match(rf"(?i)\W*({rx})\b", l) if l.isupper() else re.fullmatch(rf"(?i)\W*({rx})(\s+[\wáéíóúñ]+){{0,3}}\W*", l)):
+                    head = (name, st, l)
+                    break
+        if head:
+            cur = {"title": head[2].title() if head[2].isupper() else head[2], "style": head[1], "items": []}
+            sections.append(cur)
+        elif cur is not None and len(l) > 25:
+            cur["items"].append(re.sub(r"^\s*[-•*▪●·]\s*|^\s*\d+[.)]\s+", "", l))
+    return [{"type": "card_list", "title": c["title"], "style": c["style"], "items": c["items"][:30]} for c in sections if len(c["items"]) >= 1]
+
+
+def _noisy(rows: list[list[str]]) -> bool:
+    """Tablas casi vacías o de una sola celda con todo el texto: son diseño de la diapositiva, no datos."""
+    cells = [c for r in rows for c in r]
+    return not cells or sum(1 for c in cells if c.strip()) / len(cells) < 0.45
+
+
 def basic_blocks(text: str) -> list[dict]:
     blocks: list[dict] = []
     for m in re.finditer(r"\[TABLA\]\n(.*?)\n\[/TABLA\]", text, re.S):
         rows = [r.split("\t") for r in m.group(1).split("\n") if r.strip()]
-        if len(rows) < 2 or max(len(r) for r in rows) < 2:
+        if len(rows) < 2 or max(len(r) for r in rows) < 2 or _noisy(rows):
             continue
         w = max(len(r) for r in rows)
         cols = [{"key": f"c{i}", "label": (rows[0][i] if i < len(rows[0]) and rows[0][i] else f"Columna {i + 1}"), "format": "text"} for i in range(w)]
@@ -97,7 +162,10 @@ def basic_blocks(text: str) -> list[dict]:
             stats.append({"label": m.group(1).strip(), "value": m.group(2).strip()})
     if stats:
         blocks.insert(0, {"type": "stat_grid", "items": stats[:8]})
-    if bullets:
+    guide = _guide_blocks(plain)
+    if len(guide) >= 2:
+        blocks.extend(guide)
+    elif bullets:
         blocks.append({"type": "card_list", "title": "Puntos del documento", "style": "plain", "items": bullets[:40]})
     if not blocks:
         paras = [p.strip() for p in re.split(r"\n\s*\n", plain) if len(p.strip()) > 20]
