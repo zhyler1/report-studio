@@ -106,13 +106,18 @@ const CSS = `
 .rs-add:hover{background:rgba(33,96,176,.12)}
 #rsHov,#rsSel{position:absolute;pointer-events:none;border-radius:10px;z-index:99990;display:none}
 #rsHov{outline:2px dashed #2160b0;outline-offset:2px}#rsSel{outline:3px solid #E8711A;outline-offset:2px}
-#rsHov b{pointer-events:auto;cursor:grab;position:absolute;top:-22px;left:0;background:#2160b0;color:#fff;font:600 11px Inter,system-ui,sans-serif;padding:2px 8px;border-radius:6px 6px 0 0;white-space:nowrap}
+#rsHov b{pointer-events:auto;cursor:grab;touch-action:none;user-select:none;position:absolute;top:8px;left:8px;background:#2160b0;color:#fff;font:700 12px Inter,system-ui,sans-serif;padding:6px 12px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.3);white-space:nowrap}
 #rsBar{position:absolute;z-index:99999;display:none;gap:4px;background:#0f1b33;padding:5px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center}
 #rsBar button,#rsBar select{font:600 12px Inter,system-ui,sans-serif;border:0;border-radius:6px;padding:5px 8px;background:#26385c;color:#fff;cursor:pointer}
 #rsBar button:hover{background:#3a5288}#rsBar .x{background:#a82a2a}
 [contenteditable=true]{outline:2px solid #E8711A!important;outline-offset:3px;background:rgba(232,113,26,.08);cursor:text}
 #rsDrop{position:absolute;z-index:99998;display:none;background:#E8711A;border-radius:3px;pointer-events:none;box-shadow:0 0 0 3px rgba(232,113,26,.25)}
-.rs-tabdrop{outline:3px solid #E8711A!important;outline-offset:2px}.rs-drag{cursor:grab!important}.rs-b.rs-dragging{opacity:.45}
+.rs-tabdrop{outline:3px solid #E8711A!important;outline-offset:2px;background:rgba(232,113,26,.15)!important}
+#rsGhost{position:fixed;z-index:100000;pointer-events:none;display:none;background:#E8711A;color:#fff;font:700 13px Inter,system-ui,sans-serif;padding:8px 14px;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.35);transform:translate(14px,14px);white-space:nowrap}
+body.rs-dragmode,body.rs-dragmode *{cursor:grabbing!important;user-select:none!important}
+body.rs-dragmode .tab{outline:2px dashed #E8711A;outline-offset:2px}
+#rsDrop{box-shadow:0 0 0 4px rgba(232,113,26,.28)!important}
+#rsDrop em{position:absolute;top:-24px;left:0;background:#E8711A;color:#fff;font:700 11px Inter,system-ui,sans-serif;font-style:normal;padding:3px 9px;border-radius:7px;white-space:nowrap}.rs-drag{cursor:grab!important}.rs-b.rs-dragging{opacity:.45}
 #rsTx{position:absolute;z-index:99999;display:none;gap:6px;background:#0f1b33;padding:6px 8px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center;color:#fff;font:600 11px Inter,system-ui,sans-serif}
 #rsTx i{width:20px;height:20px;border-radius:50%;border:2px solid #fff;cursor:pointer;display:inline-block}#rsTx i:hover{transform:scale(1.2)}
 #rsTx input[type=color],#rsBar input[type=color]{width:26px;height:24px;padding:0;border:0;background:none;cursor:pointer}
@@ -138,7 +143,7 @@ export function attach(doc: Document, h: Host) {
     const r = el && rectOf(el)
     if (!r) { box.style.display = 'none'; return null }
     Object.assign(box.style, { display: 'block', left: r.l + 'px', top: r.t + 'px', width: r.w + 'px', height: r.h + 'px' })
-    if (label !== undefined) box.innerHTML = `<b draggable="true" title="Arrastra para mover la casilla">⠿ ${label}</b>`
+    if (label !== undefined) box.innerHTML = `<b title="Agarra y arrastra para mover la casilla">⠿ Mover · ${label}</b>`
     return r
   }
   let hovP: string | null = null
@@ -153,7 +158,7 @@ export function attach(doc: Document, h: Host) {
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="drag" draggable="true" class="rs-drag" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
@@ -177,6 +182,7 @@ export function attach(doc: Document, h: Host) {
     hovP = el.getAttribute('data-bp'); place(hov, el, label(el))
   })
   doc.addEventListener('click', e => {
+    if (Date.now() - dragEnd < 350) { e.preventDefault(); e.stopPropagation(); return }
     const t = e.target as HTMLElement
     if (t.closest('#rsBar') || t.closest('[contenteditable=true]')) return
     const ad = t.closest('.rs-add') as HTMLElement | null
@@ -282,91 +288,116 @@ export function attach(doc: Document, h: Host) {
     const onKey = (ev: KeyboardEvent) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); el.blur() } else if (ev.key === 'Escape') { ev.preventDefault(); done(false) } }
     el.addEventListener('blur', onBlur); el.addEventListener('keydown', onKey)
   })
-  // ── arrastrar casillas ──
-  type Drop = { kind: 'block'; to: string; after: boolean; side: boolean } | { kind: 'tab'; id: string; el: HTMLElement }
-  let dragP: string | null = null, dropAt: Drop | null = null
-  const clearDrag = () => {
-    drop.style.display = 'none'; dropAt = null
+  // ── arrastrar casillas (eventos de puntero: ratón y táctil, con fantasma, guía y desplazamiento automático) ──
+  type Drop = { kind: 'block'; to: string; after: boolean; side: boolean } | { kind: 'tab'; id: string; el: HTMLElement } | { kind: 'list'; list: string; el: HTMLElement }
+  const ghost = mk('rsGhost')
+  let dragP: string | null = null, dropAt: Drop | null = null, last = { x: 0, y: 0 }, raf = 0, dragEnd = 0
+  const clearMarks = () => doc.querySelectorAll('.rs-tabdrop').forEach(x => x.classList.remove('rs-tabdrop'))
+  const stopDrag = () => {
+    dragP = null; dropAt = null; dragEnd = Date.now(); cancelAnimationFrame(raf)
+    drop.style.display = 'none'; ghost.style.display = 'none'; clearMarks()
+    doc.body.classList.remove('rs-dragmode')
     doc.querySelectorAll('.rs-dragging').forEach(x => x.classList.remove('rs-dragging'))
-    doc.querySelectorAll('.rs-tabdrop').forEach(x => x.classList.remove('rs-tabdrop'))
+    doc.removeEventListener('pointermove', onMove, true); doc.removeEventListener('pointerup', onUp, true)
+    doc.removeEventListener('pointercancel', onCancel, true); doc.removeEventListener('keydown', onEsc, true)
   }
-  const startDrag = (e: DragEvent, p: string) => {
-    dragP = p; e.dataTransfer?.setData('text/plain', p); if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
-    blockAt(p)?.classList.add('rs-dragging')
-  }
-  bar.addEventListener('dragstart', e => {
-    const b = (e.target as HTMLElement).closest('button[data-a="drag"]'); const p = h.sel()
-    if (!b || !p) { e.preventDefault(); return }
-    startDrag(e, p)
-  })
-  hov.addEventListener('dragstart', e => { if (!hovP) { e.preventDefault(); return } startDrag(e, hovP) })
-  hov.addEventListener('dragend', () => { dragP = null; clearDrag() })
-  const autoScroll = (e: DragEvent) => {
-    const m = 90, H = win.innerHeight
-    if (e.clientY < m) win.scrollBy(0, -Math.ceil((m - e.clientY) / 4)); else if (e.clientY > H - m) win.scrollBy(0, Math.ceil((e.clientY - (H - m)) / 4))
-  }
-  doc.addEventListener('dragover', e => {
+  const hint = (t: string, tone = '') => { drop.innerHTML = `<em>${t}</em>`; drop.dataset.tone = tone }
+  const resolve = () => {
     if (!dragP) return
-    autoScroll(e)
-    const tgt = e.target as HTMLElement
-    const tab = tgt.closest?.('.tab') as HTMLElement | null
-    if (tab) {                                           // soltar sobre una pestaña = mover a esa sección
-      e.preventDefault(); clearDrag(); tab.classList.add('rs-tabdrop'); drop.style.display = 'none'
-      dropAt = { kind: 'tab', id: tab.getAttribute('data-t') || '', el: tab }; return
-    }
-    doc.querySelectorAll('.rs-tabdrop').forEach(x => x.classList.remove('rs-tabdrop'))
-    const el = tgt.closest?.('.rs-b') as HTMLElement | null
-    if (!el) { drop.style.display = 'none'; dropAt = null; return }
+    const { x, y } = last
+    const tgt = doc.elementFromPoint(x, y) as HTMLElement | null
+    clearMarks(); drop.style.display = 'none'; dropAt = null
+    if (!tgt) return
+    const tab = tgt.closest('.tab') as HTMLElement | null
+    if (tab) { tab.classList.add('rs-tabdrop'); dropAt = { kind: 'tab', id: tab.getAttribute('data-t') || '', el: tab }; return }
+    const ad = tgt.closest('.rs-add') as HTMLElement | null
+    if (ad && ad.dataset.addto) { ad.classList.add('rs-tabdrop'); dropAt = { kind: 'list', list: ad.dataset.addto, el: ad }; return }
+    const el = tgt.closest('.rs-b') as HTMLElement | null
+    if (!el) return
     const to = el.getAttribute('data-bp')!
-    const r = rectOf(el); if (!r || to === dragP) { drop.style.display = 'none'; dropAt = null; return }
-    e.preventDefault()
-    const cx = e.clientX + win.scrollX, cy = e.clientY + win.scrollY
+    if (to === dragP || to.startsWith(dragP + '.')) return
+    const r = rectOf(el); if (!r) return
+    const cx = x + win.scrollX, cy = y + win.scrollY
     const tspan = getAt(h.get(), to)?.span || 'full'
     const fx = (cx - r.l) / r.w
     let side: boolean, after: boolean
-    if (tspan !== 'full') { side = true; after = fx > 0.5 }                 // ya está en una fila: izquierda / derecha
-    else if (fx < 0.22 || fx > 0.78) { side = true; after = fx > 0.5 }      // borde de un bloque ancho: lo deja lado a lado
-    else { side = false; after = cy > r.t + r.h / 2 }                       // centro: arriba / abajo
+    if (tspan !== 'full') { side = true; after = fx > 0.5 }
+    else if (fx < 0.25 || fx > 0.75) { side = true; after = fx > 0.5 }
+    else { side = false; after = cy > r.t + r.h / 2 }
     dropAt = { kind: 'block', to, after, side }
+    hint(side ? (after ? 'Al lado ▶' : '◀ Al lado') : (after ? 'Debajo' : 'Arriba'))
     Object.assign(drop.style, side
-      ? { display: 'block', top: r.t + 'px', height: r.h + 'px', left: (after ? r.l + r.w + 4 : r.l - 8) + 'px', width: '5px' }
-      : { display: 'block', left: r.l + 'px', width: r.w + 'px', top: (after ? r.t + r.h + 4 : r.t - 8) + 'px', height: '5px' })
-  })
-  doc.addEventListener('drop', e => {
+      ? { display: 'block', top: r.t + 'px', height: r.h + 'px', left: (after ? r.l + r.w + 2 : r.l - 8) + 'px', width: '7px' }
+      : { display: 'block', left: r.l + 'px', width: r.w + 'px', top: (after ? r.t + r.h + 2 : r.t - 8) + 'px', height: '7px' })
+  }
+  const loop = () => {
     if (!dragP) return
-    e.preventDefault()
-    const from = dragP, at = dropAt; dragP = null; clearDrag()
-    if (!at) return
-    const d0 = h.get()
-    if (at.kind === 'tab') {
-      const si = (d0.sections || []).findIndex((x: Json) => x.id === at.id)
-      const sp = parentOf(from)
-      if (si < 0) { h.toast('Esa pestaña no es una sección editable'); return }
-      const tl = `sections.${si}.blocks`
-      if (sp.list === tl) { h.toast('La casilla ya está en esa sección'); return }
+    const m = 110, H = win.innerHeight
+    if (last.y < m) win.scrollBy(0, -Math.ceil((m - last.y) / 3)); else if (last.y > H - m) win.scrollBy(0, Math.ceil((last.y - (H - m)) / 3))
+    resolve(); raf = requestAnimationFrame(loop)
+  }
+  const onMove = (e: PointerEvent) => { e.preventDefault(); last = { x: e.clientX, y: e.clientY }; ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px' }
+  const onCancel = () => stopDrag()
+  const onEsc = (e: KeyboardEvent) => { if (e.key === 'Escape') stopDrag() }
+  const onUp = (e: PointerEvent) => {
+    e.preventDefault(); last = { x: e.clientX, y: e.clientY }; resolve()
+    const from = dragP, at = dropAt; stopDrag()
+    if (from && at) applyDrop(from, at)
+  }
+  const startDrag = (p: string, e: PointerEvent) => {
+    dragP = p; last = { x: e.clientX, y: e.clientY }
+    const el = blockAt(p); el?.classList.add('rs-dragging')
+    ghost.textContent = '⠿ ' + (el ? label(el) : 'Casilla'); ghost.style.display = 'block'
+    ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px'
+    hov.style.display = 'none'; win.getSelection()?.removeAllRanges()
+    doc.body.classList.add('rs-dragmode')
+    doc.addEventListener('pointermove', onMove, true); doc.addEventListener('pointerup', onUp, true)
+    doc.addEventListener('pointercancel', onCancel, true); doc.addEventListener('keydown', onEsc, true)
+    raf = requestAnimationFrame(loop)
+  }
+  const applyDrop = (from: string, at: Drop) => {
+    const d0 = h.get(); const sp = parentOf(from)
+    if (at.kind === 'tab' || at.kind === 'list') {
+      let tl: string, name = ''
+      if (at.kind === 'tab') {
+        const si = (d0.sections || []).findIndex((x: Json) => x.id === at.id)
+        if (si < 0) { h.toast('Esa pestaña no es una sección editable'); return }
+        tl = `sections.${si}.blocks`; name = d0.sections[si].label || d0.sections[si].title || at.id
+      } else tl = at.list
+      if (tl === from || tl.startsWith(from + '.') || tl.startsWith(sp.list + '.')) { h.toast('No se puede soltar ahí'); return }
       const item = { ...getAt(d0, from), span: 'full' }
       const d1 = setAt(d0, sp.list, getAt(d0, sp.list).filter((_: Json, k: number) => k !== sp.i))
       const dst = [...(getAt(d1, tl) || []), item]
-      at.el.click(); h.put(setAt(d1, tl, dst)); h.select(tl + '.' + (dst.length - 1))
-      h.toast('Movida a «' + (d0.sections[si].label || d0.sections[si].title || at.id) + '»')
+      if (at.kind === 'tab') { dragEnd = 0; at.el.click() }
+      h.put(setAt(d1, tl, dst)); h.select(tl + '.' + (dst.length - 1))
+      if (name) h.toast('Movida a «' + name + '»')
       return
     }
     const tt = getAt(d0, at.to)
     const r = listOps.moveTo(d0, from, at.to, at.after)
     if (!r) { h.toast('No se puede soltar ahí'); return }
-    // lado a lado: ambas casillas comparten fila; arriba/abajo: la casilla ocupa todo el ancho
     let d = r.d
     if (at.side) {
       const w = (tt?.span && tt.span !== 'full') ? tt.span : '1/2'
       d = setAt(d, r.path + '.span', w)
-      if (!tt?.span || tt.span === 'full') {
-        const sp = parentOf(r.path); const tIdx = at.after ? sp.i - 1 : sp.i + 1
-        d = setAt(d, sp.list + '.' + tIdx + '.span', w)
-      }
+      if (!tt?.span || tt.span === 'full') { const q = parentOf(r.path); d = setAt(d, q.list + '.' + (at.after ? q.i - 1 : q.i + 1) + '.span', w) }
     } else d = setAt(d, r.path + '.span', 'full')
     h.put(d); h.select(r.path)
-  })
-  doc.addEventListener('dragend', () => { dragP = null; clearDrag() })
+  }
+  // agarrar: etiqueta «Mover» (aparece dentro de la casilla), botón de la barra, o mantener pulsado ~½ s sobre cualquier casilla
+  hov.addEventListener('pointerdown', e => { const b = (e.target as HTMLElement).closest('b'); if (!b || !hovP) return; e.preventDefault(); e.stopPropagation(); startDrag(hovP, e) })
+  bar.addEventListener('pointerdown', e => { const b = (e.target as HTMLElement).closest('button[data-a="drag"]'); const p = h.sel(); if (!b || !p) return; e.preventDefault(); startDrag(p, e) })
+  doc.addEventListener('pointerdown', e => {
+    if (e.button !== 0 || dragP || e.pointerType === 'touch') return
+    const t = e.target as HTMLElement
+    if (t.closest('#rsBar,#rsTx,#rsHov,[contenteditable=true],input,select,textarea,.rs-add,a,button,.tab,svg')) return
+    const el = t.closest('.rs-b'); if (!el) return
+    const p = el.getAttribute('data-bp')!, x0 = e.clientX, y0 = e.clientY
+    const end = () => { clearTimeout(timer); doc.removeEventListener('pointermove', mv, true); doc.removeEventListener('pointerup', end, true) }
+    const mv = (ev: PointerEvent) => { if (Math.hypot(ev.clientX - x0, ev.clientY - y0) > 6) end() }
+    const timer = setTimeout(() => { end(); startDrag(p, e) }, 480)
+    doc.addEventListener('pointermove', mv, true); doc.addEventListener('pointerup', end, true)
+  }, true)
   win.addEventListener('resize', drawSel)
   const redraw = () => drawSel()
   ;(doc as any).__rsRedraw = redraw
