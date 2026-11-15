@@ -240,3 +240,11 @@ def test_disenos_completos():
         d = json.loads(json.dumps(base)); d["meta"]["theme"]["layout"] = lay
         h = render(load(d)[0])
         assert f'data-layout="{lay}"' in h and 'id="rs-layout"' in h
+
+
+def test_incluye_estilos_de_celular():
+    import json
+    from app.render import render
+    from app.validate import load
+    h = render(load(json.load(open("seed/report.seed.json", encoding="utf-8")))[0])
+    assert 'id="rs-mobile"' in h and "max-width:640px" in h
