@@ -17,7 +17,7 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.util import Emu, Inches, Pt
 
 from .render import Ctx, _blocks, num_text
-from .schema import (Activities, Agreement, CalendarBlock, CardList, Chart, Gallery, Grid, LinkCards, MediaBlock, NoteList, NumberedCards,
+from .schema import (Activities, Agreement, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, MediaBlock, NoteList, NumberedCards,
                      Plants, PlantCard, Callout, Heading, Proposals, Report, RingCard, RowList, StatGrid, StatusList, StepCards, Table, Workflow, Budget)
 
 W, H = 13.333, 7.5
@@ -269,6 +269,9 @@ class Deck:
             for col in b.columns:
                 for x in col:
                     self.block(x)
+        elif isinstance(b, Group):
+            for x in b.blocks:
+                self.block(x)
         elif isinstance(b, (Budget, CalendarBlock, Proposals, Gallery, MediaBlock)):
             pass  # presupuesto, calendario, propuestas y multimedia viven mejor en el HTML
 

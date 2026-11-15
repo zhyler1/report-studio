@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
-import { attach, getAt, setAt, listOps, lockedAt, splitBlock } from './editLayer'
+import { attach, getAt, setAt, listOps, lockedAt, splitBlock, ungroup, groupNext, parentBlock } from './editLayer'
 import { BLOCK, ICONOS } from './labels'
 import Loader from './Loader'
 import Templates from './Templates'
@@ -242,6 +242,9 @@ export default function App() {
     if (a === 'up' || a === 'down') { setD(listOps.move(dd, sp, a === 'up' ? -1 : 1)); select(list + '.' + Math.max(0, i + (a === 'up' ? -1 : 1))) }
     else if (a === 'dup') { setD(listOps.dup(dd, sp)); select(list + '.' + (i + 1)) }
     else if (a === 'del' && confirm('¿Quitar esta casilla?')) { setD(listOps.del(dd, sp)); select(null) }
+    else if (a === 'parent') { const q = parentBlock(dd, sp); if (q) select(q) }
+    else if (a === 'ungroup') { setD(ungroup(dd, sp)); select(null); flash('Grupo deshecho') }
+    else if (a === 'groupnext') { setD(groupNext(dd, sp)); flash('Agrupada con la siguiente: se mueven juntas, o por partes') }
     else if (a === 'split') { setD(splitBlock(dd, sp)); flash('Separada en casillas: ahora cada parte se arrastra sola'); select(null) }
     else if (a === 'del!') { setD(listOps.del(dd, sp)); select(null); flash('Casilla quitada · Ctrl+Z para deshacer') }
   }

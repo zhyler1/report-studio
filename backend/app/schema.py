@@ -408,11 +408,17 @@ class Grid(BlockBase):
     columns: list[list["Block"]]
 
 
+class Group(BlockBase):
+    """Agrupa casillas: se puede mover entera o por partes, y se desagrupa cuando se quiera."""
+    type: Literal["group"] = "group"
+    blocks: list["Block"] = []
+
+
 Block = Annotated[
     Union[
         StatGrid, RowList, NoteList, CardList, RingCard, StatusList, NumberedCards, StepCards,
         LinkCards, Gallery, Table, Plants, Workflow, Agreement, Activities, Budget,
-        CalendarBlock, Proposals, Chart, MediaBlock, Grid, PlantCard, Callout, Heading,
+        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading,
     ],
     Field(discriminator="type"),
 ]
@@ -492,7 +498,7 @@ class Report(Base):
     alerts: list[Alert] = []
 
 
-for _m in (Gallery, Grid, Section, Tab, Report):
+for _m in (Gallery, Grid, Group, Section, Tab, Report):
     _m.model_rebuild()
 
 

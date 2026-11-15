@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { getAt, setAt, VIZ, canSplit } from './editLayer'
+import { getAt, setAt, VIZ, canSplit, parentBlock } from './editLayer'
 import type { Json } from './api'
 
 export type RibTab = 'inicio' | 'insertar' | 'diseno' | 'casilla' | 'datos'
@@ -124,6 +124,7 @@ export default function Ribbon(p: RibProps) {
         {(b.type === 'ring_card' || b.type === 'agreement') && <Grp t="Visualización"><div className="fld"><label>Cómo se dibuja</label>
           <select value={b.viz || 'ring'} onChange={e => putB({ viz: e.target.value })}>{VIZ.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>}
         {canSplit(b) && <Grp t="Partes"><Btn i="columns" l="Separar en casillas" title="Cada parte pasa a ser una casilla que se arrastra, intercambia y bloquea sola" onClick={() => p.op('split')} /></Grp>}
+        <Grp t="Agrupar">{b.type === 'group' ? <Btn i="columns" l="Desagrupar" title="Suelta las casillas del grupo" onClick={() => p.op('ungroup')} /> : <Btn i="layers" l="Agrupar con la siguiente" title="Juntas se mueven como un bloque, y cada una se puede mover sola" onClick={() => p.op('groupnext')} />}{sel && parentBlock(d, sel) && <Btn i="left" l="Contenedor" title="Selecciona el bloque que contiene a esta casilla" onClick={() => p.op('parent')} />}</Grp>
         <Grp t="Organizar"><Btn i="left" l="Antes" title="Alt + ↑" onClick={() => p.op('up')} /><Btn i="right" l="Después" title="Alt + ↓" onClick={() => p.op('down')} /><Btn i="copy" l="Duplicar" title="Ctrl/Cmd + D" onClick={() => p.op('dup')} /></Grp>
         <Grp t="Más"><Btn i="sliders" l="Todas las opciones" onClick={() => p.openDrawer('casilla')} /><Btn i="lock" l="Bloquear" title="Nadie la mueve, edita ni borra por accidente" onClick={() => p.op('lock')} /><Btn i="trash" l="Quitar" cls="danger" title="Supr" onClick={() => p.op('del')} /></Grp>
       </>}

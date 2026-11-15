@@ -22,6 +22,14 @@ export const setAt = (d: Json, p: string, v: Json): Json => {
   }
   return rec(d, 0)
 }
+/** Corrige una ruta después de quitar el elemento `i` de la lista `list`. */
+const adj = (path: string, list: string, i: number): string => {
+  const pre = list + '.'
+  if (!path.startsWith(pre)) return path
+  const rest = path.slice(pre.length).split('.'); const n = Number(rest[0])
+  if (n > i) rest[0] = String(n - 1)
+  return pre + rest.join('.')
+}
 const parentOf = (p: string) => { const k = p.split('.'); const i = Number(k.pop()); return { list: k.join('.'), i } }
 
 /** ¿La casilla `p` está bloqueada, o está dentro de otra bloqueada? */
@@ -84,8 +92,28 @@ export const splitBlock = (d: Json, p: string): Json => {
       })
     }
   }
+  if (b.type !== 'grid') parts = [{ type: 'group', span: b.span || 'full', blocks: parts }]   // se puede mover entero o por partes
   const a = [...getAt(d, list)]; a.splice(i, 1, ...parts)
   return setAt(d, list, a)
+}
+
+/** Deshace un grupo: sus casillas pasan a la lista que lo contiene. */
+export const ungroup = (d: Json, p: string): Json => {
+  const b = getAt(d, p); if (b?.type !== 'group') return d
+  const { list, i } = parentOf(p); const a = [...getAt(d, list)]; a.splice(i, 1, ...(b.blocks || []))
+  return setAt(d, list, a)
+}
+/** Junta la casilla con la siguiente en un grupo. */
+export const groupNext = (d: Json, p: string): Json => {
+  const { list, i } = parentOf(p); const a = [...getAt(d, list)]; if (i + 1 >= a.length) return d
+  a.splice(i, 2, { type: 'group', span: 'full', blocks: [a[i], a[i + 1]] })
+  return setAt(d, list, a)
+}
+/** Ruta del bloque que contiene a `p` (un grupo o unas columnas), o null. */
+export const parentBlock = (d: Json, p: string): string | null => {
+  const k = p.split('.')
+  while (k.length > 1) { k.pop(); const q = k.join('.'); if (getAt(d, q)?.type) return q }
+  return null
 }
 
 export const listOps = {
@@ -94,19 +122,15 @@ export const listOps = {
     if (j < 0 || j >= a.length) return d
     ;[a[i], a[j]] = [a[j], a[i]]; return setAt(d, list, a)
   },
-  /** Mueve la casilla `p` a antes (after=false) o después de la casilla `to`; puede cambiar de lista. */
+  /** Mueve la casilla `p` a antes (after=false) o después de la casilla `to`; puede cambiar de lista, también hacia o desde un grupo. */
   moveTo(d: Json, p: string, to: string, after: boolean): { d: Json; path: string } | null {
-    const s = parentOf(p), t = parentOf(to)
-    if (p === to || t.list === p || t.list.startsWith(p + '.')) return null            // no soltar dentro de sí misma
-    if (s.list !== t.list && (s.list.startsWith(t.list + '.') || t.list.startsWith(s.list + '.'))) return null  // listas anidadas: ambiguo
-    const item = getAt(d, p); let j = t.i + (after ? 1 : 0)
-    if (s.list === t.list) {
-      const a = [...getAt(d, s.list)]; a.splice(s.i, 1); if (s.i < j) j--; a.splice(j, 0, item)
-      return { d: setAt(d, s.list, a), path: s.list + '.' + j }
-    }
-    const from = getAt(d, s.list).filter((_: Json, k: number) => k !== s.i)
-    const dst = [...(getAt(d, t.list) || [])]; dst.splice(j, 0, item)
-    return { d: setAt(setAt(d, s.list, from), t.list, dst), path: t.list + '.' + j }
+    if (p === to || to.startsWith(p + '.')) return null            // no soltar dentro de sí misma
+    const s = parentOf(p); const item = getAt(d, p)
+    const d1 = setAt(d, s.list, getAt(d, s.list).filter((_: Json, k: number) => k !== s.i))
+    const t = parentOf(adj(to, s.list, s.i))                         // el destino puede haber cambiado de índice al sacar la casilla
+    const j = t.i + (after ? 1 : 0)
+    const dst = [...(getAt(d1, t.list) || [])]; dst.splice(j, 0, item)
+    return { d: setAt(d1, t.list, dst), path: t.list + '.' + j }
   },
   dup(d: Json, p: string): Json {
     const { list, i } = parentOf(p); const a = [...getAt(d, list)]
@@ -170,7 +194,10 @@ const CSS = `
 .rs-add:hover{background:rgba(33,96,176,.12)}
 #rsHov,#rsSel{position:absolute;pointer-events:none;border-radius:10px;z-index:99990;display:none}
 #rsHov{outline:2px dashed #2160b0;outline-offset:2px}#rsSel{outline:3px solid #E8711A;outline-offset:2px}
-#rsHov b{pointer-events:auto;cursor:grab;touch-action:none;user-select:none;position:absolute;top:8px;left:8px;background:#2160b0;color:#fff;font:700 12px Inter,system-ui,sans-serif;padding:6px 12px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.3);white-space:nowrap}
+#rsHov .rsch{position:absolute;top:8px;left:8px;display:flex;gap:6px;pointer-events:none}
+#rsHov u{pointer-events:auto;cursor:pointer;text-decoration:none;background:#475569;color:#fff;font:700 12px Inter,system-ui,sans-serif;padding:6px 10px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+.rs-grp{border:2px dashed #9db4d8;border-radius:14px;padding:12px;margin:8px 0;background:rgba(33,96,176,.03)}
+#rsHov b{pointer-events:auto;cursor:grab;touch-action:none;user-select:none;background:#2160b0;color:#fff;font:700 12px Inter,system-ui,sans-serif;padding:6px 12px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.3);white-space:nowrap}
 #rsHov b.lk{background:#475569}
 .rs-b[data-lk]{}
 #rsBar{position:absolute;z-index:99999;display:none;gap:4px;background:#0f1b33;padding:5px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center}
@@ -209,7 +236,7 @@ export function attach(doc: Document, h: Host) {
     const r = el && rectOf(el)
     if (!r) { box.style.display = 'none'; return null }
     Object.assign(box.style, { display: 'block', left: r.l + 'px', top: r.t + 'px', width: r.w + 'px', height: r.h + 'px' })
-    if (label !== undefined) box.innerHTML = `<b title="Agarra y arrastra para mover la casilla">${label.startsWith('🔒') ? label + ' · bloqueada' : '⠿ Mover · ' + label}</b>`
+    if (label !== undefined) { const bp = el!.getAttribute('data-bp') || ''; box.innerHTML = `<div class="rsch"><b title="Agarra y arrastra para mover la casilla">${label.startsWith('🔒') ? label + ' · bloqueada' : '⠿ Mover · ' + label}</b>${parentBlock(h.get(), bp) ? '<u title="Seleccionar el bloque que la contiene (para moverlo entero)">⬆ Contenedor</u>' : ''}</div>` }
     return r
   }
   let hovP: string | null = null
@@ -231,7 +258,7 @@ export function attach(doc: Document, h: Host) {
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${canSplit(b) ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada parte se arrastra e intercambia sola">⧉ Separar en casillas</button>' : ''}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${canSplit(b) ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada parte se arrastra e intercambia sola">⧉ Separar en casillas</button>' : ''}${parentBlock(h.get(), p) ? '<button data-a="parent" title="Seleccionar el bloque que contiene a esta casilla">⬆ Contenedor</button>' : ''}${b?.type === 'group' ? '<button data-a="ungroup" title="Suelta las casillas del grupo">Desagrupar</button>' : '<button data-a="groupnext" title="Junta esta casilla con la siguiente en un grupo">Agrupar con la siguiente</button>'}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
@@ -240,6 +267,9 @@ export function attach(doc: Document, h: Host) {
     const d = h.get()
     if (a === 'lock') { h.put(setAt(d, p + '.locked', !getAt(d, p)?.locked)); h.toast(getAt(d, p)?.locked ? 'Casilla desbloqueada' : 'Casilla bloqueada 🔒'); return }
     if (lockedAt(d, p)) { h.toast('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
+    if (a === 'parent') { const q = parentBlock(d, p); if (q) h.select(q); return }
+    if (a === 'ungroup') { h.put(ungroup(d, p)); h.select(null); h.toast('Grupo deshecho'); return }
+    if (a === 'groupnext') { h.put(groupNext(d, p)); h.toast('Agrupada con la siguiente: se mueven juntas, o por partes'); return }
     if (a === 'split') { h.put(splitBlock(d, p)); h.select(null); h.toast('Separada en casillas: ahora cada parte se arrastra sola'); return }
     if (a === 'up') h.put(listOps.move(d, p, -1)); else if (a === 'down') h.put(listOps.move(d, p, 1))
     else if (a === 'dup') h.put(listOps.dup(d, p))
@@ -452,12 +482,13 @@ export function attach(doc: Document, h: Host) {
         if (si < 0) { h.toast('Esa pestaña no es una sección editable'); return }
         tl = `sections.${si}.blocks`; name = d0.sections[si].label || d0.sections[si].title || at.id
       } else tl = at.list
-      if (tl === from || tl.startsWith(from + '.') || tl.startsWith(sp.list + '.')) { h.toast('No se puede soltar ahí'); return }
+      if (tl === from || tl.startsWith(from + '.')) { h.toast('No se puede soltar ahí'); return }
       const item = { ...getAt(d0, from), span: 'full' }
       const d1 = setAt(d0, sp.list, getAt(d0, sp.list).filter((_: Json, k: number) => k !== sp.i))
-      const dst = [...(getAt(d1, tl) || []), item]
+      const tl2 = adj(tl, sp.list, sp.i)
+      const dst = [...(getAt(d1, tl2) || []), item]
       if (at.kind === 'tab') { dragEnd = 0; at.el.click() }
-      h.put(setAt(d1, tl, dst)); h.select(tl + '.' + (dst.length - 1))
+      h.put(setAt(d1, tl2, dst)); h.select(tl2 + '.' + (dst.length - 1))
       if (name) h.toast('Movida a «' + name + '»')
       return
     }
@@ -480,6 +511,7 @@ export function attach(doc: Document, h: Host) {
     h.put(d); h.select(r.path)
   }
   // agarrar: etiqueta «Mover» (aparece dentro de la casilla), botón de la barra, o mantener pulsado ~½ s sobre cualquier casilla
+  hov.addEventListener('click', e => { if (!(e.target as HTMLElement).closest('u') || !hovP) return; const q = parentBlock(h.get(), hovP); if (q) { e.stopPropagation(); h.select(q) } })
   hov.addEventListener('pointerdown', e => { const b = (e.target as HTMLElement).closest('b'); if (!b || !hovP) return; e.preventDefault(); e.stopPropagation(); startDrag(hovP, e) })
   bar.addEventListener('pointerdown', e => { const b = (e.target as HTMLElement).closest('button[data-a="drag"]'); const p = h.sel(); if (!b || !p) return; e.preventDefault(); startDrag(p, e) })
   doc.addEventListener('pointerdown', e => {

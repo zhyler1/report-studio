@@ -1339,6 +1339,7 @@
          "chart": "#/$defs/Chart",
          "gallery": "#/$defs/Gallery",
          "grid": "#/$defs/Grid",
+         "group": "#/$defs/Group",
          "heading": "#/$defs/Heading",
          "link_cards": "#/$defs/LinkCards",
          "media": "#/$defs/MediaBlock",
@@ -1422,6 +1423,9 @@
          "$ref": "#/$defs/Grid"
         },
         {
+         "$ref": "#/$defs/Group"
+        },
+        {
          "$ref": "#/$defs/PlantCard"
         },
         {
@@ -1442,6 +1446,201 @@
     "columns"
    ],
    "title": "Grid",
+   "type": "object"
+  },
+  "Group": {
+   "additionalProperties": false,
+   "description": "Agrupa casillas: se puede mover entera o por partes, y se desagrupa cuando se quiera.",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
+    "type": {
+     "const": "group",
+     "default": "group",
+     "title": "Type",
+     "type": "string"
+    },
+    "blocks": {
+     "default": [],
+     "items": {
+      "discriminator": {
+       "mapping": {
+        "activities": "#/$defs/Activities",
+        "agreement": "#/$defs/Agreement",
+        "budget": "#/$defs/Budget",
+        "calendar": "#/$defs/CalendarBlock",
+        "callout": "#/$defs/Callout",
+        "card_list": "#/$defs/CardList",
+        "chart": "#/$defs/Chart",
+        "gallery": "#/$defs/Gallery",
+        "grid": "#/$defs/Grid",
+        "group": "#/$defs/Group",
+        "heading": "#/$defs/Heading",
+        "link_cards": "#/$defs/LinkCards",
+        "media": "#/$defs/MediaBlock",
+        "note_list": "#/$defs/NoteList",
+        "numbered_cards": "#/$defs/NumberedCards",
+        "plant_card": "#/$defs/PlantCard",
+        "plants": "#/$defs/Plants",
+        "proposals": "#/$defs/Proposals",
+        "ring_card": "#/$defs/RingCard",
+        "row_list": "#/$defs/RowList",
+        "stat_grid": "#/$defs/StatGrid",
+        "status_list": "#/$defs/StatusList",
+        "step_cards": "#/$defs/StepCards",
+        "table": "#/$defs/Table",
+        "workflow": "#/$defs/Workflow"
+       },
+       "propertyName": "type"
+      },
+      "oneOf": [
+       {
+        "$ref": "#/$defs/StatGrid"
+       },
+       {
+        "$ref": "#/$defs/RowList"
+       },
+       {
+        "$ref": "#/$defs/NoteList"
+       },
+       {
+        "$ref": "#/$defs/CardList"
+       },
+       {
+        "$ref": "#/$defs/RingCard"
+       },
+       {
+        "$ref": "#/$defs/StatusList"
+       },
+       {
+        "$ref": "#/$defs/NumberedCards"
+       },
+       {
+        "$ref": "#/$defs/StepCards"
+       },
+       {
+        "$ref": "#/$defs/LinkCards"
+       },
+       {
+        "$ref": "#/$defs/Gallery"
+       },
+       {
+        "$ref": "#/$defs/Table"
+       },
+       {
+        "$ref": "#/$defs/Plants"
+       },
+       {
+        "$ref": "#/$defs/Workflow"
+       },
+       {
+        "$ref": "#/$defs/Agreement"
+       },
+       {
+        "$ref": "#/$defs/Activities"
+       },
+       {
+        "$ref": "#/$defs/Budget"
+       },
+       {
+        "$ref": "#/$defs/CalendarBlock"
+       },
+       {
+        "$ref": "#/$defs/Proposals"
+       },
+       {
+        "$ref": "#/$defs/Chart"
+       },
+       {
+        "$ref": "#/$defs/MediaBlock"
+       },
+       {
+        "$ref": "#/$defs/Grid"
+       },
+       {
+        "$ref": "#/$defs/Group"
+       },
+       {
+        "$ref": "#/$defs/PlantCard"
+       },
+       {
+        "$ref": "#/$defs/Callout"
+       },
+       {
+        "$ref": "#/$defs/Heading"
+       }
+      ]
+     },
+     "title": "Blocks",
+     "type": "array"
+    }
+   },
+   "title": "Group",
    "type": "object"
   },
   "Heading": {
@@ -3113,6 +3312,7 @@
         "chart": "#/$defs/Chart",
         "gallery": "#/$defs/Gallery",
         "grid": "#/$defs/Grid",
+        "group": "#/$defs/Group",
         "heading": "#/$defs/Heading",
         "link_cards": "#/$defs/LinkCards",
         "media": "#/$defs/MediaBlock",
@@ -3194,6 +3394,9 @@
        },
        {
         "$ref": "#/$defs/Grid"
+       },
+       {
+        "$ref": "#/$defs/Group"
        },
        {
         "$ref": "#/$defs/PlantCard"
@@ -3764,6 +3967,7 @@
         "chart": "#/$defs/Chart",
         "gallery": "#/$defs/Gallery",
         "grid": "#/$defs/Grid",
+        "group": "#/$defs/Group",
         "heading": "#/$defs/Heading",
         "link_cards": "#/$defs/LinkCards",
         "media": "#/$defs/MediaBlock",
@@ -3845,6 +4049,9 @@
        },
        {
         "$ref": "#/$defs/Grid"
+       },
+       {
+        "$ref": "#/$defs/Group"
        },
        {
         "$ref": "#/$defs/PlantCard"

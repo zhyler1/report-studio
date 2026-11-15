@@ -11,7 +11,7 @@ import json
 import re
 from pathlib import Path
 
-from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, LinkCards, Media, MediaBlock,
+from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, Media, MediaBlock,
                      NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
                      StepCards, Table, Workflow)
 
@@ -148,6 +148,8 @@ def _blocks(s: Section):
             if isinstance(b, Grid):
                 for col in b.columns:
                     yield from walk(col)
+            elif isinstance(b, Group):
+                yield from walk(b.blocks)
     yield from walk(s.blocks)
     for t in s.tabs:
         yield from walk(t.blocks)
@@ -410,6 +412,12 @@ def r_media(b: MediaBlock, ctx: Ctx) -> str:
     return f'{t}<figure data-r>{media_tag(b.media)}{cap}</figure>'
 
 
+def r_group(b: Group, ctx: Ctx) -> str:
+    t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
+    inner = render_list(b.blocks, ctx, f"{ctx.path}.blocks") + add_slot(ctx, f"{ctx.path}.blocks")
+    return f'{t}<div class="rs-grp">{inner}</div>' if ctx.edit else f"{t}{inner}"
+
+
 def r_grid(b: Grid, ctx: Ctx) -> str:
     t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
     cols = ""
@@ -423,7 +431,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
 R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList: r_card_list, RingCard: r_ring, StatusList: r_status_list,
      NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading,
      Workflow: r_workflow, Agreement: r_agreement, Activities: r_activities, Budget: r_budget, CalendarBlock: r_calendar,
-     Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid}
+     Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid, Group: r_group}
 
 
 SPAN_W = {"1/2": "calc(50% - 10px)", "1/3": "calc(33.333% - 14px)", "2/3": "calc(66.666% - 7px)", "1/4": "calc(25% - 15px)", "3/4": "calc(75% - 5px)"}
