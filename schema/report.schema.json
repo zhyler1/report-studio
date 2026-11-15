@@ -420,6 +420,19 @@
     "source": {
      "title": "Source",
      "type": "string"
+    },
+    "viz": {
+     "default": "donut",
+     "enum": [
+      "donut",
+      "gauge",
+      "radialbar",
+      "bullet",
+      "bar",
+      "kpi"
+     ],
+     "title": "Viz",
+     "type": "string"
     }
    },
    "required": [
@@ -2104,6 +2117,17 @@
     },
     "logro": {
      "title": "Logro",
+     "type": "string"
+    },
+    "viz": {
+     "default": "bars",
+     "enum": [
+      "bars",
+      "donut",
+      "bar",
+      "kpi"
+     ],
+     "title": "Viz",
      "type": "string"
     }
    },

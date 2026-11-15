@@ -109,7 +109,8 @@
      "procesos_label": "Procesos de Vinculación",
      "posesiones": 60,
      "posesiones_label": "Posesiones realizadas del 14 de octubre al 11 de noviembre de 2026",
-     "logro": "Se gestionaron 121 procesos de vinculación y se realizaron 60 posesiones entre el 14 de octubre y el 11 de noviembre de 2026."
+     "logro": "Se gestionaron 121 procesos de vinculación y se realizaron 60 posesiones entre el 14 de octubre y el 11 de noviembre de 2026.",
+     "viz": "bars"
     },
     {
      "hidden": false,
@@ -769,7 +770,8 @@
        "fg": "",
        "tints": [],
        "type": "budget",
-       "source": "act"
+       "source": "act",
+       "viz": "donut"
       }
      ]
     },

@@ -19,6 +19,8 @@ SCHEMA_VERSION = "1.0"
 
 Rich = str  # texto con **negrilla**
 Viz = Literal["ring", "gauge", "radialbar", "donut", "bullet", "bar", "kpi"]   # cómo se dibuja un porcentaje principal
+PlantViz = Literal["bars", "donut", "bar", "kpi"]                              # provistos vs vacantes de cada planta
+BudgetViz = Literal["donut", "gauge", "radialbar", "bullet", "bar", "kpi"]     # proyección frente al presupuesto
 Color = Literal["auto", "blue", "red", "green", "orange", "yellow", "purple", "navy"]
 Level = Literal["alto", "medio", "bajo"]
 Status = Literal["ejecutado", "proceso", "espera"]
@@ -216,6 +218,7 @@ class Plants(BlockBase):
     posesiones: int
     posesiones_label: str
     logro: Rich
+    viz: PlantViz = "bars"        # barra apilada (original) u otro gráfico por planta
 
 
 class WorkflowStep(Base):
@@ -280,6 +283,7 @@ class Activities(BlockBase):
 class Budget(BlockBase):
     type: Literal["budget"] = "budget"
     source: str                   # id de un bloque activities
+    viz: BudgetViz = "donut"      # dona (original) u otro gráfico del % frente al presupuesto
 
 
 class CalendarBlock(BlockBase):

@@ -82,6 +82,8 @@ const ser = (x: Node): string => {
   return s
 }
 const isLeaf = (x: Element) => !x.querySelector('*:not(b):not(br):not([data-rc])')
+export const VIZ_BUD: [string, string][] = [['donut', 'Dona (original)'], ['gauge', 'Medidor'], ['radialbar', 'Anillo de gráfico'], ['bullet', 'Barra con meta'], ['bar', 'Barra'], ['kpi', 'Cifra grande']]
+export const VIZ_PLA: [string, string][] = [['bars', 'Barra apilada (original)'], ['donut', 'Dona'], ['bar', 'Barras'], ['kpi', 'Cifra grande']]
 export const VIZ: [string, string][] = [['ring', 'Anillo (original)'], ['gauge', 'Medidor'], ['radialbar', 'Anillo de gráfico'], ['donut', 'Dona'], ['bullet', 'Barra con meta'], ['bar', 'Barra'], ['kpi', 'Cifra grande']]
 const COLORS = ['#C62828', '#E8711A', '#FDC800', '#2E9E5B', '#1F5FAF', '#7C3AED', '#14243F', '#FFFFFF']
 
@@ -132,7 +134,8 @@ export function attach(doc: Document, h: Host) {
     if (!r || !p || !el) { bar.style.display = 'none'; return }
     const t = el.getAttribute('data-bt'); const b = getAt(h.get(), p)
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
-    const viz = (t === 'ring_card' || t === 'agreement') ? `<select id="rsV" title="Cómo se dibuja el porcentaje">${VIZ.map(([k, l]) => `<option value="${k}"${(b?.viz || 'ring') === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
+    const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
+    const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
     bar.innerHTML = `<button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'

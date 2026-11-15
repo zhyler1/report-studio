@@ -726,6 +726,10 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
   function updTotals(){var t=totalBien(),h=document.getElementById('homeTotal'),hb=document.getElementById('homeBudget'),hl=document.getElementById('homeTotLbl');if(hl)hl.textContent=totLbl();
     if(h){h.setAttribute('data-to',t);h.textContent=money(t)}
     if(hb)hb.textContent='Presupuesto '+budgetTxt()}
+  function chartDiv(spec,w){return '<div class="rs-ch'+'art" style="width:min(100%,'+(w||260)+'px);flex:none" data-spec="'+JSON.stringify(spec).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></div>'}
+  function mountCharts(){var RC=window['RS'+'Charts'];if(RC){try{RC.init()}catch(e){}}}
+  function budViz(){var b=document.getElementById('presBox');return (b&&b.getAttribute('data-viz'))||'donut'}
+  function pctSpec(kind,v,label){return {kind:kind,labels:[label||''],series:[{name:label||'',values:[+v.toFixed(1)],color:'auto'}],unit:'%',max:100,height:190,show_legend:false,show_values:true,target:[],events:[],links:[],totals:[],forecast_labels:[],bins:0,forecast:0}}
   function renderPres(){
     var box=document.getElementById('presBox');if(!box)return;updTotals();
     var bud=parseMoney(budgetTxt()),tot=totalBien(),sum=sumBien();
@@ -739,14 +743,14 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
       '<div class="card stat" data-r style="--i:3"><span class="num long" data-to="'+Math.abs(diff)+'" data-pre="$ ">0</span><span class="lbl">'+(over?X('pres.excede','Excede el presupuesto (cálculo)'):X('pres.dif','Diferencia frente al presupuesto (cálculo)'))+'</span></div>'+
       '<div class="card stat" data-r style="--i:4"><span class="num" data-to="'+BIEN.length+'">0</span><span class="lbl">'+esc(tx('pres.pend','Actividades pendientes ({n} con valor, {m} sin costo)').replace('{n}',nval).replace('{m}',BIEN.length-nval))+'</span></div></div>';
     h+='<div class="pres-grid"><div class="card" data-r style="--i:1;display:flex;flex-direction:column;align-items:center;gap:14px"><h3 style="align-self:flex-start">'+esc(totLbl())+X('pres.frente',' frente al presupuesto')+'</h3>'+
-      '<div class="donut" data-r style="--i:2"><svg viewBox="0 0 180 180" width="220" height="220" role="img" aria-label="'+ptxt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+off+'"/></svg><div class="dc"><b>'+ptxt+'</b><span>'+X('pres.del','del presupuesto')+'</span></div></div>'+
+      (budViz()!=='donut'?chartDiv(pctSpec(budViz(),pct*100,tx('pres.del','del presupuesto')),300):'<div class="donut" data-r style="--i:2"><svg viewBox="0 0 180 180" width="220" height="220" role="img" aria-label="'+ptxt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+off+'"/></svg><div class="dc"><b>'+ptxt+'</b><span>'+X('pres.del','del presupuesto')+'</span></div></div>')+
       '<div class="legend" style="justify-content:center"><div><i style="background:var(--yellow)"></i>'+esc(totLbl())+' '+money(tot)+'</div><div><i style="background:rgba(198,40,40,.45)"></i>'+X('pres.presupuesto','Presupuesto')+' '+esc(budgetTxt())+'</div></div></div>'+
       '<div class="card" data-r style="--i:2"><h3>'+X('pres.desglose','Desglose por actividad (valor pendiente)')+'</h3><div class="hb" data-r>';
     items.forEach(function(x,i){var p=tot?(x.v/tot*100).toFixed(1).replace('.',','):'0';
       h+='<div class="hb-r"><div class="hb-t"><b>'+esc(x.n)+'</b><span>'+money(x.v)+' · '+p+' %</span></div><div class="bar" style="--w:'+(x.v/max*100).toFixed(1)+'%"><i style="background:'+(x.g?'#6B7A90':PAL[i%PAL.length])+'"></i></div></div>'});
     if(!items.length)h+='<p class="muted">'+X('pres.sinvalor','Aún no hay actividades con valor.')+'</p>';
     h+='</div></div></div>';
-    box.innerHTML=h;
+    box.innerHTML=h;mountCharts();
     renderHomeX();
     if(box.offsetParent){try{animate(box.closest('.sub')||box)}catch(e){}}
   }
@@ -789,13 +793,13 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
     var h='<div class="p-plants">';
     PER.plantas.forEach(function(p,i){var pr=+p[1]||0,va=+p[2]||0,t=pr+va,a=t?pr/t*100:0;
       h+='<div class="card stat" data-r style="--i:'+(i+1)+'"><span class="num" data-to="'+t+'">0</span><span class="lbl" style="font-weight:700;color:var(--head)">'+esc(p[0])+'</span>'+
-        '<div class="bar stack" style="height:14px;margin:16px 0 14px"><i style="--w:'+a.toFixed(2)+'%;background:var(--blue)"></i><i style="--w:'+(100-a).toFixed(2)+'%;background:var(--yellow)"></i></div>'+
+        (PER.viz?chartDiv({kind:PER.viz,labels:[tx('per.prov','Provistos'),tx('per.vac','Vacantes')],series:[{name:p[0],values:[pr,va],color:'auto'}],unit:'',height:190,show_legend:true,show_values:true,target:[],events:[],links:[],totals:[],forecast_labels:[],bins:0,forecast:0,max:null},300):'<div class="bar stack" style="height:14px;margin:16px 0 14px"><i style="--w:'+a.toFixed(2)+'%;background:var(--blue)"></i><i style="--w:'+(100-a).toFixed(2)+'%;background:var(--yellow)"></i></div>')+
         '<div class="legend"><div><i style="background:var(--blue)"></i><b class="num" data-to="'+pr+'">0</b> '+X('per.prov','Provistos')+'</div><div><i style="background:var(--yellow)"></i><b class="num" data-to="'+va+'">0</b> '+X('per.vac','Vacantes')+'</div></div></div>'});
     h+='</div><div class="p-ind">'+
       '<div class="card stat" data-r style="--i:4"><span class="num" data-to="'+(+PER.procesos||0)+'">0</span><span class="lbl">'+esc(PER.procLabel)+'</span></div>'+
       '<div class="card stat" data-r style="--i:5"><span class="num" data-to="'+(+PER.posesiones||0)+'">0</span><span class="lbl">'+esc(PER.posLabel)+'</span></div>'+
       '<div class="card win" data-r style="--i:6"><h3>'+X('per.logro','Logro destacado:')+'</h3><p style="font-size:14px">'+esc(PER.logro)+'</p></div></div>';
-    b.innerHTML=h;
+    b.innerHTML=h;mountCharts();
     if(b.offsetParent){try{animate(b)}catch(e){}}
   }
   function renderHero(){
@@ -816,7 +820,7 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
       p.innerHTML='<div class="ptico">▤</div><h3>'+X('wf.titulo','Planta transitoria')+'</h3><p class="muted" style="font-size:14px">'+X('wf.texto','Flujo de trabajo para la prórroga de la planta transitoria.')+'</p><div class="mini"><span class="s-ejecutado"><i class="sd"></i><b class="ptm-ej">'+cn.ejecutado+'</b> '+X('wf.ejecutado','ejecutado')+'</span><span class="s-proceso"><i class="sd"></i><b class="ptm-pr">'+cn.proceso+'</b> '+X('wf.proceso','en proceso')+'</span><span class="s-espera"><i class="sd"></i><b class="ptm-es">'+cn.espera+'</b> '+X('wf.espera','en espera')+'</span></div><button class="lbtn" data-ptbtn type="button" data-href="'+esc(oh)+'">Ver planta transitoria ↗</button>'}
     var a=document.getElementById('homePRES');
     if(a){var bud=parseMoney(budgetTxt()),tot=totalBien(),pc=bud?tot/bud:0,pt=(pc*100).toFixed(1).replace('.',',')+' %',of=(439.82*(1-Math.min(pc,1))).toFixed(2);
-      a.innerHTML='<h3>'+esc(totLbl())+X('pres.frente',' frente al presupuesto')+'</h3><div class="donut" data-r><svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="'+pt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+of+'"/></svg><div class="dc"><b>'+pt+'</b><span>'+X('pres.del','del presupuesto')+'</span></div></div><div class="legend"><div><i style="background:var(--yellow)"></i>'+esc(totLbl())+' '+money(tot)+'</div><div><i style="background:rgba(198,40,40,.45)"></i>'+X('pres.presupuesto','Presupuesto')+' '+esc(budgetTxt())+'</div></div><span class="go">Ver información →</span>'}
+      a.innerHTML='<h3>'+esc(totLbl())+X('pres.frente',' frente al presupuesto')+'</h3>'+(budViz()!=='donut'?chartDiv(pctSpec(budViz(),pc*100,''),220):'<div class="donut" data-r><svg viewBox="0 0 180 180" width="180" height="180" role="img" aria-label="'+pt+' del presupuesto"><circle class="trk" cx="90" cy="90" r="70" fill="none" stroke-width="22"/><circle class="arc" cx="90" cy="90" r="70" fill="none" stroke-width="22" style="--off:'+of+'"/></svg><div class="dc"><b>'+pt+'</b><span>'+X('pres.del','del presupuesto')+'</span></div></div>')+'<div class="legend"><div><i style="background:var(--yellow)"></i>'+esc(totLbl())+' '+money(tot)+'</div><div><i style="background:rgba(198,40,40,.45)"></i>'+X('pres.presupuesto','Presupuesto')+' '+esc(budgetTxt())+'</div></div><span class="go">Ver información →</span>'}
     var hc=document.getElementById('homeCards');if(hc&&hc.offsetParent&&document.readyState==='complete'){try{animate(hc)}catch(e){}}
   }
   var ACU=/*@ACU*/{"tabla":false,"titulo":"Seguimiento al Acuerdo Colectivo Sectorial 2025-2027","corte":"Corte 12 de noviembre de 2026","prom":81.9,"col":"g","texto":"81,9 % de avance promedio en los compromisos priorizados definidos en la mesa de seguimiento ante la Procuraduría Delegada para la Salud y el Trabajo. La gestión adelantada permitió reconstruir evidencia documental, validar soportes y consolidar acciones con las entidades del sector para avanzar en el cierre de los compromisos objeto de seguimiento.","rows":[],"avances":[["Cumplimiento y cierre de acciones asociadas a educación formal, capacitación institucional y compensación de tiempo por actividades de formación."],["Consolidación del seguimiento sectorial a los procesos de formalización laboral."],["Desarrollo de mesas técnicas para la actualización del Sistema Propio de Evaluación del Desempeño Laboral."],["Articulación entre el DAPRE y las entidades del sector para la validación de evidencias y cumplimiento de compromisos priorizados."]],"aspectos":[["Numeral 19: culminar ajustes y remitir la propuesta de actualización del Sistema Propio de Evaluación del Desempeño Laboral a la CNSC."],["Numerales 23 y 25: finalizar, validar y socializar los lineamientos sectoriales con las organizaciones sindicales."],["Numeral 27: fortalecer la instancia bipartita de seguimiento mediante sesión con la alta dirección."]],"hitoFecha":"26 de noviembre de 2026","hito":[["Reunión sectorial con las organizaciones sindicales."],["Consolidación definitiva de evidencias."],["Suscripción del acta de cumplimiento."],["Presentación de resultados ante la Procuraduría Delegada para la Salud y el Trabajo."]]}/*@/ACU*/;

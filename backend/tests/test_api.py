@@ -160,3 +160,29 @@ def test_section_icon_drives_background():
     assert '"SB":{' in html.replace("/*@SB*/", "") or '/*@SB*/{"personal":"gear"' in html
     d["sections"][0]["icon"] = "no-existe"
     assert load(d)[0] is None
+
+
+def test_viz_presupuesto_y_plantas():
+    """La dona del presupuesto y las barras de provistos/vacantes se pueden cambiar por otro gráfico."""
+    import json
+    from app.render import render
+    from app.validate import load
+    d = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    def walk(o):
+        if isinstance(o, dict):
+            if o.get("type") == "budget":
+                o["viz"] = "gauge"
+            if o.get("type") == "plants":
+                o["viz"] = "donut"
+            for v in o.values():
+                walk(v)
+        elif isinstance(o, list):
+            for v in o:
+                walk(v)
+    walk(d)
+    rep, errs = load(d)
+    assert rep is not None, errs
+    html = render(rep)
+    assert 'data-viz="gauge"' in html and '"viz":"donut"' in html and "RSCharts" in html
+    base = render(load(json.load(open("seed/report.seed.json", encoding="utf-8")))[0])
+    assert 'data-viz=' not in base and "RSCharts" not in base  # el original no cambia ni carga el motor

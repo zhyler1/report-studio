@@ -330,7 +330,8 @@ def r_activities(b: Activities, ctx: Ctx) -> str:
 def r_budget(b: Budget, ctx: Ctx) -> str:
     a = ctx.acts[b.source]
     tot = f' data-total="{attr(a.total)}"' if a.total.strip() else ""
-    return f'<div class="bar-h">{esc(b.title or "PRESUPUESTO")}</div><div id="presBox" data-budget="{attr(a.budget)}"{tot} data-totlabel="{attr(a.total_label)}"></div>'
+    vz = f' data-viz="{b.viz}"' if b.viz != "donut" else ""
+    return f'<div class="bar-h">{esc(b.title or "PRESUPUESTO")}</div><div id="presBox" data-budget="{attr(a.budget)}"{tot}{vz} data-totlabel="{attr(a.total_label)}"></div>'
 
 
 def r_calendar(b: CalendarBlock, ctx: Ctx) -> str:
@@ -533,6 +534,8 @@ def js_data(rep: Report) -> dict:
     if pl:
         d["PER"] = {"plantas": [[p.label, p.provistos, p.vacantes] for p in pl.plants], "procesos": pl.procesos, "procLabel": pl.procesos_label,
                     "posesiones": pl.posesiones, "posLabel": pl.posesiones_label, "logro": pl.logro}
+        if pl.viz != "bars":
+            d["PER"]["viz"] = pl.viz
     return d
 
 
@@ -554,7 +557,9 @@ def hours_text(w: Workflow | None) -> str:
 
 
 def _has_chart(rep: Report) -> bool:
-    return any(not b.hidden and (isinstance(b, Chart) or (isinstance(b, (RingCard, Agreement)) and b.viz != "ring")) for s in rep.sections for b in _blocks(s))
+    return any(not b.hidden and (isinstance(b, Chart) or (isinstance(b, (RingCard, Agreement)) and b.viz != "ring")
+                                 or (isinstance(b, Plants) and b.viz != "bars") or (isinstance(b, Budget) and b.viz != "donut"))
+               for s in rep.sections for b in _blocks(s))
 
 
 def _mix(h: str, k: float) -> str:
