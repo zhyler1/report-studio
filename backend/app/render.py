@@ -193,7 +193,7 @@ def r_stat_grid(b: StatGrid, ctx: Ctx) -> str:
 
 
 def r_row_list(b: RowList, ctx: Ctx) -> str:
-    h = f'<div class="bar-h" data-r>{esc(b.header)}</div><div class="evh"><span>{esc(b.columns[0])}</span><span>{esc(b.columns[1])}</span></div><div class="rows">'
+    h = (f'<div class="bar-h" data-r>{esc(b.header)}</div>' if b.header else "") + f'<div class="evh"><span>{esc(b.columns[0])}</span><span>{esc(b.columns[1])}</span></div><div class="rows">'
     for k, it in enumerate(b.items):
         ps = "".join(f"<p>{rich(x)}</p>" for x in it.text.split("\n"))
         bar = (f'<div class="bar" style="--w:{it.bar_pct:g}%;margin-top:10px"><i style="background:{VAR.get(it.bar_color, "var(--blue)")}"></i></div>'
@@ -205,7 +205,8 @@ def r_row_list(b: RowList, ctx: Ctx) -> str:
 
 def r_note_list(b: NoteList, ctx: Ctx) -> str:
     li = "".join(f"<li>{rich(x)}</li>" for x in b.items)
-    return f'<div class="bar-h" style="margin-top:22px" data-r>{esc(b.header)}</div><div class="obs" data-r><ul>{li}</ul></div>'
+    hd = f'<div class="bar-h" style="margin-top:22px" data-r>{esc(b.header)}</div>' if b.header else ""
+    return f'{hd}<div class="obs" data-r><ul>{li}</ul></div>'
 
 
 def r_card_list(b: CardList, ctx: Ctx) -> str:
@@ -258,7 +259,8 @@ def r_step_cards(b: StepCards, ctx: Ctx) -> str:
         f'<div class="step" data-r style="--i:{k + 1}"><div class="big">{esc(s.n)}</div><span class="tag">{esc(s.tag)}</span><br><span class="date">{esc(s.date)}</span><h4>{esc(s.title)}</h4><p>{esc(s.text)}</p></div>'
         for k, s in enumerate(b.items))
     fig = media_img(b.media, "font-size:12px;font-weight:600;margin-top:8px") if b.media else ""
-    return f'<div class="bar-h" data-r>{esc(b.header)}</div><div class="eg">{fig}<div class="steps stc">{steps}</div></div>'
+    hd = f'<div class="bar-h" data-r>{esc(b.header)}</div>' if b.header else ""
+    return f'{hd}<div class="eg">{fig}<div class="steps stc">{steps}</div></div>'
 
 
 def r_link_cards(b: LinkCards, ctx: Ctx) -> str:

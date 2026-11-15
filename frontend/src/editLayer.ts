@@ -32,16 +32,58 @@ export const lockedAt = (d: Json, p: string | null): boolean => {
   return false
 }
 
-/** Parte el bloque de plantas en casillas sueltas: título, una tarjeta por planta, procesos, posesiones y el logro. */
-export const splitPlants = (d: Json, p: string): Json => {
-  const b = getAt(d, p); if (!b || b.type !== 'plants') return d
+const LISTAS = ['stat_grid', 'row_list', 'note_list', 'card_list', 'numbered_cards', 'step_cards', 'link_cards', 'status_list', 'gallery']
+/** ¿Este bloque se puede partir en casillas individuales? */
+export const canSplit = (b: Json): boolean => {
+  if (!b) return false
+  if (LISTAS.includes(b.type)) return (b.items || []).length > 1
+  if (b.type === 'proposals') return (b.show || []).length > 1
+  if (b.type === 'grid') return (b.columns || []).some((c: Json[]) => c.length > 0)
+  return b.type === 'plants' || b.type === 'agreement'
+}
+const cp = (o: Json): Json => JSON.parse(JSON.stringify(o))
+const spanN = (n: number) => (n === 2 ? '1/2' : n === 4 ? '1/4' : '1/3')
+
+/** Parte un bloque compuesto en casillas sueltas que se arrastran, intercambian y bloquean una por una. */
+export const splitBlock = (d: Json, p: string): Json => {
+  const b = getAt(d, p); if (!canSplit(b)) return d
   const k = p.split('.'); const i = Number(k.pop()); const list = k.join('.')
-  const parts: Json[] = []
-  if (b.title) parts.push({ type: 'heading', title: b.title })
-  for (const pl of b.plants || []) parts.push({ type: 'plant_card', label: pl.label, provistos: pl.provistos, vacantes: pl.vacantes, viz: b.viz || 'bars', span: '1/3' })
-  parts.push({ type: 'stat_grid', span: '1/3', items: [{ value: b.procesos, label: b.procesos_label, bind: 'plants.procesos' }] })
-  parts.push({ type: 'stat_grid', span: '1/3', items: [{ value: b.posesiones, label: b.posesiones_label, bind: 'plants.posesiones' }] })
-  parts.push({ type: 'callout', heading: 'Logro destacado:', text: b.logro, span: '1/3' })
+  const { id: _id, tints: _t, ...rest } = cp(b)
+  let parts: Json[] = []
+  if (b.type === 'plants') {
+    if (b.title) parts.push({ type: 'heading', title: b.title })
+    for (const pl of b.plants || []) parts.push({ type: 'plant_card', label: pl.label, provistos: pl.provistos, vacantes: pl.vacantes, viz: b.viz || 'bars', span: '1/3' })
+    parts.push({ type: 'stat_grid', span: '1/3', items: [{ value: b.procesos, label: b.procesos_label, bind: 'plants.procesos' }] })
+    parts.push({ type: 'stat_grid', span: '1/3', items: [{ value: b.posesiones, label: b.posesiones_label, bind: 'plants.posesiones' }] })
+    parts.push({ type: 'callout', heading: 'Logro destacado:', text: b.logro, span: '1/3' })
+  } else if (b.type === 'agreement') {
+    parts.push({ type: 'heading', title: b.heading + (b.cutoff ? ' · ' + b.cutoff : '') })
+    parts.push({ type: 'ring_card', value: b.avg, text: b.summary, color: b.color || 'auto', viz: b.viz || 'ring', title: 'Resultado general', span: '1/2' })
+    parts.push({ type: 'card_list', style: 'checks', title: 'Principales avances alcanzados', items: cp(b.progress || []), span: '1/2' })
+    parts.push({ type: 'card_list', style: 'warn', title: 'Aspectos que requieren seguimiento', items: cp(b.watch || []), span: '1/2' })
+    parts.push({ type: 'card_list', style: 'plain', title: 'Próximo hito' + (b.milestone_date ? ': ' + b.milestone_date : ''), items: cp(b.milestone || []), span: '1/2' })
+    if (b.table) parts.push({ type: 'table', title: b.table.title, columns: cp(b.table.columns), rows: cp(b.table.rows), span: 'full' })
+  } else if (b.type === 'proposals') {
+    parts = (b.show as string[]).map(s => ({ ...cp(rest), show: [s], span: 'full' }))
+  } else if (b.type === 'grid') {
+    const cols: Json[][] = b.columns, n = cols.length, w = spanN(n)
+    const rows = Math.max(...cols.map(c => c.length))
+    for (let r = 0; r < rows; r++) for (const c of cols) if (c[r]) { const x = cp(c[r]); delete x.id; if (n > 1 && (x.span || 'full') === 'full') x.span = w; parts.push(x) }
+  } else {
+    const items: Json[] = b.items || [], n = items.length
+    const lado = ['stat_grid', 'numbered_cards', 'link_cards', 'gallery'].includes(b.type)
+    if (b.type === 'gallery') {
+      items.forEach(m => parts.push({ type: 'media', media: cp(m), span: spanN(n) }))
+      if (b.side_card) parts.push({ type: 'card_list', style: 'plain', title: b.side_card.title, items: cp(b.side_card.items), span: spanN(n) })
+      if (b.title) parts.unshift({ type: 'heading', title: b.title })
+    } else {
+      items.forEach((it, j) => {
+        const x: Json = { ...cp(rest), items: [cp(it)], span: lado ? spanN(n) : 'full' }
+        if (j > 0) { delete x.title; if ('header' in x) x.header = ''; delete x.media }
+        parts.push(x)
+      })
+    }
+  }
   const a = [...getAt(d, list)]; a.splice(i, 1, ...parts)
   return setAt(d, list, a)
 }
@@ -189,7 +231,7 @@ export function attach(doc: Document, h: Host) {
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${t === 'plants' ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada planta, procesos, posesiones y logro">⧉ Separar en casillas</button>' : ''}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${canSplit(b) ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada parte se arrastra e intercambia sola">⧉ Separar en casillas</button>' : ''}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
@@ -198,7 +240,7 @@ export function attach(doc: Document, h: Host) {
     const d = h.get()
     if (a === 'lock') { h.put(setAt(d, p + '.locked', !getAt(d, p)?.locked)); h.toast(getAt(d, p)?.locked ? 'Casilla desbloqueada' : 'Casilla bloqueada 🔒'); return }
     if (lockedAt(d, p)) { h.toast('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
-    if (a === 'split') { h.put(splitPlants(d, p)); h.select(null); h.toast('Separada en casillas: ahora cada parte se arrastra sola'); return }
+    if (a === 'split') { h.put(splitBlock(d, p)); h.select(null); h.toast('Separada en casillas: ahora cada parte se arrastra sola'); return }
     if (a === 'up') h.put(listOps.move(d, p, -1)); else if (a === 'down') h.put(listOps.move(d, p, 1))
     else if (a === 'dup') h.put(listOps.dup(d, p))
     else if (a === 'clr') h.put(setAt(setAt(d, p + '.bg', ''), p + '.fg', ''))

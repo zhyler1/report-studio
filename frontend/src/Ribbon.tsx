@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { getAt, setAt, VIZ } from './editLayer'
+import { getAt, setAt, VIZ, canSplit } from './editLayer'
 import type { Json } from './api'
 
 export type RibTab = 'inicio' | 'insertar' | 'diseno' | 'casilla' | 'datos'
@@ -123,7 +123,7 @@ export default function Ribbon(p: RibProps) {
         {b.type === 'chart' && <Grp t="Gráfico"><div className="fld"><label>Tipo</label><select value={b.kind} onChange={e => putB({ kind: e.target.value })}>{p.kinds.map(k => <option key={k} value={k}>{k}</option>)}</select></div></Grp>}
         {(b.type === 'ring_card' || b.type === 'agreement') && <Grp t="Visualización"><div className="fld"><label>Cómo se dibuja</label>
           <select value={b.viz || 'ring'} onChange={e => putB({ viz: e.target.value })}>{VIZ.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>}
-        {b.type === 'plants' && <Grp t="Partes"><Btn i="columns" l="Separar en casillas" title="Cada planta, procesos, posesiones y logro pasan a ser casillas que se arrastran solas" onClick={() => p.op('split')} /></Grp>}
+        {canSplit(b) && <Grp t="Partes"><Btn i="columns" l="Separar en casillas" title="Cada parte pasa a ser una casilla que se arrastra, intercambia y bloquea sola" onClick={() => p.op('split')} /></Grp>}
         <Grp t="Organizar"><Btn i="left" l="Antes" title="Alt + ↑" onClick={() => p.op('up')} /><Btn i="right" l="Después" title="Alt + ↓" onClick={() => p.op('down')} /><Btn i="copy" l="Duplicar" title="Ctrl/Cmd + D" onClick={() => p.op('dup')} /></Grp>
         <Grp t="Más"><Btn i="sliders" l="Todas las opciones" onClick={() => p.openDrawer('casilla')} /><Btn i="lock" l="Bloquear" title="Nadie la mueve, edita ni borra por accidente" onClick={() => p.op('lock')} /><Btn i="trash" l="Quitar" cls="danger" title="Supr" onClick={() => p.op('del')} /></Grp>
       </>}
