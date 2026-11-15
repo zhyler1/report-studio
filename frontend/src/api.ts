@@ -19,6 +19,7 @@ const J = (body: unknown): RequestInit => ({ method: 'POST', headers: { 'content
 export const api = {
   list: (): Promise<ReportRow[]> => req('/api/reports').then(r => r.json()),
   get: (id: number): Promise<{ id: number; title: string; version: number; data: Json }> => req(`/api/reports/${id}`).then(r => r.json()),
+  importFile: (f: File) => { const fd = new FormData(); fd.append('file', f); return fetch('/api/reports/import', { method: 'POST', body: fd }).then(async r => { if (!r.ok) { const j = await r.json().catch(() => ({})); throw { message: j.detail?.toString() || 'No se pudo importar', issues: j.issues } } return r.json() }) },
   create: (data: Json, note = '') => req('/api/reports', J({ data, note })).then(r => r.json()),
   save: (id: number, data: Json, note: string) => req(`/api/reports/${id}`, { ...J({ data, note }), method: 'PUT' }).then(r => r.json()),
   remove: (id: number) => req(`/api/reports/${id}`, { method: 'DELETE' }),

@@ -6,6 +6,8 @@
 from __future__ import annotations
 
 import io
+import json
+import zipfile
 import os
 import mimetypes
 import base64
@@ -171,6 +173,50 @@ def validate(body: dict[str, Any] = Body(...)):
 @router.get("/reports")
 def list_reports(s: Store = Depends(get_store)):
     return s.list()
+
+
+_MEDIA_ANY = re.compile(r'/media/([A-Za-z0-9_.-]+)')
+
+
+@router.get("/reports/{rid}/export.rsz")
+def export_pack(rid: int, s: Store = Depends(get_store)):
+    """Paquete para llevar el informe a otro computador: el JSON y las imágenes/videos que usa."""
+    r = _get(s, rid)
+    txt = json.dumps(r["data"], ensure_ascii=False, indent=1)
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("report.json", txt)
+        for n in sorted(set(_MEDIA_ANY.findall(txt))):
+            f = MEDIA_DIR / n
+            if f.is_file():
+                z.write(f, "media/" + n)
+    return Response(buf.getvalue(), media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="informe-{rid}.rsz"'})
+
+
+@router.post("/reports/import", status_code=201)
+async def import_pack(file: UploadFile = File(...), user=Depends(guard), s: Store = Depends(get_store)):
+    """Acepta un .rsz (paquete) o un .json suelto. Copia los medios y crea el informe como uno nuevo."""
+    auth.require_admin(user)
+    raw = await file.read()
+    if raw[:2] == b"PK":
+        try:
+            z = zipfile.ZipFile(io.BytesIO(raw))
+            data = json.loads(z.read("report.json"))
+        except Exception:
+            raise HTTPException(400, "El paquete no es válido: falta report.json")
+        MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+        for n in z.namelist():
+            base = Path(n).name
+            if n.startswith("media/") and Path(base).suffix.lower() in OK_EXT and re.fullmatch(r"[A-Za-z0-9_.-]+", base) and not (MEDIA_DIR / base).exists():
+                (MEDIA_DIR / base).write_bytes(z.read(n))
+    else:
+        try:
+            data = json.loads(raw.decode("utf-8"))
+        except Exception:
+            raise HTTPException(400, "El archivo no es un JSON ni un paquete .rsz")
+    rep = _valid(data)
+    rid = s.create(rep.model_dump(mode="json"), "Importado")
+    return s.get(rid)
 
 
 @router.post("/reports", status_code=201)

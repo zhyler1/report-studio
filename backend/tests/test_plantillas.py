@@ -76,3 +76,26 @@ def test_workflow_suelto_no_rompe_la_impresion():
     sec["blocks"].append(wf)
     rep, _ = load(d)
     assert 'id="ptPrint"' in render(rep)
+
+
+def test_paquete_rsz_ida_y_vuelta(tmp_path, monkeypatch):
+    import io, zipfile
+    from app import api
+    seed = json.load(open(__file__.rsplit("/backend/", 1)[0] + "/seed/report.seed.json"))
+    ma, mb = tmp_path / "ma", tmp_path / "mb"; ma.mkdir(); mb.mkdir()
+    (ma / "abc123.png").write_bytes(b"\x89PNG")
+    seed["meta"]["title"] = "Con imagen /media/abc123.png"
+    sa, sb = Store(str(tmp_path / "a.db")), Store(str(tmp_path / "b.db"))
+    app.dependency_overrides[get_store] = lambda: sa
+    try:
+        c = TestClient(app)
+        monkeypatch.setattr(api, "MEDIA_DIR", ma)
+        rid = c.post("/api/reports", json={"data": seed}).json()["id"]
+        z = c.get(f"/api/reports/{rid}/export.rsz"); assert z.status_code == 200
+        assert "media/abc123.png" in zipfile.ZipFile(io.BytesIO(z.content)).namelist()
+        app.dependency_overrides[get_store] = lambda: sb
+        monkeypatch.setattr(api, "MEDIA_DIR", mb)
+        r = c.post("/api/reports/import", files={"file": ("i.rsz", z.content)}); assert r.status_code == 201
+        assert (mb / "abc123.png").read_bytes() == b"\x89PNG"
+        assert c.post("/api/reports/import", files={"file": ("x", b"basura")}).status_code == 400
+    finally: app.dependency_overrides.clear()

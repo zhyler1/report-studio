@@ -299,9 +299,9 @@ export default function App() {
   return <div className="app">
     <aside className="side"><h1>Report Studio</h1>
       <button className="pri" style={{ width: '100%', marginBottom: 12 }} onClick={create}>{d ? 'Duplicar informe' : 'Nuevo informe'}</button>
-      <label style={{ cursor: 'pointer' }}>Importar JSON<input type="file" accept="application/json" style={{ display: 'none' }} onChange={async e => {
+      <label style={{ cursor: 'pointer' }} title="Abre un paquete .rsz (con sus imágenes) o un JSON suelto">Importar paquete o JSON<input type="file" accept=".rsz,.zip,application/json,.json" style={{ display: 'none' }} onChange={async e => {
         const f = e.target.files?.[0]; if (!f) return
-        try { const r = await api.create(JSON.parse(await f.text()), 'Importado'); await refresh(); open(r.id) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) }
+        try { const r = await api.importFile(f); await refresh(); open(r.id) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) }
         e.target.value = ''
       }} /></label>
       {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={() => open(r.id)}>{r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
