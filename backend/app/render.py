@@ -406,8 +406,11 @@ def render_block(b, ctx: Ctx, path: str = "") -> str:
     if b.bg or b.fg:
         st = (f"background:{b.bg};" if b.bg else "") + (f"color:{b.fg};--text:{b.fg};--head:{b.fg};--muted:{b.fg};" if b.fg else "")
         out = f'<div class="rs-sty" style="{st}">{out}</div>'
+    tint = f' data-tint="{attr(json.dumps([x.model_dump() for x in b.tints if x.c], ensure_ascii=False))}"' if any(x.c for x in b.tints) else ""
     if ctx.edit and path:  # modo edición: cada casilla se marca para poder seleccionarla en la vista previa
-        out = f'<div class="rs-b" data-bp="{attr(path)}" data-bt="{b.type}" style="display:contents">{out}</div>'
+        out = f'<div class="rs-b" data-bp="{attr(path)}" data-bt="{b.type}"{tint} style="display:contents">{out}</div>'
+    elif tint:
+        out = f'<div class="rs-t"{tint} style="display:contents">{out}</div>'
     return out
 
 

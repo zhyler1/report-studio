@@ -71,6 +71,19 @@ export function applyText(d: Json, blockPath: string, old: string, k: number, ne
   return setAt(d, blockPath + '.' + l.path, v)
 }
 
+// texto con colores parciales: los <span data-rc> se vuelven {{#hex|texto}}
+const ser = (x: Node): string => {
+  let s = ''
+  x.childNodes.forEach(n => {
+    if (n.nodeType === 3) s += n.nodeValue
+    else if (n.nodeName === 'BR') s += '\n'
+    else { const e = n as HTMLElement; const c = e.getAttribute?.('data-rc'); const i = ser(e); s += c ? `{{${c}|${i}}}` : i }
+  })
+  return s
+}
+const isLeaf = (x: Element) => !x.querySelector('*:not(b):not(br):not([data-rc])')
+const COLORS = ['#C62828', '#E8711A', '#FDC800', '#2E9E5B', '#1F5FAF', '#7C3AED', '#14243F', '#FFFFFF']
+
 const CSS = `
 .rs-add{margin:14px 0;padding:18px;border:2px dashed #9db4d8;border-radius:14px;text-align:center;color:#2160b0;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;background:rgba(33,96,176,.04)}
 .rs-add:hover{background:rgba(33,96,176,.12)}
@@ -81,6 +94,11 @@ const CSS = `
 #rsBar button,#rsBar select{font:600 12px Inter,system-ui,sans-serif;border:0;border-radius:6px;padding:5px 8px;background:#26385c;color:#fff;cursor:pointer}
 #rsBar button:hover{background:#3a5288}#rsBar .x{background:#a82a2a}
 [contenteditable=true]{outline:2px solid #E8711A!important;outline-offset:3px;background:rgba(232,113,26,.08);cursor:text}
+#rsTx{position:absolute;z-index:99999;display:none;gap:6px;background:#0f1b33;padding:6px 8px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center;color:#fff;font:600 11px Inter,system-ui,sans-serif}
+#rsTx i{width:20px;height:20px;border-radius:50%;border:2px solid #fff;cursor:pointer;display:inline-block}#rsTx i:hover{transform:scale(1.2)}
+#rsTx input[type=color],#rsBar input[type=color]{width:26px;height:24px;padding:0;border:0;background:none;cursor:pointer}
+#rsTx button{font:600 11px Inter,system-ui,sans-serif;border:0;border-radius:6px;padding:4px 7px;background:#26385c;color:#fff;cursor:pointer}
+#rsBar label{display:flex;align-items:center;gap:3px;color:#fff;font:600 11px Inter,system-ui,sans-serif}
 .rs-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f1b33;color:#fff;padding:10px 16px;border-radius:10px;font:600 13px Inter,system-ui,sans-serif;z-index:99999}
 `
 
@@ -88,7 +106,7 @@ export function attach(doc: Document, h: Host) {
   if (!doc.body || doc.getElementById('rsBar')) return
   const st = doc.createElement('style'); st.textContent = CSS; doc.head.appendChild(st)
   const mk = (id: string) => { const e = doc.createElement('div'); e.id = id; doc.body.appendChild(e); return e }
-  const hov = mk('rsHov'), sel = mk('rsSel'), bar = mk('rsBar')
+  const hov = mk('rsHov'), sel = mk('rsSel'), bar = mk('rsBar'), tx = mk('rsTx')
   const win = doc.defaultView!
   const rectOf = (el: Element) => {
     let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9
@@ -113,7 +131,7 @@ export function attach(doc: Document, h: Host) {
     if (!r || !p || !el) { bar.style.display = 'none'; return }
     const t = el.getAttribute('data-bt'); const b = getAt(h.get(), p)
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button>${kinds}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${kinds}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
@@ -122,13 +140,14 @@ export function attach(doc: Document, h: Host) {
     const d = h.get()
     if (a === 'up') h.put(listOps.move(d, p, -1)); else if (a === 'down') h.put(listOps.move(d, p, 1))
     else if (a === 'dup') h.put(listOps.dup(d, p))
+    else if (a === 'clr') h.put(setAt(setAt(d, p + '.bg', ''), p + '.fg', ''))
     else if (a === 'del') { if (win.confirm('¿Eliminar esta casilla?')) { h.put(listOps.del(d, p)); h.select(null) } }
     else if (a === 'add') { const { list, i } = parentOf(p); h.add(list, i + 1) }
     // la selección sigue al movimiento
     if (a === 'up' || a === 'down') { const { list, i } = parentOf(p); h.select(list + '.' + (i + (a === 'up' ? -1 : 1))) }
   }
   bar.addEventListener('click', e => { const b = (e.target as HTMLElement).closest('button'); if (b?.dataset.a) { e.stopPropagation(); act(b.dataset.a) } })
-  bar.addEventListener('change', e => { const s = e.target as HTMLSelectElement; if (s.id === 'rsK') { const p = h.sel(); if (p) h.put(setAt(h.get(), p + '.kind', s.value)) } })
+  bar.addEventListener('change', e => { const s = e.target as HTMLSelectElement; const p0 = h.sel(); if (p0 && (s.id === 'rsBg' || s.id === 'rsFg')) { h.put(setAt(h.get(), p0 + (s.id === 'rsBg' ? '.bg' : '.fg'), s.value)); return } if (s.id === 'rsK') { const p = h.sel(); if (p) h.put(setAt(h.get(), p + '.kind', s.value)) } })
 
   doc.addEventListener('mousemove', e => {
     const t = e.target as HTMLElement; if (t.closest('#rsBar') || doc.querySelector('[contenteditable=true]')) return
@@ -144,7 +163,65 @@ export function attach(doc: Document, h: Host) {
     if (t.closest('a')) e.preventDefault()
     h.select(el.getAttribute('data-bp'))
   }, true)
+  // ── color de texto o cifra al seleccionar ──
+  type Pend = { bp: string; text: string; kt: number; old: string; k: number; s0: number; e0: number; whole: boolean; segs: { t: string; c: string }[] }
+  let pend: Pend | null = null
+  const hideTx = () => { tx.style.display = 'none'; pend = null }
+  tx.innerHTML = COLORS.map(c => `<i data-c="${c}" style="background:${c}" title="${c}"></i>`).join('') + '<input type="color" id="rsTc" title="Otro color"><button data-c="">Sin color</button>'
+  const applyColor = (c: string) => {
+    const p = pend; if (!p) return
+    const d = h.get()
+    if (p.whole) {
+      const b = getAt(d, p.bp); const l = (b.tints || []).filter((x: Json) => !(x.t === p.text && x.k === p.kt)); if (c) l.push({ t: p.text, k: p.kt, c })
+      h.put(setAt(d, p.bp + '.tints', l)); hideTx(); return
+    }
+    const out: { t: string; c: string }[] = []; let pos = 0
+    for (const s of p.segs) {
+      const a = pos, b2 = pos + s.t.length; pos = b2
+      const i0 = Math.max(a, p.s0), i1 = Math.min(b2, p.e0)
+      if (i0 >= i1) { out.push(s); continue }
+      if (i0 > a) out.push({ t: s.t.slice(0, i0 - a), c: s.c })
+      out.push({ t: s.t.slice(i0 - a, i1 - a), c })
+      if (i1 < b2) out.push({ t: s.t.slice(i1 - a), c: s.c })
+    }
+    const m: { t: string; c: string }[] = []
+    for (const s of out) { if (!s.t) continue; const l = m[m.length - 1]; if (l && l.c === s.c) l.t += s.t; else m.push({ ...s }) }
+    const neu = m.map(s => (s.c ? `{{${s.c}|${s.t}}}` : s.t)).join('')
+    const r = applyText(d, p.bp, p.old, p.k, neu)
+    if (r) { h.put(r); hideTx() } else h.toast('Ese texto se calcula o viene de otro dato; edítalo en el panel')
+  }
+  tx.addEventListener('mousedown', e => { if ((e.target as HTMLElement).tagName !== 'INPUT') e.preventDefault() })
+  tx.addEventListener('click', e => { const c = (e.target as HTMLElement).closest('[data-c]') as HTMLElement | null; if (c) applyColor(c.dataset.c!) })
+  tx.addEventListener('change', e => { const i = e.target as HTMLInputElement; if (i.id === 'rsTc') applyColor(i.value) })
+  doc.addEventListener('mousedown', e => { if (!(e.target as HTMLElement).closest('#rsTx')) hideTx() })
+  doc.addEventListener('mouseup', e => {
+    if ((e.target as HTMLElement).closest('#rsTx,#rsBar')) return
+    setTimeout(() => {
+      const s = win.getSelection(); if (!s || s.isCollapsed || !s.rangeCount) return
+      const r = s.getRangeAt(0)
+      const n = r.commonAncestorContainer; let el = (n.nodeType === 3 ? n.parentElement : n) as HTMLElement | null
+      if (!el || el.closest('[contenteditable=true],svg,.rs-chart,#rsBar,#rsTx')) return
+      const blk = el.closest('.rs-b') as HTMLElement | null; if (!blk) return
+      while (el !== blk && el.parentElement && el.parentElement !== blk && !el.hasAttribute('data-to') && (/^(B|I|STRONG|EM)$/.test(el.tagName) || el.hasAttribute('data-rc'))) el = el.parentElement
+      if (el === blk || !isLeaf(el)) { if (el === blk || el.querySelector('div,p,li,table,figure,h3,h4,ul')) return }
+      const text = (el.textContent || '').trim(); if (!text) return
+      const whole = r.toString().trim() === text || el.hasAttribute('data-to') || /^[\d.,\s%$]+$/.test(text) || !!el.querySelector('br')
+      const segs: { t: string; c: string }[] = []
+      const walk = (x: Node, c: string) => x.childNodes.forEach(m => { if (m.nodeType === 3) segs.push({ t: m.nodeValue || '', c }); else if ((m as HTMLElement).hasAttribute?.('data-rc')) walk(m, (m as HTMLElement).getAttribute('data-rc')!); else walk(m, c) })
+      walk(el, '')
+      const r0 = doc.createRange(); r0.selectNodeContents(el); r0.setEnd(r.startContainer, r.startOffset)
+      const r1 = doc.createRange(); r1.selectNodeContents(el); r1.setEnd(r.endContainer, r.endOffset)
+      const old = ser(el)
+      const same = Array.from(blk.querySelectorAll('*')).filter(x => isLeaf(x) && ser(x) === old)
+      const sameT = Array.from(blk.querySelectorAll('*')).filter(x => isLeaf(x) && (x.textContent || '').trim() === text)
+      pend = { bp: blk.getAttribute('data-bp')!, text, kt: Math.max(0, sameT.indexOf(el)), old, k: Math.max(0, same.indexOf(el)), s0: r0.toString().length, e0: r1.toString().length, whole, segs }
+      const rc = r.getBoundingClientRect()
+      tx.style.display = 'flex'
+      tx.style.left = Math.max(4, rc.left + win.scrollX) + 'px'; tx.style.top = Math.max(4, rc.top + win.scrollY - 44) + 'px'
+    }, 280)
+  })
   doc.addEventListener('dblclick', e => {
+    hideTx()
     const t = e.target as HTMLElement
     if (t.closest('svg') || t.closest('.rs-chart') || t.closest('#rsBar')) { if (t.closest('.rs-chart')) h.toast('Los datos del gráfico se editan en el panel de la derecha'); return }
     const blk = t.closest('.rs-b'); if (!blk || !t.textContent?.trim()) return
@@ -165,16 +242,16 @@ export function attach(doc: Document, h: Host) {
       fx.addEventListener('blur', ob); fx.addEventListener('keydown', ok2)
       return
     }
-    while (el !== blk && el.parentElement && el.parentElement !== blk && /^(B|I|STRONG|EM)$/.test(el.tagName) && !/^(DIV|TD|TH)$/.test(el.parentElement.tagName)) el = el.parentElement
+    while (el !== blk && el.parentElement && el.parentElement !== blk && (/^(B|I|STRONG|EM)$/.test(el.tagName) || el.hasAttribute('data-rc')) && !/^(DIV|TD|TH)$/.test(el.parentElement.tagName)) el = el.parentElement
     if (el.querySelector('div,p,li,table,figure,h3')) { h.toast('Haz doble clic directamente sobre el texto'); return }
-    const old = el.textContent || ''
-    const same = Array.from(blk.querySelectorAll('*')).filter(x => x.textContent === old && !x.querySelector('*:not(b):not(br)'))
+    const old = ser(el)
+    const same = Array.from(blk.querySelectorAll('*')).filter(x => isLeaf(x) && ser(x) === old)
     const k = Math.max(0, same.indexOf(el))
     el.contentEditable = 'true'; el.focus()
     win.getSelection()?.selectAllChildren(el)
     const done = (ok: boolean) => {
       el.removeEventListener('blur', onBlur); el.removeEventListener('keydown', onKey); el.contentEditable = 'false'; el.removeAttribute('contenteditable')
-      const neu = (el.innerText || el.textContent || '').replace(/\n+$/, '')
+      const neu = (el.querySelector('[data-rc]') ? ser(el) : (el.innerText || el.textContent || '')).replace(/\n+$/, '')
       if (!ok || neu === old) { el.textContent = old; return }
       const r = applyText(h.get(), blk.getAttribute('data-bp')!, old, k, neu)
       if (r) h.put(r); else { el.textContent = old; h.toast('Ese texto se calcula o viene de otro dato; edítalo en el panel') }

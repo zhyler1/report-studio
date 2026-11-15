@@ -109,3 +109,19 @@ def test_texts_override(c):
     assert rep is not None, errs
     html = render(rep)
     assert "Cargos por proveer" in html
+
+
+def test_tints_and_covers():
+    import json
+    from app.render import render
+    from app.validate import load
+    d = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    sec = next(s for s in d["sections"] if s.get("blocks"))
+    sec["blocks"][0]["tints"] = [{"t": "869", "k": 0, "c": "#E8711A"}]
+    d["meta"]["theme"]["cover"] = "ondas"
+    rep, errs = load(d)
+    assert rep is not None, errs
+    html = render(rep)
+    assert 'class="rs-t"' in html and "data-tint=" in html and 'data-bg="ondas"' in html
+    d["meta"]["theme"]["cover"] = "no-existe"
+    assert load(d)[0] is None

@@ -57,6 +57,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "activities",
      "default": "activities",
@@ -199,6 +207,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "agreement",
@@ -373,6 +389,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "budget",
      "default": "budget",
@@ -476,6 +500,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "calendar",
      "default": "calendar",
@@ -561,6 +593,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "card_list",
@@ -649,6 +689,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "chart",
@@ -995,6 +1043,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "gallery",
      "default": "gallery",
@@ -1083,6 +1139,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "grid",
@@ -1383,6 +1447,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "link_cards",
      "default": "link_cards",
@@ -1551,6 +1623,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "media",
@@ -1739,6 +1819,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "note_list",
      "default": "note_list",
@@ -1849,6 +1937,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "numbered_cards",
      "default": "numbered_cards",
@@ -1954,6 +2050,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "plants",
@@ -2086,6 +2190,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "proposals",
@@ -2267,6 +2379,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "ring_card",
      "default": "ring_card",
@@ -2423,6 +2543,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "row_list",
@@ -2849,6 +2977,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "stat_grid",
      "default": "stat_grid",
@@ -2972,6 +3108,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "status_list",
      "default": "status_list",
@@ -3082,6 +3226,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "step_cards",
@@ -3293,6 +3445,14 @@
      "title": "Fg",
      "type": "string"
     },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
     "type": {
      "const": "table",
      "default": "table",
@@ -3353,7 +3513,10 @@
      "default": "foto",
      "enum": [
       "foto",
-      "clasica"
+      "clasica",
+      "aurora",
+      "ondas",
+      "malla"
      ],
      "title": "Cover",
      "type": "string"
@@ -3420,6 +3583,32 @@
    "title": "Theme",
    "type": "object"
   },
+  "Tint": {
+   "additionalProperties": false,
+   "description": "Color de un texto o cifra completa dentro de una casilla (el texto se ubica por su contenido y el orden en que aparece).",
+   "properties": {
+    "t": {
+     "title": "T",
+     "type": "string"
+    },
+    "k": {
+     "default": 0,
+     "title": "K",
+     "type": "integer"
+    },
+    "c": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "C",
+     "type": "string"
+    }
+   },
+   "required": [
+    "t"
+   ],
+   "title": "Tint",
+   "type": "object"
+  },
   "Workflow": {
    "additionalProperties": false,
    "properties": {
@@ -3476,6 +3665,14 @@
      "pattern": "^(#[0-9a-fA-F]{6})?$",
      "title": "Fg",
      "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
     },
     "type": {
      "const": "workflow",

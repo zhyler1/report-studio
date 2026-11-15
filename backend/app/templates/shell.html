@@ -524,6 +524,21 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
 .lcard .lnum{font-size:56px}
 /* portada: data-bg="foto" (con Palacio) o "clasica" (solo partículas). También ?portada=clasica en la URL */
 #intro[data-bg="clasica"] .ibg,#intro[data-bg="clasica"] .ibg2{display:none}
+/* portadas animadas opcionales (theme.cover): foto (predeterminada) · clasica · aurora · ondas · malla */
+#intro[data-bg="aurora"] .ibg,#intro[data-bg="aurora"] .ibg2,#intro[data-bg="aurora"] #cv,#intro[data-bg="ondas"] .ibg,#intro[data-bg="ondas"] .ibg2,#intro[data-bg="ondas"] #cv,#intro[data-bg="malla"] .ibg,#intro[data-bg="malla"] .ibg2,#intro[data-bg="malla"] #cv{display:none}
+#intro[data-bg="aurora"]{background:#0A111F}
+#intro[data-bg="aurora"]::before{content:"";position:absolute;inset:-25%;background:radial-gradient(40% 40% at 25% 30%,rgba(31,95,175,.85),transparent 70%),radial-gradient(35% 35% at 75% 25%,rgba(124,58,237,.6),transparent 70%),radial-gradient(40% 40% at 60% 80%,rgba(253,200,0,.4),transparent 70%),radial-gradient(30% 30% at 20% 85%,rgba(239,83,80,.35),transparent 70%);filter:blur(34px);animation:aur 16s ease-in-out infinite alternate}
+@keyframes aur{from{transform:translate(-5%,-4%) rotate(0) scale(1)}to{transform:translate(6%,5%) rotate(14deg) scale(1.18)}}
+#intro[data-bg="ondas"]{background:linear-gradient(180deg,#0A111F 0%,#14305A 100%)}
+#intro[data-bg="ondas"]::before,#intro[data-bg="ondas"]::after{content:"";position:absolute;left:0;bottom:0;width:200%;height:48%;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 200' preserveAspectRatio='none'%3E%3Cpath d='M0 100 C200 20 400 180 600 100 S1000 20 1200 100 V200 H0Z' fill='%231F5FAF' fill-opacity='.38'/%3E%3C/svg%3E") repeat-x;background-size:50% 100%;animation:wv 15s linear infinite}
+#intro[data-bg="ondas"]::after{height:36%;opacity:.7;filter:hue-rotate(40deg);animation-duration:9s;animation-direction:reverse}
+@keyframes wv{to{transform:translateX(-50%)}}
+#intro[data-bg="malla"]{background:radial-gradient(ellipse at 50% 30%,#1b3a6e 0%,#0A111F 70%)}
+#intro[data-bg="malla"]::before{content:"";position:absolute;left:-60%;right:-60%;bottom:-4%;height:95%;background:linear-gradient(rgba(96,165,250,.7) 2px,transparent 2px),linear-gradient(90deg,rgba(96,165,250,.7) 2px,transparent 2px);background-size:64px 64px;transform:perspective(420px) rotateX(62deg);transform-origin:50% 100%;-webkit-mask-image:linear-gradient(to top,#000,transparent 90%);mask-image:linear-gradient(to top,#000,transparent 90%);animation:grd 2.4s linear infinite}
+#intro[data-bg="malla"]::after{content:"";position:absolute;left:50%;top:14%;width:min(60vw,520px);height:min(60vw,520px);margin-left:calc(min(60vw,520px)/-2);border-radius:50%;background:radial-gradient(circle,rgba(253,200,0,.5),rgba(239,83,80,.18) 55%,transparent 72%);filter:blur(6px);animation:sun 6s ease-in-out infinite alternate}
+@keyframes grd{to{background-position:0 64px}}
+@keyframes sun{from{transform:scale(.92);opacity:.75}to{transform:scale(1.08);opacity:1}}
+@media(prefers-reduced-motion:reduce){#intro[data-bg]::before,#intro[data-bg]::after{animation:none!important}}
 /* ===== v8: cifras de Inicio + fondos animados por sección ===== */
 #homeCards .gcard .grid .stat .num{font-size:clamp(30px,3vw,46px);font-weight:800;line-height:1;letter-spacing:-.03em}
 #homeCards .gcard>.stat .num:not(.long){font-size:clamp(52px,5.4vw,80px);font-weight:800;line-height:1;letter-spacing:-.03em}
@@ -1215,6 +1230,30 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
   show(TABS.indexOf(h)>=0?h:'inicio',false);
   window.addEventListener('hashchange',function(){var x='';try{x=location.hash.replace('#','')}catch(e){}if(TABS.indexOf(x)>=0&&x!==cur)show(x,false)});
   window.TH={renderHomeX:renderHomeX,PER:PER,renderPer:renderPer,applyLogo:applyLogo,ACU:ACU,renderAcu:renderAcu,semc:semc,TABS:TABS,DEV:DEV,renderDev:renderDev,BIEN:BIEN,PT:PT,AL:AL,renderTb:renderTb,renderPres:renderPres,renderAl:renderAl,updAl:updAl,refreshPT:refreshPT,applySlots:applySlots,renderHero:renderHero,renderCal:renderCal,renderSem:renderSem,setPres:setPres,show:show,esc:esc,fmt:fmt};
+
+  /* colores puntuales: {{#hex|texto}} dentro de un texto, y tints (texto o cifra completa) por casilla */
+  (function(){
+    var RC=/\{\{(#[0-9a-fA-F]{6})\|([\s\S]*?)\}\}/g,busy=0,tm=0;
+    function leafOk(x){return !x.querySelector('*:not(b):not(br):not([data-rc])')}
+    function numOf(s){return Number(String(s).replace(/\./g,'').replace(',','.'))}
+    function rcPass(){
+      var w=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT,{acceptNode:function(n){var p=n.parentNode;if(!p||/^(SCRIPT|STYLE|TEXTAREA)$/.test(p.nodeName)||(p.closest&&p.closest('[contenteditable=true]')))return 2;return n.nodeValue.indexOf('{{#')>-1?1:2}}),a=[];
+      while(w.nextNode())a.push(w.currentNode);
+      a.forEach(function(n){var s=n.nodeValue,f=document.createDocumentFragment(),i=0,m;RC.lastIndex=0;
+        while((m=RC.exec(s))){if(m.index>i)f.appendChild(document.createTextNode(s.slice(i,m.index)));var sp=document.createElement('span');sp.className='rc';sp.setAttribute('data-rc',m[1]);sp.style.color=m[1];sp.textContent=m[2];f.appendChild(sp);i=m.index+m[0].length}
+        if(i<s.length)f.appendChild(document.createTextNode(s.slice(i)));n.parentNode.replaceChild(f,n)});
+    }
+    function tintPass(){
+      document.querySelectorAll('[data-tint]').forEach(function(w){var L;try{L=JSON.parse(w.getAttribute('data-tint'))}catch(e){return}
+        L.forEach(function(t){var tx=String(t.t).trim(),n=0,isn=/^[\d.,\s%$]+$/.test(tx);
+          var els=w.querySelectorAll('*');for(var i=0;i<els.length;i++){var x=els[i];if(!leafOk(x))continue;
+            var ok=x.textContent.trim()===tx||(isn&&x.hasAttribute('data-to')&&Number(x.getAttribute('data-to'))===numOf(tx));
+            if(ok){if(n===t.k){x.style.color=t.c;break}n++}}})})
+    }
+    function pass(){if(busy)return;busy=1;try{rcPass();tintPass()}catch(e){}busy=0}
+    pass();
+    try{new MutationObserver(function(){clearTimeout(tm);tm=setTimeout(pass,70)}).observe(document.body,{childList:true,subtree:true,characterData:true})}catch(e){}
+  })();
 })();
 </script>
 <style>

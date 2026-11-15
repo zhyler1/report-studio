@@ -74,6 +74,13 @@ class Column(Base):
 Hex = Field("", pattern=r"^(#[0-9a-fA-F]{6})?$")
 
 
+class Tint(Base):
+    """Color de un texto o cifra completa dentro de una casilla (el texto se ubica por su contenido y el orden en que aparece)."""
+    t: str
+    k: int = 0
+    c: str = Hex
+
+
 class BlockBase(Base):
     id: Optional[str] = None
     title: Optional[str] = None
@@ -81,6 +88,7 @@ class BlockBase(Base):
     span: Literal["full", "1/2", "1/3", "2/3", "1/4", "3/4"] = "full"   # ancho; las casillas consecutivas con ancho parcial quedan lado a lado
     bg: str = Hex          # color de fondo de la casilla (vacío = el del tema)
     fg: str = Hex          # color del texto de la casilla (vacío = el del tema)
+    tints: list[Tint] = []  # colores puntuales de textos o cifras de la casilla
 
 
 class StatGrid(BlockBase):
@@ -417,7 +425,7 @@ class Alert(Base):
 
 class Theme(Base):
     default: Literal["light", "dark"] = "light"
-    cover: Literal["foto", "clasica"] = "foto"
+    cover: Literal["foto", "clasica", "aurora", "ondas", "malla"] = "foto"   # animación de portada; "foto" = la original
     palace_url: str = ""
     logo_dark: str = ""
     logo_light: str = ""

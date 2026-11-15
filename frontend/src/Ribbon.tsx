@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { getAt, setAt } from './editLayer'
 import type { Json } from './api'
 
@@ -11,6 +12,11 @@ export const PALETAS: { k: string; n: string; c: [string, string, string] }[] = 
   { k: 'atardecer', n: 'Atardecer', c: ['#7C3AED', '#FDBA74', '#EA580C'] },
 ]
 const FUENTES: [string, string][] = [['public', 'Public Sans (original)'], ['sistema', 'Sistema'], ['georgia', 'Georgia (con serifa)'], ['verdana', 'Verdana'], ['trebuchet', 'Trebuchet'], ['mono', 'Monoespaciada']]
+const PORTADAS: [string, string][] = [['foto', 'Palacio (predeterminada)'], ['clasica', 'Clásica: partículas'], ['aurora', 'Aurora'], ['ondas', 'Ondas'], ['malla', 'Malla 3D']]
+// tema predeterminado: el que trae la plantilla original
+export const TEMA_BASE = { palette: 'presidencia', primary: '', accent: '', font: 'public', cover: 'foto', default: 'light' }
+const TKEYS = ['palette', 'primary', 'accent', 'font', 'cover', 'default']
+const loadTemas = (): { n: string; th: Json }[] => { try { return JSON.parse(localStorage.getItem('rs.themes') || '[]') } catch { return [] } }
 const ANCHOS: [string, string][] = [['full', 'Ancho completo'], ['1/2', 'Mitad (1/2)'], ['1/3', 'Un tercio (1/3)'], ['2/3', 'Dos tercios (2/3)'], ['1/4', 'Un cuarto (1/4)'], ['3/4', 'Tres cuartos (3/4)']]
 const INSERTAR: [string, string, string][] = [['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video / audio / imagen'], ['table', '▦', 'Tabla'], ['stat_grid', '🔢', 'Cifras'], ['card_list', '📝', 'Texto y listas'], ['grid', '◫', 'Columnas'], ['__doc', '📥', 'Desde documento']]
 
@@ -36,6 +42,10 @@ export default function Ribbon(p: RibProps) {
   const setTh = (patch: Json) => setD(setAt(d, 'meta.theme', { ...th, ...patch }))
   const b = sel ? getAt(d, sel) : null
   const putB = (patch: Json) => sel && setD(setAt(d, sel, { ...b, ...patch }))
+  const [temas, setTemas] = useState(loadTemas)
+  const saveTemas = (l: { n: string; th: Json }[]) => { setTemas(l); try { localStorage.setItem('rs.themes', JSON.stringify(l)) } catch { /* sin almacenamiento */ } }
+  const cur = Object.fromEntries(TKEYS.map(k => [k, th[k] ?? (TEMA_BASE as Json)[k]]))
+  const same = (a: Json) => TKEYS.every(k => (a[k] ?? '') === (cur[k] ?? ''))
   const tabs: [RibTab, string][] = [['inicio', 'Inicio'], ['insertar', 'Insertar'], ['diseno', 'Diseño'], ...(sel ? [['casilla', 'Casilla'] as [RibTab, string]] : []), ['datos', 'Datos']]
   const pal = PALETAS.find(x => x.k === th.palette) || PALETAS[0]
   return <div className="ribbon">
@@ -56,6 +66,15 @@ export default function Ribbon(p: RibProps) {
         <span className="rmut">{sel ? 'Se agrega debajo de la casilla seleccionada.' : 'Se agrega al final de la sección que estás viendo.'}</span>
       </>}
       {rib === 'diseno' && <>
+        <div className="rgrp"><div className="rgl">Temas</div><div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          <button className={'pal' + (same(TEMA_BASE) ? ' on' : '')} title="Tema original de la plantilla" onClick={() => setTh(TEMA_BASE)}><span style={{ display: 'flex' }}>{PALETAS[0].c.map(c => <i key={c} style={{ background: c }} />)}</span><small>Predeterminado</small></button>
+          {temas.map((x, i) => <span key={i} style={{ display: 'inline-flex' }}><button className={'pal' + (same(x.th) ? ' on' : '')} title={x.n} onClick={() => setTh(x.th)}>
+            <span style={{ display: 'flex' }}>{[x.th.primary || (PALETAS.find(q => q.k === x.th.palette) || PALETAS[0]).c[0], x.th.accent || (PALETAS.find(q => q.k === x.th.palette) || PALETAS[0]).c[1]].map(c => <i key={c} style={{ background: c }} />)}</span><small>{x.n}</small></button>
+            <button className="rx" title="Borrar este tema" onClick={() => saveTemas(temas.filter((_, j) => j !== i))}>✕</button></span>)}
+          <Btn i="＋" l="Guardar tema" title="Guarda paleta, colores, fuente y portada actuales" onClick={() => { const n = window.prompt('Nombre del tema'); if (n && n.trim()) saveTemas([...temas.filter(x => x.n !== n.trim()), { n: n.trim(), th: cur }]) }} /></div></div>
+        <span className="rsep" />
+        <div className="rgrp"><div className="rgl">Portada animada</div><select value={th.cover} onChange={e => setTh({ cover: e.target.value })}>{PORTADAS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
+        <span className="rsep" />
         <div className="rgrp"><div className="rgl">Paleta de colores</div><div style={{ display: 'flex', gap: 6 }}>
           {PALETAS.map(x => <button key={x.k} className={'pal' + (th.palette === x.k && !th.primary && !th.accent ? ' on' : '')} title={x.n} onClick={() => setTh({ palette: x.k, primary: '', accent: '' })}>
             <span style={{ display: 'flex' }}>{x.c.map(c => <i key={c} style={{ background: c }} />)}</span><small>{x.n}</small></button>)}</div></div>
