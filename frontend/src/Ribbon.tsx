@@ -64,6 +64,7 @@ export default function Ribbon(p: RibProps) {
         <a href={`/api/reports/${p.id}/export.pdf`}><Btn i="📄" l="Exportar PDF" onClick={() => { }} /></a>
         <span className="rsep" />
         <Btn i="🗑" l="Eliminar informe" cls="danger" onClick={p.remove} />
+        <span className="rmut">Para dar color a un texto o cifra (como el «01»): selecciónalo arrastrando el mouse, sin doble clic. Doble clic es para escribir.</span>
       </>}
       {rib === 'insertar' && <>
         {INSERTAR.map(([k, i, l]) => <Btn key={k} i={i} l={l} onClick={() => p.insert(k)} />)}
