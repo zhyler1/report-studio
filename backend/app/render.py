@@ -626,6 +626,9 @@ def render(rep: Report, edit: bool = False) -> str:
     out = out.replace("@@TABS@@", tabs).replace("@@PANELS@@", panels)
     for name, v in js_data(rep).items():
         out = re.sub(r"/\*@%s\*/.*?/\*@/%s\*/" % (name, name), lambda _m, n=name, j=_json(v): f"/*@{n}*/{j}/*@/{n}*/", out, flags=re.S)
+    if m.theme.layout != "clasico":
+        out = out.replace("<html ", f'<html data-layout="{m.theme.layout}" ', 1)
+        out = out.replace("</head>", "<style id=\"rs-layout\">" + (SHELL.parent / "layouts.css").read_text(encoding="utf-8") + "</style></head>", 1)
     if _has_chart(rep):  # el motor de gráficos solo viaja si el informe los usa
         tpl = SHELL.parent
         out = out.replace("</head>", "<style>" + (tpl / "charts.css").read_text(encoding="utf-8") + "</style></head>", 1)

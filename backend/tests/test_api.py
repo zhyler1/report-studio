@@ -228,3 +228,15 @@ def test_usuarios_y_permisos(c):
     assert c.put(f"/api/reports/{rid}", json={"data": th}).status_code == 403
     assert c.delete(f"/api/reports/{rid}").status_code == 403
     assert c.get("/api/users").status_code == 403
+
+
+def test_disenos_completos():
+    import json
+    from app.render import render
+    from app.validate import load
+    base = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    assert 'data-layout' not in render(load(base)[0])          # el clásico no cambia
+    for lay in ("lateral", "editorial", "tablero", "continuo"):
+        d = json.loads(json.dumps(base)); d["meta"]["theme"]["layout"] = lay
+        h = render(load(d)[0])
+        assert f'data-layout="{lay}"' in h and 'id="rs-layout"' in h

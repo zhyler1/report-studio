@@ -1734,6 +1734,7 @@
      "$ref": "#/$defs/Theme",
      "default": {
       "default": "light",
+      "layout": "clasico",
       "cover": "foto",
       "palace_url": "",
       "logo_dark": "",
@@ -3574,6 +3575,18 @@
      "type": "string",
      "default": "light",
      "title": "Default"
+    },
+    "layout": {
+     "default": "clasico",
+     "enum": [
+      "clasico",
+      "lateral",
+      "editorial",
+      "tablero",
+      "continuo"
+     ],
+     "title": "Layout",
+     "type": "string"
     },
     "cover": {
      "default": "foto",

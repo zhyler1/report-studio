@@ -1,0 +1,88 @@
+/* Diseños completos de la plantilla (theme.layout). Cada uno cambia la estructura, no solo los colores. */
+
+/* ───── LATERAL: menú vertical fijo a la izquierda ───── */
+@media(min-width:960px){
+html[data-layout=lateral] .wrap{max-width:none;margin:0;padding:0 36px 60px 300px}
+html[data-layout=lateral] .navbar{position:fixed;left:0;top:0;bottom:0;width:272px;margin:0;padding:28px 14px 20px;z-index:40;background:linear-gradient(180deg,var(--navy),#0c1d38);backdrop-filter:none;overflow-y:auto;border-right:4px solid var(--gold)}
+html[data-layout=lateral] .tabs{flex-direction:column;flex-wrap:nowrap;overflow:visible;justify-content:flex-start;gap:4px;padding:0}
+html[data-layout=lateral] .tab{width:100%;text-align:left;background:transparent;border:0;border-left:4px solid transparent;border-radius:0 12px 12px 0;color:#cfd8ea;padding:13px 16px;font-size:14px;white-space:normal}
+html[data-layout=lateral] .tab:hover{background:rgba(255,255,255,.08);transform:none;color:#fff}
+html[data-layout=lateral] .tab.active{background:rgba(253,200,0,.14);border-left-color:var(--gold);color:#fff;box-shadow:none}
+html[data-layout=lateral] .prog{display:none}
+html[data-layout=lateral] header{text-align:left;padding:30px 0 6px}
+html[data-layout=lateral] h1{font-size:clamp(26px,3.2vw,40px)}
+html[data-layout=lateral] .htop{margin-bottom:8px}
+html[data-layout=lateral] .arrows{right:16px}
+}
+
+/* ───── EDITORIAL: tipografía de revista, líneas finas, sin sombras ───── */
+html[data-layout=editorial]{--serif:Georgia,'Iowan Old Style','Times New Roman',serif}
+html[data-layout=editorial] body{background:var(--bg1)!important}
+html[data-layout=editorial] .blob,html[data-layout=editorial] .hero-watermark{display:none}
+html[data-layout=editorial] h1,html[data-layout=editorial] h2,html[data-layout=editorial] h3,html[data-layout=editorial] .num,html[data-layout=editorial] .ptitle h2{font-family:var(--serif)!important;font-weight:700;letter-spacing:-.01em}
+html[data-layout=editorial] .wrap{max-width:1180px}
+html[data-layout=editorial] header{text-align:left;border-bottom:3px double var(--head);padding:30px 0 18px}
+html[data-layout=editorial] .htop{margin-bottom:10px}
+html[data-layout=editorial] .navbar{background:var(--bg1);backdrop-filter:none;border-bottom:1px solid var(--border)}
+html[data-layout=editorial] .tabs{justify-content:flex-start;gap:22px}
+html[data-layout=editorial] .tab{background:none;border:0;border-bottom:3px solid transparent;border-radius:0;padding:8px 2px;box-shadow:none;color:var(--muted);font-family:var(--serif);font-size:15px}
+html[data-layout=editorial] .tab:hover{background:none;transform:none;color:var(--head)}
+html[data-layout=editorial] .tab.active{background:none;color:var(--head);border-bottom-color:var(--red);box-shadow:none}
+html[data-layout=editorial] .prog{display:none}
+html[data-layout=editorial] .card,html[data-layout=editorial] .step,html[data-layout=editorial] .tw,html[data-layout=editorial] .rows,html[data-layout=editorial] .obs{border-radius:2px;box-shadow:none;background:transparent;border:0;border-top:2px solid var(--head);backdrop-filter:none}
+html[data-layout=editorial] .card:hover,html[data-layout=editorial] .step:hover{transform:none;background:var(--card)}
+html[data-layout=editorial] .hero{border-radius:2px;background:var(--head);color:var(--bg1);box-shadow:none}
+html[data-layout=editorial] .hero h2,html[data-layout=editorial] .hero p{color:var(--bg1)}
+html[data-layout=editorial] .bar-h{border-radius:0;background:transparent;color:var(--head);border-bottom:2px solid var(--head);padding-left:0}
+html[data-layout=editorial] th{background:transparent;color:var(--head);border-bottom:2px solid var(--head)}
+html[data-layout=editorial] .ptitle{border-left:0;padding-left:0;border-bottom:1px solid var(--border);padding-bottom:12px}
+html[data-layout=editorial] .pill,html[data-layout=editorial] .lbtn,html[data-layout=editorial] .fbtn,html[data-layout=editorial] .sbtn,html[data-layout=editorial] .chip{border-radius:2px}
+html[data-layout=editorial] .bar,html[data-layout=editorial] .bar i{border-radius:0}
+
+/* ───── TABLERO: denso, para ver mucho a la vez ───── */
+html[data-layout=tablero] body{font-size:13px}
+html[data-layout=tablero] .wrap{max-width:1760px;padding:0 16px 40px}
+html[data-layout=tablero] header{padding:12px 0 4px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 24px;text-align:left}
+html[data-layout=tablero] .htop{margin:0;flex:1 1 auto}
+html[data-layout=tablero] img.logo,html[data-layout=tablero] .hlogo img.logo{height:40px}
+html[data-layout=tablero] .hlogo{min-height:0}
+html[data-layout=tablero] h1{font-size:20px;letter-spacing:0;order:-1;flex:0 0 100%}
+html[data-layout=tablero] h1 br{display:none}
+html[data-layout=tablero] h1 span{margin-left:8px}
+html[data-layout=tablero] .hsub{margin:0;font-size:12px}
+html[data-layout=tablero] .navbar{padding:4px 16px 2px}
+html[data-layout=tablero] .tabs{justify-content:flex-start;gap:4px;padding-bottom:6px}
+html[data-layout=tablero] .tab{padding:6px 12px;font-size:12px;border-radius:8px}
+html[data-layout=tablero] .panel{padding-top:10px}
+html[data-layout=tablero] .ptitle{margin-bottom:10px;border-left-width:4px}
+html[data-layout=tablero] .ptitle h2{font-size:20px}
+html[data-layout=tablero] .ptitle p{font-size:12px;margin-top:0}
+html[data-layout=tablero] .card,html[data-layout=tablero] .step{padding:12px 14px;border-radius:10px}
+html[data-layout=tablero] .grid,html[data-layout=tablero] .p-plants,html[data-layout=tablero] .p-ind,html[data-layout=tablero] .stk{gap:10px}
+html[data-layout=tablero] .stat .num{font-size:clamp(20px,2.2vw,28px)}
+html[data-layout=tablero] .stat .num.long{font-size:clamp(16px,1.6vw,20px)}
+html[data-layout=tablero] .stat .lbl{font-size:11px;margin-top:2px}
+html[data-layout=tablero] .card h3,html[data-layout=tablero] .gcard h3{font-size:14px;margin-bottom:4px}
+html[data-layout=tablero] .bar-h{padding:7px 12px;font-size:12px}
+html[data-layout=tablero] td,html[data-layout=tablero] th{padding:6px 10px;font-size:12px}
+html[data-layout=tablero] .row{padding:8px 12px;gap:10px;grid-template-columns:34px minmax(0,1fr) 170px}
+html[data-layout=tablero] .row .n{width:28px;height:28px;font-size:12px}
+html[data-layout=tablero] .row p,html[data-layout=tablero] .obs li{font-size:12px}
+html[data-layout=tablero] .step .big{font-size:36px}
+html[data-layout=tablero] .hero{padding:16px 20px;border-radius:12px}
+html[data-layout=tablero] .hero h2{font-size:26px;margin:4px 0}
+html[data-layout=tablero] .sec{margin-top:12px}
+html[data-layout=tablero] .rs-row{margin-bottom:10px;gap:10px}
+
+/* ───── CONTINUO: una sola página que baja, con el menú fijo arriba ───── */
+html[data-layout=continuo] body:not(.pres) .panel{display:block;animation:none;padding:34px 0 38px;border-top:2px solid var(--border);scroll-margin-top:84px}
+html[data-layout=continuo] body:not(.pres) .panel:first-of-type{border-top:0}
+html[data-layout=continuo] .panel[hidden]{display:none!important}
+html[data-layout=continuo] .ptitle{border-left:0;padding-left:0;margin-bottom:26px}
+html[data-layout=continuo] .ptitle h2{font-size:clamp(28px,4vw,44px)}
+html[data-layout=continuo] .ptitle:before{content:"";display:block;width:64px;height:6px;border-radius:6px;background:var(--gold);flex:0 0 100%;margin-bottom:6px}
+html[data-layout=continuo] .arrows{display:none}
+html[data-layout=continuo] .tab.active{transform:none}
+
+@media(max-width:959px){html[data-layout=lateral] .tabs{justify-content:flex-start;flex-wrap:nowrap}}
+@media print{html[data-layout] .navbar{position:static!important;width:auto!important;background:none!important}html[data-layout] .wrap{padding:0!important;margin:0 auto}}
