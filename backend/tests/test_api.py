@@ -146,3 +146,17 @@ def test_viz_swaps_ring_for_chart():
     assert rep is not None, errs
     html = render(rep)
     assert '"vizSpec"' in html and "RSCharts" in html
+
+
+def test_section_icon_drives_background():
+    import json
+    from app.render import render
+    from app.validate import load
+    d = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    d["sections"][0]["icon"] = "gear"
+    rep, errs = load(d)
+    assert rep is not None, errs
+    html = render(rep)
+    assert '"SB":{' in html.replace("/*@SB*/", "") or '/*@SB*/{"personal":"gear"' in html
+    d["sections"][0]["icon"] = "no-existe"
+    assert load(d)[0] is None

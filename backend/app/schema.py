@@ -22,7 +22,8 @@ Viz = Literal["ring", "gauge", "radialbar", "donut", "bullet", "bar", "kpi"]   #
 Color = Literal["auto", "blue", "red", "green", "orange", "yellow", "purple", "navy"]
 Level = Literal["alto", "medio", "bajo"]
 Status = Literal["ejecutado", "proceso", "espera"]
-Icon = Literal["none", "people", "stock", "heart", "doc", "radio", "shield"]
+Icon = Literal["none", "people", "stock", "heart", "doc", "radio", "shield",
+               "briefcase", "calendar", "chart", "target", "graduation", "megaphone", "gear", "lock", "scale", "building", "trophy", "bell", "clock", "globe"]   # 20 iconos animados de sección
 
 
 class Base(BaseModel):

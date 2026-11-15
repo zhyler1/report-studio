@@ -62,3 +62,9 @@ export const CHART_FIELDS: Record<string, string[]> = {
   calendar: [...COMMON, 'events'], sankey: [...COMMON, 'links'], timeline: [...COMMON, 'events'], gantt: [...COMMON, 'events'],
 }
 export const SERIES_FIELDS = (kind: string) => ['name', 'color', ...(kind === 'combo' ? ['kind'] : []), ...(kind === 'scatter' || kind === 'bubble' ? ['points'] : kind === 'candles' ? ['ohlc'] : ['values'])]
+
+export const ICONOS: [string, string, string][] = [
+  ['none', '∅', 'Sin ícono'], ['people', '👥', 'Equipo'], ['stock', '📈', 'Bolsa'], ['heart', '❤️', 'Bienestar'], ['doc', '📄', 'Documento'], ['radio', '📡', 'Radio'], ['shield', '🛡️', 'Escudo'],
+  ['briefcase', '💼', 'Maletín'], ['calendar', '📅', 'Calendario'], ['chart', '📊', 'Barras'], ['target', '🎯', 'Meta'], ['graduation', '🎓', 'Formación'], ['megaphone', '📣', 'Megáfono'],
+  ['gear', '⚙️', 'Engranaje'], ['lock', '🔒', 'Candado'], ['scale', '⚖️', 'Balanza'], ['building', '🏛️', 'Entidad'], ['trophy', '🏆', 'Logro'], ['bell', '🔔', 'Alertas'], ['clock', '🕒', 'Reloj'], ['globe', '🌐', 'Mundo'],
+]

@@ -2652,7 +2652,21 @@
       "heart",
       "doc",
       "radio",
-      "shield"
+      "shield",
+      "briefcase",
+      "calendar",
+      "chart",
+      "target",
+      "graduation",
+      "megaphone",
+      "gear",
+      "lock",
+      "scale",
+      "building",
+      "trophy",
+      "bell",
+      "clock",
+      "globe"
      ],
      "title": "Icon",
      "type": "string"

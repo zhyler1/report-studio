@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
 import { attach, getAt, setAt, listOps } from './editLayer'
-import { BLOCK } from './labels'
+import { BLOCK, ICONOS } from './labels'
 import Loader from './Loader'
 import Ribbon, { type RibTab } from './Ribbon'
 import { STARTERS } from './starters'
@@ -48,7 +48,10 @@ function Secciones({ d, set, focus }: { d: Json; set: (d: Json) => void; focus: 
       <button onClick={() => move(i, -1)} aria-label="Subir">↑</button><button onClick={() => move(i, 1)} aria-label="Bajar">↓</button>
       <button onClick={() => setOpen(open === i ? null : i)}>{open === i ? 'Cerrar' : 'Editar'}</button>
       <button className="danger" onClick={() => confirm(`¿Eliminar la sección «${s.label}» con todo su contenido?`) && set({ ...d, sections: secs.filter((_, k) => k !== i) })}>✕</button></div>
-    {open === i && <SectionForm section={s} set={v => put(i, v)} />}
+    {open === i && <>
+      <div className="rgl" style={{ margin: '12px 0 6px' }}>Ícono animado del fondo de esta sección</div>
+      <div className="icogrid">{ICONOS.map(([k, e, n]) => <button key={k} className={'icob' + ((s.icon || 'none') === k ? ' on' : '')} title={n} onClick={() => put(i, { ...s, icon: k })}><span>{e}</span><small>{n}</small></button>)}</div>
+      <SectionForm section={s} set={v => put(i, v)} /></>}
   </div>)}<button className="pri" onClick={add}>+ Agregar sección</button></>
 }
 

@@ -552,7 +552,7 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
 /* fondos por sección */
 #secbg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
 .sb{position:absolute;inset:0;display:none}
-html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[data-sec="bienestar"] .sb-bienestar,html[data-sec="comunicacion"] .sb-comunicacion,html[data-sec="historias"] .sb-historias,html[data-sec="sst"] .sb-sst{display:block;animation:sbIn .9s both}
+.sb.on{display:block;animation:sbIn .9s both}
 @keyframes sbIn{from{opacity:0}to{opacity:1}}
 @keyframes sbWave{0%{transform:scale(.1);opacity:.4}100%{transform:scale(3.2);opacity:0}}
 @keyframes sbEq{from{transform:scaleY(.15)}to{transform:scaleY(1)}}
@@ -586,8 +586,13 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
 /* sst: escudo y franja */
 .sb-shield{position:absolute;right:6%;top:24%;width:min(300px,30vw)}
 .sb-shield svg{width:100%;opacity:.24;animation:sbShield 4s ease-in-out infinite alternate}
-.sb-sst .sb-w i{border-color:var(--k4)}
+.sbi-shield .sb-w i{border-color:var(--k4)}
 .sb-hz{position:absolute;left:0;right:0;bottom:0;height:14px;opacity:.32;background:repeating-linear-gradient(135deg,#E39A0B 0 14px,#14243F 14px 28px);background-size:56px 14px;animation:sbStripe 2.4s linear infinite}
+.sb-ico .spin{transform-box:fill-box;transform-origin:center;animation:sbSpin 14s linear infinite}
+.sb-ico .swing{transform-box:fill-box;transform-origin:50% 0;animation:sbSwing 3.2s ease-in-out infinite alternate}
+.sb-ico .rise{transform-box:fill-box;transform-origin:bottom;animation:sbEq 1.9s ease-in-out infinite alternate}
+@keyframes sbSpin{to{transform:rotate(360deg)}}
+@keyframes sbSwing{from{transform:rotate(-13deg)}to{transform:rotate(13deg)}}
 @media print{#secbg{display:none!important}}
 /* ===== v9: calendario de Bienestar ===== */
 .cal-tabs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
@@ -708,6 +713,7 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
   var filt='all',q='';
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')}
   var TX=/*@TX*/{}/*@/TX*/;
+  var SB=/*@SB*/{}/*@/SB*/;
   function tx(k,d){var v=TX[k];return v!=null&&String(v)!==''?v:d}
   function X(k,d){return '<span data-tx="'+k+'">'+esc(tx(k,d))+'</span>'}
   var PAL=['#2563B0','#C62828','#2E7D32','#E39A0B','#8E63C8','#0E9AA7','#D2691E','#6B7A90'];
@@ -882,6 +888,7 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     document.documentElement.setAttribute('data-dir',ni>=pi?'f':'b');
     cur=id;
     document.documentElement.setAttribute('data-sec',id);
+    document.querySelectorAll('#secbg .sb').forEach(function(x){x.classList.toggle('on',x.classList.contains('sb-'+id))});
     document.querySelectorAll('.tab').forEach(function(b){b.classList.toggle('active',b.getAttribute('data-t')===id)});
     document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('active',p.id==='p-'+id)});
     document.getElementById('prog').style.width=((TABS.indexOf(id)+1)/TABS.length*100)+'%';
@@ -1081,10 +1088,10 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
   function buildSecBg(){
     var root=document.getElementById('secbg');if(!root)return;
     var s=7;function rnd(){s=(s*16807)%2147483647;return (s-1)/2147483646}
-    var o='',i;
+    var o='',i,SCN={};
     var ST=function(c){return 'fill="color-mix(in srgb,var('+c+') 12%,transparent)" stroke="var('+c+')" stroke-width="5" stroke-linejoin="round"'};
     /* personal: grupo de personas */
-    o+='<div class="sb sb-personal"><div class="sb-ico"><svg viewBox="0 0 240 200">'+
+    SCN.people='<div class="sb sbi-people"><div class="sb-ico"><svg viewBox="0 0 240 200">'+
       '<g class="pp"><circle cx="52" cy="88" r="18" '+ST('--k1')+'/><path d="M16 172 C16 136 88 136 88 172 Z" '+ST('--k1')+'/></g>'+
       '<g class="pp"><circle cx="188" cy="88" r="18" '+ST('--k1')+'/><path d="M152 172 C152 136 224 136 224 172 Z" '+ST('--k1')+'/></g>'+
       '<g class="pp"><circle cx="120" cy="60" r="27" '+ST('--k1')+'/><path d="M66 180 C66 122 174 122 174 180 Z" '+ST('--k1')+'/></g>'+
@@ -1093,18 +1100,38 @@ html[data-sec="personal"] .sb-personal,html[data-sec="nomina"] .sb-nomina,html[d
     var cd='',pts='';
     for(i=0;i<44;i++){var up=rnd()>.38,hh=30+i*1.6+rnd()*60|0;cd+='<b class="'+(up?'g':'r')+'" style="height:'+hh+'px;animation-duration:'+(1.2+rnd()*2.2).toFixed(2)+'s;animation-delay:-'+(rnd()*3).toFixed(2)+'s"></b>';
       pts+=(i?' ':'')+(i*27.9).toFixed(0)+','+(150-i*2.4-rnd()*34|0)}
-    o+='<div class="sb sb-nomina"><div class="sb-stock">'+cd+'<svg viewBox="0 0 1200 170" preserveAspectRatio="none"><polyline class="sb-tr" vector-effect="non-scaling-stroke" points="'+pts+'"/></svg></div></div>';
+    SCN.stock='<div class="sb sbi-stock"><div class="sb-stock">'+cd+'<svg viewBox="0 0 1200 170" preserveAspectRatio="none"><polyline class="sb-tr" vector-effect="non-scaling-stroke" points="'+pts+'"/></svg></div></div>';
     /* bienestar: corazon con latido */
-    o+='<div class="sb sb-bienestar"><div class="sb-ico beat"><svg viewBox="0 0 200 190"><path d="M100 175 C20 120 0 70 35 40 C62 18 92 32 100 58 C108 32 138 18 165 40 C200 70 180 120 100 175 Z" '+ST('--k2')+'/><path class="ecg" d="M24 100 H70 L86 66 L106 136 L122 88 L132 100 H176" fill="none" stroke="var(--k2)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
+    SCN.heart='<div class="sb sbi-heart"><div class="sb-ico beat"><svg viewBox="0 0 200 190"><path d="M100 175 C20 120 0 70 35 40 C62 18 92 32 100 58 C108 32 138 18 165 40 C200 70 180 120 100 175 Z" '+ST('--k2')+'/><path class="ecg" d="M24 100 H70 L86 66 L106 136 L122 88 L132 100 H176" fill="none" stroke="var(--k2)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>';
     /* comunicacion: ondas y ecualizador (se conserva) */
     var rg=function(){return '<i></i><i style="animation-delay:1.5s"></i><i style="animation-delay:3s"></i><i style="animation-delay:4.5s"></i>'},eq='';
     for(i=0;i<56;i++)eq+='<b style="height:'+(30+rnd()*90|0)+'px;animation-duration:'+(.7+rnd()*1.3).toFixed(2)+'s;animation-delay:-'+(rnd()*2).toFixed(2)+'s"></b>';
-    o+='<div class="sb sb-comunicacion"><div class="sb-w" style="right:8%;bottom:14%">'+rg()+'</div><div class="sb-w" style="left:6%;top:22%">'+rg()+'</div><div class="sb-eq">'+eq+'</div></div>';
+    SCN.radio='<div class="sb sbi-radio"><div class="sb-w" style="right:8%;bottom:14%">'+rg()+'</div><div class="sb-w" style="left:6%;top:22%">'+rg()+'</div><div class="sb-eq">'+eq+'</div></div>';
     /* historias: documento que se escribe */
     var ln='';for(i=0;i<5;i++)ln+='<line class="dl" style="--len:90;animation-delay:'+(i*.35).toFixed(2)+'s" x1="66" y1="'+(100+i*26)+'" x2="146" y2="'+(100+i*26)+'" stroke="var(--k4)" stroke-width="7" stroke-linecap="round"/>';
-    o+='<div class="sb sb-historias"><div class="sb-ico"><svg viewBox="0 0 200 240"><path d="M40 10 H125 L170 55 V230 H40 Z" '+ST('--k4')+'/><path d="M125 10 V55 H170" fill="none" stroke="var(--k4)" stroke-width="5" stroke-linejoin="round"/>'+ln+'</svg></div></div>';
+    SCN.doc='<div class="sb sbi-doc"><div class="sb-ico"><svg viewBox="0 0 200 240"><path d="M40 10 H125 L170 55 V230 H40 Z" '+ST('--k4')+'/><path d="M125 10 V55 H170" fill="none" stroke="var(--k4)" stroke-width="5" stroke-linejoin="round"/>'+ln+'</svg></div></div>';
     /* sst: escudo (se conserva) */
-    o+='<div class="sb sb-sst"><div class="sb-w" style="right:calc(6% + min(150px,15vw));top:calc(24% + 150px)">'+rg()+'</div><div class="sb-shield"><svg viewBox="0 0 200 240"><path d="M100 8 L190 44 V112 C190 168 150 208 100 232 C50 208 10 168 10 112 V44 Z" fill="color-mix(in srgb,var(--k4) 12%,transparent)" stroke="var(--k4)" stroke-width="5"/><path d="M62 118 L92 148 L142 88" fill="none" stroke="var(--k4)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sb-hz"></div></div>';
+    SCN.shield='<div class="sb sbi-shield"><div class="sb-w" style="right:calc(6% + min(150px,15vw));top:calc(24% + 150px)">'+rg()+'</div><div class="sb-shield"><svg viewBox="0 0 200 240"><path d="M100 8 L190 44 V112 C190 168 150 208 100 232 C50 208 10 168 10 112 V44 Z" fill="color-mix(in srgb,var(--k4) 12%,transparent)" stroke="var(--k4)" stroke-width="5"/><path d="M62 118 L92 148 L142 88" fill="none" stroke="var(--k4)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="sb-hz"></div></div>';
+
+    /* iconos nuevos: dibujo simple, mismo estilo que el escudo */
+    var NI=function(svg,vb){return '<div class="sb sbi-X"><div class="sb-ico"><svg viewBox="'+(vb||'0 0 200 200')+'">'+svg+'</svg></div></div>'};
+    var S1=ST('--k1'),S2=ST('--k2'),S3=ST('--k3'),S4=ST('--k4'),S5=ST('--k5');
+    var LN=function(c){return 'fill="none" stroke="var('+c+')" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"'};
+    SCN.briefcase=NI('<rect x="28" y="68" width="144" height="98" rx="14" '+S1+'/><path d="M72 68 V52 a10 10 0 0 1 10-10 h36 a10 10 0 0 1 10 10 V68" '+LN('--k1')+'/><path d="M28 112 H172" '+LN('--k1')+'/><rect x="88" y="102" width="24" height="20" rx="4" '+S1+'/>');
+    SCN.calendar=NI('<rect x="28" y="40" width="144" height="132" rx="16" '+S2+'/><path d="M28 80 H172" '+LN('--k2')+'/><path d="M66 24 V54 M134 24 V54" '+LN('--k2')+'/><path class="dl" style="--len:120" d="M64 130 L90 152 L140 104" '+LN('--k2')+'/>');
+    SCN.chart=NI('<g class="rise" style="animation-delay:-.2s"><rect x="34" y="110" width="28" height="56" rx="5" '+S3+'/></g><g class="rise" style="animation-delay:-.9s"><rect x="76" y="70" width="28" height="96" rx="5" '+S3+'/></g><g class="rise" style="animation-delay:-1.4s"><rect x="118" y="90" width="28" height="76" rx="5" '+S3+'/></g><g class="rise" style="animation-delay:-.5s"><rect x="160" y="40" width="28" height="126" rx="5" '+S3+'/></g><path d="M18 176 H190" '+LN('--k3')+'/>');
+    SCN.target=NI('<circle cx="100" cy="100" r="78" '+S4+'/><circle cx="100" cy="100" r="52" '+S4+'/><circle cx="100" cy="100" r="26" '+S4+'/><g class="swing"><path d="M100 100 L170 30 M152 28 H172 V48" '+LN('--k4')+'/></g>');
+    SCN.graduation=NI('<path d="M100 40 L188 82 L100 124 L12 82 Z" '+S5+'/><path d="M52 108 V146 C52 166 148 166 148 146 V108" '+LN('--k5')+'/><g class="swing"><path d="M188 82 V132" '+LN('--k5')+'/><circle cx="188" cy="138" r="8" '+S5+'/></g>');
+    SCN.megaphone=NI('<path d="M34 84 H80 L152 44 V156 L80 116 H34 Z" '+S2+'/><path d="M56 116 L66 164 H94 L86 118" '+LN('--k2')+'/><path class="dl" style="--len:60" d="M168 74 C182 90 182 110 168 126" '+LN('--k2')+'/><path class="dl" style="--len:80;animation-delay:.4s" d="M178 52 C202 84 202 116 178 148" '+LN('--k2')+'/>');
+    SCN.gear=NI('<g class="spin"><g '+S1+'><rect x="90" y="18" width="20" height="30" rx="4"/><rect x="90" y="152" width="20" height="30" rx="4"/><rect x="18" y="90" width="30" height="20" rx="4"/><rect x="152" y="90" width="30" height="20" rx="4"/><rect x="90" y="18" width="20" height="30" rx="4" transform="rotate(45 100 100)"/><rect x="90" y="152" width="20" height="30" rx="4" transform="rotate(45 100 100)"/><rect x="18" y="90" width="30" height="20" rx="4" transform="rotate(45 100 100)"/><rect x="152" y="90" width="30" height="20" rx="4" transform="rotate(45 100 100)"/></g><circle cx="100" cy="100" r="56" '+S1+'/><circle cx="100" cy="100" r="22" '+S1+'/></g>');
+    SCN.lock=NI('<rect x="40" y="92" width="120" height="84" rx="16" '+S4+'/><path d="M64 92 V68 a36 36 0 0 1 72 0 V92" '+LN('--k4')+'/><circle cx="100" cy="128" r="12" '+S4+'/><path d="M100 140 V158" '+LN('--k4')+'/>');
+    SCN.scale=NI('<path d="M100 28 V168 M62 172 H138" '+LN('--k3')+'/><g class="swing" style="transform-origin:50% 0"><path d="M34 56 H166" '+LN('--k3')+'/><path d="M34 56 L16 112 M34 56 L52 112 M166 56 L148 112 M166 56 L184 112" '+LN('--k3')+'/><path d="M10 112 H58 C58 134 10 134 10 112 Z M142 112 H190 C190 134 142 134 142 112 Z" '+S3+'/></g>');
+    SCN.building=NI('<rect x="46" y="34" width="108" height="136" rx="8" '+S1+'/><g fill="var(--k1)" opacity=".7"><rect x="64" y="56" width="16" height="16" rx="3"/><rect x="92" y="56" width="16" height="16" rx="3"/><rect x="120" y="56" width="16" height="16" rx="3"/><rect x="64" y="88" width="16" height="16" rx="3"/><rect x="92" y="88" width="16" height="16" rx="3"/><rect x="120" y="88" width="16" height="16" rx="3"/></g><path d="M86 170 V132 H114 V170" '+LN('--k1')+'/><path d="M26 170 H174" '+LN('--k1')+'/>');
+    SCN.trophy=NI('<path d="M62 36 H138 V92 C138 126 62 126 62 92 Z" '+S4+'/><path d="M62 52 H34 C34 86 54 94 66 94 M138 52 H166 C166 86 146 94 134 94" '+LN('--k4')+'/><path d="M100 118 V148" '+LN('--k4')+'/><rect x="66" y="148" width="68" height="22" rx="6" '+S4+'/><path class="dl" style="--len:70" d="M100 54 L106 70 L124 72 L110 84 L114 102 L100 92 L86 102 L90 84 L76 72 L94 70 Z" '+LN('--k4')+'/>');
+    SCN.bell=NI('<g class="swing"><path d="M100 30 C64 30 54 66 54 98 C54 124 38 134 38 146 H162 C162 134 146 124 146 98 C146 66 136 30 100 30 Z" '+S5+'/><path d="M84 160 a16 16 0 0 0 32 0" '+LN('--k5')+'/></g>');
+    SCN.clock=NI('<circle cx="100" cy="100" r="78" '+S2+'/><g class="spin" style="animation-duration:6s"><path d="M100 100 V48" '+LN('--k2')+'/></g><g class="spin" style="animation-duration:48s"><path d="M100 100 H140" '+LN('--k2')+'/></g><circle cx="100" cy="100" r="6" fill="var(--k2)"/><path d="M100 30 V40 M100 160 V170 M30 100 H40 M160 100 H170" '+LN('--k2')+'/>');
+    SCN.globe=NI('<circle cx="100" cy="100" r="76" '+S3+'/><ellipse cx="100" cy="100" rx="32" ry="76" '+LN('--k3')+'/><path d="M24 100 H176 M34 64 H166 M34 136 H166" '+LN('--k3')+'/>');
+    Object.keys(SB).forEach(function(id){var ic=SB[id],h=SCN[ic];if(!h)return;o+=h.replace('class="sb sbi-'+(h.match(/sbi-(\w+|X)/)||[])[1]+'"','class="sb sb-'+id.replace(/[^\w-]/g,'')+' sbi-'+ic+'"')});
     root.innerHTML=o;
   }
   buildSecBg();
