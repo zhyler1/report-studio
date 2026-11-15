@@ -106,13 +106,13 @@ const CSS = `
 .rs-add:hover{background:rgba(33,96,176,.12)}
 #rsHov,#rsSel{position:absolute;pointer-events:none;border-radius:10px;z-index:99990;display:none}
 #rsHov{outline:2px dashed #2160b0;outline-offset:2px}#rsSel{outline:3px solid #E8711A;outline-offset:2px}
-#rsHov b{position:absolute;top:-22px;left:0;background:#2160b0;color:#fff;font:600 11px Inter,system-ui,sans-serif;padding:2px 8px;border-radius:6px 6px 0 0;white-space:nowrap}
+#rsHov b{pointer-events:auto;cursor:grab;position:absolute;top:-22px;left:0;background:#2160b0;color:#fff;font:600 11px Inter,system-ui,sans-serif;padding:2px 8px;border-radius:6px 6px 0 0;white-space:nowrap}
 #rsBar{position:absolute;z-index:99999;display:none;gap:4px;background:#0f1b33;padding:5px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center}
 #rsBar button,#rsBar select{font:600 12px Inter,system-ui,sans-serif;border:0;border-radius:6px;padding:5px 8px;background:#26385c;color:#fff;cursor:pointer}
 #rsBar button:hover{background:#3a5288}#rsBar .x{background:#a82a2a}
 [contenteditable=true]{outline:2px solid #E8711A!important;outline-offset:3px;background:rgba(232,113,26,.08);cursor:text}
 #rsDrop{position:absolute;z-index:99998;display:none;background:#E8711A;border-radius:3px;pointer-events:none;box-shadow:0 0 0 3px rgba(232,113,26,.25)}
-.rs-drag{cursor:grab!important}.rs-b.rs-dragging{opacity:.45}
+.rs-tabdrop{outline:3px solid #E8711A!important;outline-offset:2px}.rs-drag{cursor:grab!important}.rs-b.rs-dragging{opacity:.45}
 #rsTx{position:absolute;z-index:99999;display:none;gap:6px;background:#0f1b33;padding:6px 8px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center;color:#fff;font:600 11px Inter,system-ui,sans-serif}
 #rsTx i{width:20px;height:20px;border-radius:50%;border:2px solid #fff;cursor:pointer;display:inline-block}#rsTx i:hover{transform:scale(1.2)}
 #rsTx input[type=color],#rsBar input[type=color]{width:26px;height:24px;padding:0;border:0;background:none;cursor:pointer}
@@ -138,9 +138,10 @@ export function attach(doc: Document, h: Host) {
     const r = el && rectOf(el)
     if (!r) { box.style.display = 'none'; return null }
     Object.assign(box.style, { display: 'block', left: r.l + 'px', top: r.t + 'px', width: r.w + 'px', height: r.h + 'px' })
-    if (label !== undefined) box.innerHTML = `<b>${label}</b>`
+    if (label !== undefined) box.innerHTML = `<b draggable="true" title="Arrastra para mover la casilla">⠿ ${label}</b>`
     return r
   }
+  let hovP: string | null = null
   const blockAt = (p: string | null) => (p ? doc.querySelector(`.rs-b[data-bp="${p}"]`) : null)
   const label = (el: Element) => BLOCK[el.getAttribute('data-bt') || ''] || el.getAttribute('data-bt') || ''
 
@@ -171,9 +172,9 @@ export function attach(doc: Document, h: Host) {
   bar.addEventListener('change', e => { const s = e.target as HTMLSelectElement; const p0 = h.sel(); if (p0 && (s.id === 'rsBg' || s.id === 'rsFg')) { h.put(setAt(h.get(), p0 + (s.id === 'rsBg' ? '.bg' : '.fg'), s.value)); return } if (s.id === 'rsV') { const p = h.sel(); if (p) h.put(setAt(h.get(), p + '.viz', s.value)); return } if (s.id === 'rsK') { const p = h.sel(); if (p) h.put(setAt(h.get(), p + '.kind', s.value)) } })
 
   doc.addEventListener('mousemove', e => {
-    const t = e.target as HTMLElement; if (t.closest('#rsBar') || doc.querySelector('[contenteditable=true]')) return
+    const t = e.target as HTMLElement; if (e.buttons || t.closest('#rsBar') || t.closest('#rsHov') || doc.querySelector('[contenteditable=true]')) return
     const el = t.closest('.rs-b'); if (!el) { hov.style.display = 'none'; return }
-    place(hov, el, label(el))
+    hovP = el.getAttribute('data-bp'); place(hov, el, label(el))
   })
   doc.addEventListener('click', e => {
     const t = e.target as HTMLElement
@@ -282,37 +283,88 @@ export function attach(doc: Document, h: Host) {
     el.addEventListener('blur', onBlur); el.addEventListener('keydown', onKey)
   })
   // ── arrastrar casillas ──
-  let dragP: string | null = null, dropAt: { to: string; after: boolean } | null = null
-  const clearDrag = () => { drop.style.display = 'none'; dropAt = null; doc.querySelectorAll('.rs-dragging').forEach(x => x.classList.remove('rs-dragging')) }
+  type Drop = { kind: 'block'; to: string; after: boolean; side: boolean } | { kind: 'tab'; id: string; el: HTMLElement }
+  let dragP: string | null = null, dropAt: Drop | null = null
+  const clearDrag = () => {
+    drop.style.display = 'none'; dropAt = null
+    doc.querySelectorAll('.rs-dragging').forEach(x => x.classList.remove('rs-dragging'))
+    doc.querySelectorAll('.rs-tabdrop').forEach(x => x.classList.remove('rs-tabdrop'))
+  }
+  const startDrag = (e: DragEvent, p: string) => {
+    dragP = p; e.dataTransfer?.setData('text/plain', p); if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
+    blockAt(p)?.classList.add('rs-dragging')
+  }
   bar.addEventListener('dragstart', e => {
     const b = (e.target as HTMLElement).closest('button[data-a="drag"]'); const p = h.sel()
     if (!b || !p) { e.preventDefault(); return }
-    dragP = p; e.dataTransfer?.setData('text/plain', p); if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
-    blockAt(p)?.classList.add('rs-dragging'); hov.style.display = 'none'
+    startDrag(e, p)
   })
+  hov.addEventListener('dragstart', e => { if (!hovP) { e.preventDefault(); return } startDrag(e, hovP) })
+  hov.addEventListener('dragend', () => { dragP = null; clearDrag() })
+  const autoScroll = (e: DragEvent) => {
+    const m = 90, H = win.innerHeight
+    if (e.clientY < m) win.scrollBy(0, -Math.ceil((m - e.clientY) / 4)); else if (e.clientY > H - m) win.scrollBy(0, Math.ceil((e.clientY - (H - m)) / 4))
+  }
   doc.addEventListener('dragover', e => {
     if (!dragP) return
-    const el = (e.target as HTMLElement).closest?.('.rs-b') as HTMLElement | null
+    autoScroll(e)
+    const tgt = e.target as HTMLElement
+    const tab = tgt.closest?.('.tab') as HTMLElement | null
+    if (tab) {                                           // soltar sobre una pestaña = mover a esa sección
+      e.preventDefault(); clearDrag(); tab.classList.add('rs-tabdrop'); drop.style.display = 'none'
+      dropAt = { kind: 'tab', id: tab.getAttribute('data-t') || '', el: tab }; return
+    }
+    doc.querySelectorAll('.rs-tabdrop').forEach(x => x.classList.remove('rs-tabdrop'))
+    const el = tgt.closest?.('.rs-b') as HTMLElement | null
     if (!el) { drop.style.display = 'none'; dropAt = null; return }
     const to = el.getAttribute('data-bp')!
     const r = rectOf(el); if (!r || to === dragP) { drop.style.display = 'none'; dropAt = null; return }
     e.preventDefault()
     const cx = e.clientX + win.scrollX, cy = e.clientY + win.scrollY
-    const wide = r.w > r.h * 1.4 || r.w > win.innerWidth * 0.6      // bloques anchos: arriba/abajo; angostos (en columnas): izquierda/derecha
-    const after = wide ? cy > r.t + r.h / 2 : cx > r.l + r.w / 2
-    dropAt = { to, after }
-    Object.assign(drop.style, wide
-      ? { display: 'block', left: r.l + 'px', width: r.w + 'px', top: (after ? r.t + r.h + 4 : r.t - 8) + 'px', height: '5px' }
-      : { display: 'block', top: r.t + 'px', height: r.h + 'px', left: (after ? r.l + r.w + 4 : r.l - 8) + 'px', width: '5px' })
+    const tspan = getAt(h.get(), to)?.span || 'full'
+    const fx = (cx - r.l) / r.w
+    let side: boolean, after: boolean
+    if (tspan !== 'full') { side = true; after = fx > 0.5 }                 // ya está en una fila: izquierda / derecha
+    else if (fx < 0.22 || fx > 0.78) { side = true; after = fx > 0.5 }      // borde de un bloque ancho: lo deja lado a lado
+    else { side = false; after = cy > r.t + r.h / 2 }                       // centro: arriba / abajo
+    dropAt = { kind: 'block', to, after, side }
+    Object.assign(drop.style, side
+      ? { display: 'block', top: r.t + 'px', height: r.h + 'px', left: (after ? r.l + r.w + 4 : r.l - 8) + 'px', width: '5px' }
+      : { display: 'block', left: r.l + 'px', width: r.w + 'px', top: (after ? r.t + r.h + 4 : r.t - 8) + 'px', height: '5px' })
   })
   doc.addEventListener('drop', e => {
     if (!dragP) return
     e.preventDefault()
     const from = dragP, at = dropAt; dragP = null; clearDrag()
     if (!at) return
-    const r = listOps.moveTo(h.get(), from, at.to, at.after)
+    const d0 = h.get()
+    if (at.kind === 'tab') {
+      const si = (d0.sections || []).findIndex((x: Json) => x.id === at.id)
+      const sp = parentOf(from)
+      if (si < 0) { h.toast('Esa pestaña no es una sección editable'); return }
+      const tl = `sections.${si}.blocks`
+      if (sp.list === tl) { h.toast('La casilla ya está en esa sección'); return }
+      const item = { ...getAt(d0, from), span: 'full' }
+      const d1 = setAt(d0, sp.list, getAt(d0, sp.list).filter((_: Json, k: number) => k !== sp.i))
+      const dst = [...(getAt(d1, tl) || []), item]
+      at.el.click(); h.put(setAt(d1, tl, dst)); h.select(tl + '.' + (dst.length - 1))
+      h.toast('Movida a «' + (d0.sections[si].label || d0.sections[si].title || at.id) + '»')
+      return
+    }
+    const tt = getAt(d0, at.to)
+    const r = listOps.moveTo(d0, from, at.to, at.after)
     if (!r) { h.toast('No se puede soltar ahí'); return }
-    h.put(r.d); h.select(r.path)
+    // lado a lado: ambas casillas comparten fila; arriba/abajo: la casilla ocupa todo el ancho
+    let d = r.d
+    if (at.side) {
+      const w = (tt?.span && tt.span !== 'full') ? tt.span : '1/2'
+      d = setAt(d, r.path + '.span', w)
+      if (!tt?.span || tt.span === 'full') {
+        const sp = parentOf(r.path); const tIdx = at.after ? sp.i - 1 : sp.i + 1
+        d = setAt(d, sp.list + '.' + tIdx + '.span', w)
+      }
+    } else d = setAt(d, r.path + '.span', 'full')
+    h.put(d); h.select(r.path)
   })
   doc.addEventListener('dragend', () => { dragP = null; clearDrag() })
   win.addEventListener('resize', drawSel)
