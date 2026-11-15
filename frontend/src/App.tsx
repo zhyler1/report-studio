@@ -251,8 +251,12 @@ export default function App() {
     const dd = dRef.current; if (!dd) return
     const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'seccion'
     const ids: string[] = dd.sections.map((x: Json) => x.id); let nid = slug, n = 2; while (ids.includes(nid)) nid = slug + '-' + n++
-    setD({ ...dd, sections: [...dd.sections, { ...sec, id: nid, label: sec.label || name, hidden: false }] })
-    flash('Sección «' + (sec.label || name) + '» creada · cámbiale nombre en Datos › Secciones'); goAfter.current = nid
+    const label = sec.label || name
+    const sg = (sec.blocks || []).find((b: Json) => b.type === 'stat_grid')   // tarjeta de Inicio: nombre, hasta 3 cifras de la primera casilla de cifras y el subtítulo
+    const home = { title: label, columns: 0, text: sec.subtitle || '', tag: '', tag_tone: 'red',
+      stats: ((sg?.items || []) as Json[]).slice(0, 3).map(i => ({ value: i.value, label: i.label, prefix: i.prefix || '', suffix: i.suffix || '', animate: true, color: 'auto', long: false })) }
+    setD({ ...dd, sections: [...dd.sections, { ...sec, id: nid, label, home, hidden: false }] })
+    flash('Sección «' + label + '» creada, con su tarjeta en Inicio · cambia el nombre en Datos › Secciones'); goAfter.current = nid
   }
   const addLoaded = (si: number, blocks: Json[]) => {
     const dd = dRef.current; if (!dd) return
