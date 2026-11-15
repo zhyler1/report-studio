@@ -99,3 +99,32 @@ def test_paquete_rsz_ida_y_vuelta(tmp_path, monkeypatch):
         assert (mb / "abc123.png").read_bytes() == b"\x89PNG"
         assert c.post("/api/reports/import", files={"file": ("x", b"basura")}).status_code == 400
     finally: app.dependency_overrides.clear()
+
+
+def test_exportar_incrusta_todos_los_medios(tmp_path, monkeypatch):
+    from app import api
+    (tmp_path / "ab12.png").write_bytes(b"\x89PNG")
+    monkeypatch.setattr(api, "MEDIA_DIR", tmp_path)
+    h = '<img src="/media/ab12.png"><div style="background:url(/media/ab12.png)"></div><script>var u="/media/ab12.png",v=\'/media/no_existe.png\'</script><p>ver /media/ab12.png</p>'
+    o = api.embed_media(h)
+    assert o.count("data:image/png;base64,") == 3          # atributo, estilo y texto JS
+    assert "/media/no_existe.png" in o                      # lo que no existe se deja como está
+    assert "<p>ver /media/ab12.png</p>" in o               # el texto suelto no se toca
+
+
+def test_traer_imagen_desde_enlace(tmp_path, monkeypatch):
+    import threading, http.server, functools
+    from app import api
+    (tmp_path / "srv").mkdir(); (tmp_path / "srv" / "f.png").write_bytes(b"\x89PNG-demo"); (tmp_path / "srv" / "x.txt").write_text("hola")
+    srv = http.server.ThreadingHTTPServer(("127.0.0.1", 0), functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(tmp_path / "srv")))
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    base = f"http://127.0.0.1:{srv.server_port}"
+    monkeypatch.setattr(api, "MEDIA_DIR", tmp_path / "m")
+    c = TestClient(app)
+    assert c.post("/api/media/url", json={"url": base + "/f.png"}).status_code == 400    # dirección interna: bloqueada
+    monkeypatch.setattr(api, "_public_host", lambda h: True)
+    r = c.post("/api/media/url", json={"url": base + "/f.png"}); assert r.status_code == 200
+    assert (tmp_path / "m" / r.json()["name"]).read_bytes() == b"\x89PNG-demo"
+    assert c.post("/api/media/url", json={"url": base + "/x.txt"}).status_code == 415   # no es imagen
+    assert c.post("/api/media/url", json={"url": "ftp://x/y.png"}).status_code == 400
+    srv.shutdown()

@@ -77,7 +77,9 @@ function Media({ v, set }: { v: any; set: (v: any) => void }) {
     <label className="upl">{busy ? '…' : 'Subir'}<input type="file" hidden accept="image/*,video/*,audio/*" onChange={async e => {
       const f = e.target.files?.[0]; if (!f) return; setBusy(true)
       try { set((await api.upload(f)).url) } catch (x: any) { alert('No se pudo subir: ' + x.message) } finally { setBusy(false); e.target.value = '' }
-    }} /></label></div>
+    }} /></label>{/^https?:\/\//.test(v || '') && <button type="button" title="Descarga el archivo y lo guarda en tu equipo, para que el informe no dependa del enlace y se exporte completo" disabled={busy} onClick={async () => {
+      setBusy(true); try { set((await api.fromUrl(v)).url) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) } finally { setBusy(false) }
+    }}>Guardar copia</button>}</div>
 }
 
 export function Field({ k, schema, value, set, parent }: { k: string; schema: S; value: any; set: (v: any) => void; parent?: any }) {

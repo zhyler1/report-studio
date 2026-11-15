@@ -159,7 +159,7 @@ export default function App() {
   const onLoad = () => {
     const doc = frame.current?.contentDocument; if (!doc) return
     doc.addEventListener('keydown', onKey)
-    attach(doc, { get: () => dRef.current, put: v => setD(v), select, sel: () => selRef.current, add: (list, index = 0) => setPicker({ list, index }), kinds, toast: flash })
+    attach(doc, { get: () => dRef.current, put: v => setD(v), select, sel: () => selRef.current, add: (list, index = 0) => setPicker({ list, index }), kinds, toast: flash, upload: async f => (await api.upload(f)).url })
     const g = goAfter.current   // sección recién creada: ir a ella en cuanto la vista previa ya la tenga
     if (g) setTimeout(() => { if (doc.querySelector(`.tab[data-t="${g}"]`)) { goAfter.current = null; goPreview(g) } }, 500)
   }

@@ -285,17 +285,80 @@ def _html(s: Store, rid: int, embed: bool = False) -> str:
     return embed_media(h) if embed else h
 
 
-_MEDIA_RE = re.compile(r'(src|poster)="/media/([A-Za-z0-9_.-]+)"')
+class UrlBody(BaseModel):
+    url: str
+
+
+_MIME_EXT = {"image/png": ".png", "image/jpeg": ".jpg", "image/gif": ".gif", "image/webp": ".webp", "image/svg+xml": ".svg",
+             "video/mp4": ".mp4", "video/webm": ".webm", "audio/mpeg": ".mp3", "audio/wav": ".wav", "audio/ogg": ".ogg", "audio/mp4": ".m4a"}
+
+
+def _public_host(host: str) -> bool:
+    import ipaddress, socket
+    try:
+        infos = socket.getaddrinfo(host, None)
+    except OSError:
+        return False
+    for i in infos:
+        ip = ipaddress.ip_address(i[4][0])
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+            return False
+    return True
+
+
+@router.post("/media/url")
+def media_from_url(body: UrlBody):
+    """Descarga una imagen/video/audio de internet y la guarda en el servidor, para que el informe no dependa del enlace."""
+    import urllib.request, urllib.error
+    from urllib.parse import urlparse
+    u = body.url.strip()
+    pu = urlparse(u)
+    if pu.scheme not in ("http", "https") or not pu.hostname:
+        raise HTTPException(400, "El enlace debe empezar por http:// o https://")
+    if not _public_host(pu.hostname):
+        raise HTTPException(400, "Ese enlace apunta a una dirección interna y no se puede descargar")
+
+    class Safe(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            h = urlparse(newurl).hostname
+            if not h or not _public_host(h):
+                raise urllib.error.URLError("redirección a una dirección interna")
+            return super().redirect_request(req, fp, code, msg, headers, newurl)
+    op = urllib.request.build_opener(Safe)
+    try:
+        with op.open(urllib.request.Request(u, headers={"User-Agent": "Mozilla/5.0 ReportStudio"}), timeout=25) as r:
+            ct = (r.headers.get_content_type() or "").lower()
+            data = r.read(100 * 1024 * 1024 + 1)
+    except Exception as e:
+        raise HTTPException(502, f"No pude descargar el enlace: {str(e)[:120]}")
+    if len(data) > 100 * 1024 * 1024:
+        raise HTTPException(413, "El archivo supera 100 MB")
+    ext = _MIME_EXT.get(ct) or Path(pu.path).suffix.lower()
+    if ext not in OK_EXT:
+        raise HTTPException(415, f"El enlace no es una imagen, video o audio permitido ({ct or 'tipo desconocido'})")
+    MEDIA_DIR.mkdir(parents=True, exist_ok=True)
+    name = f"{uuid.uuid4().hex[:12]}{ext}"
+    (MEDIA_DIR / name).write_bytes(data)
+    return {"url": f"/media/{name}", "name": name, "size": len(data)}
+
+
+_MEDIA_RE = re.compile(r'(?<=["\'(])/media/([A-Za-z0-9_.-]+)(?=["\')])')
 
 
 def embed_media(html: str) -> str:
-    """Reemplaza /media/<archivo> por data URI para que el HTML exportado sea un solo archivo."""
+    """Reemplaza /media/<archivo> por data URI (en atributos, estilos y datos) para que el HTML exportado sea un solo archivo."""
+    cache: dict[str, str] = {}
+
     def sub(m):
-        f = MEDIA_DIR / m.group(2)
-        if not f.is_file():
-            return m.group(0)
-        mime = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
-        return f'{m.group(1)}="data:{mime};base64,{base64.b64encode(f.read_bytes()).decode()}"'
+        n = m.group(1)
+        if n not in cache:
+            f = MEDIA_DIR / n
+            if not f.is_file():
+                cache[n] = m.group(0)
+            else:
+                mime = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
+                cache[n] = f"data:{mime};base64,{base64.b64encode(f.read_bytes()).decode()}"
+        return cache[n]
     return _MEDIA_RE.sub(sub, html)
 
 

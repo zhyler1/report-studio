@@ -27,6 +27,7 @@ export const api = {
   restore: (id: number, n: number) => req(`/api/reports/${id}/versions/${n}/restore`, { method: 'POST' }).then(r => r.json()),
   validate: (data: Json): Promise<{ ok: boolean; issues: string[] }> => req('/api/validate', J(data)).then(r => r.json()),
   schema: (): Promise<Json> => req('/api/schema').then(r => r.json()),
+  fromUrl: (url: string): Promise<{ url: string }> => req('/api/media/url', J({ url })).then(r => r.json()),
   upload: (f: File): Promise<{ url: string }> => { const fd = new FormData(); fd.append('file', f); return req('/api/media', { method: 'POST', body: fd }).then(r => r.json()) },
   texts: (): Promise<{ key: string; default: string; group: string }[]> => req('/api/texts').then(r => r.json()),
   ingestStatus: (): Promise<{ engine: string | null }> => req('/api/ingest/status').then(r => r.json()),

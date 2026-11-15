@@ -9,6 +9,7 @@ export type Host = {
   add(listPath: string, index?: number): void
   kinds: string[]
   toast(m: string): void
+  upload(f: File): Promise<string>
 }
 
 export const getAt = (d: Json, p: string) => p.split('.').filter(Boolean).reduce((o, k) => (o == null ? o : o[k]), d)
@@ -219,6 +220,19 @@ body.rs-dragmode .tab{outline:2px dashed #E8711A;outline-offset:2px}
 .rs-toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#0f1b33;color:#fff;padding:10px 16px;border-radius:10px;font:600 13px Inter,system-ui,sans-serif;z-index:99999}
 `
 
+/** Rutas de las imágenes/videos/audios de un bloque, en el orden en que se dibujan (sin entrar a bloques anidados). */
+export const mediaPaths = (b: Json, base: string): string[] => {
+  const out: string[] = []
+  const w = (o: Json, p: string) => {
+    if (!o || typeof o !== 'object') return
+    if (Array.isArray(o)) { o.forEach((x, i) => w(x, p + '.' + i)); return }
+    if ('src' in o && 'kind' in o && 'slot' in o) { out.push(p); return }
+    for (const k of Object.keys(o)) { if (k === 'blocks' || k === 'columns') continue; w(o[k], p + '.' + k) }
+  }
+  w(b, base); return out
+}
+const MED = 'img.pimg,video.pimg,audio.mediaa'
+
 export function attach(doc: Document, h: Host) {
   if (!doc.body || doc.getElementById('rsBar')) return
   const st = doc.createElement('style'); st.textContent = CSS; doc.head.appendChild(st)
@@ -258,12 +272,64 @@ export function attach(doc: Document, h: Host) {
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${canSplit(b) ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada parte se arrastra e intercambia sola">⧉ Separar en casillas</button>' : ''}${parentBlock(h.get(), p) ? '<button data-a="parent" title="Seleccionar el bloque que contiene a esta casilla">⬆ Contenedor</button>' : ''}${b?.type === 'group' ? '<button data-a="ungroup" title="Suelta las casillas del grupo">Desagrupar</button>' : '<button data-a="groupnext" title="Junta esta casilla con la siguiente en un grupo">Agrupar con la siguiente</button>'}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button>${mediaPaths(b, p).length ? '<button data-a="img" title="Sube una imagen, video o audio desde tu equipo (también puedes arrastrar el archivo sobre la imagen, pegarlo, o hacer doble clic en ella)">🖼 Subir imagen</button>' : ''}<button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${canSplit(b) ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada parte se arrastra e intercambia sola">⧉ Separar en casillas</button>' : ''}${parentBlock(h.get(), p) ? '<button data-a="parent" title="Seleccionar el bloque que contiene a esta casilla">⬆ Contenedor</button>' : ''}${b?.type === 'group' ? '<button data-a="ungroup" title="Suelta las casillas del grupo">Desagrupar</button>' : '<button data-a="groupnext" title="Junta esta casilla con la siguiente en un grupo">Agrupar con la siguiente</button>'}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
+
+  // ── imágenes: doble clic, arrastrar un archivo encima, pegar, o botón de la barra ──
+  const medOf = (t: EventTarget | null) => {
+    const el = t as HTMLElement | null; if (!el?.closest) return null
+    const sl = el.closest('.slot') as HTMLElement | null
+    const m = sl ? sl.previousElementSibling : el.closest(MED)
+    if (!m || !m.matches(MED)) return null
+    const blk = m.closest('[data-bp]'); if (!blk) return null
+    const all = [...blk.querySelectorAll(MED)].filter(x => x.closest('[data-bp]') === blk)
+    return { bp: blk.getAttribute('data-bp')!, idx: all.indexOf(m), n: all.length, srcs: all.map(x => !!x.getAttribute('src')) }
+  }
+  const putMedia = async (bp: string, idx: number, n: number, f: File) => {
+    const d = h.get(); const ps = mediaPaths(getAt(d, bp), bp)
+    if (lockedAt(d, bp)) { h.toast('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
+    if (ps.length !== n || !ps[idx]) { h.toast('No pude ubicar la imagen aquí: cámbiala desde el panel de la casilla'); return }
+    if (!/^(image|video|audio)\//.test(f.type)) { h.toast('Ese archivo no es una imagen, video ni audio'); return }
+    h.toast('Subiendo…')
+    try {
+      const url = await h.upload(f)
+      const kind = f.type.startsWith('video') ? 'video' : f.type.startsWith('audio') ? 'audio' : 'image'
+      const cur = getAt(h.get(), ps[idx]); h.put(setAt(h.get(), ps[idx], { ...cur, src: url, kind })); h.toast('Archivo subido ✓')
+    } catch (x: any) { h.toast('No se pudo subir: ' + (x?.message || x)) }
+  }
+  const pickFile = (cb: (f: File) => void) => {
+    const i = doc.createElement('input'); i.type = 'file'; i.accept = 'image/*,video/*,audio/*'
+    i.onchange = () => { const f = i.files?.[0]; if (f) cb(f) }; i.click()
+  }
+  doc.addEventListener('dblclick', e => {
+    const m = medOf(e.target); if (!m) return
+    e.preventDefault(); e.stopImmediatePropagation()
+    pickFile(f => putMedia(m.bp, m.idx, m.n, f))
+  }, true)
+  doc.addEventListener('dragover', e => { if (e.dataTransfer?.types?.includes('Files') && medOf(e.target)) e.preventDefault() })
+  doc.addEventListener('drop', e => {
+    const m = medOf(e.target), f = e.dataTransfer?.files?.[0]
+    e.preventDefault(); if (!m || !f) return
+    putMedia(m.bp, m.idx, m.n, f)
+  })
+  doc.addEventListener('paste', e => {
+    if (doc.querySelector('[contenteditable=true]')) return
+    const f = [...(e.clipboardData?.files || [])].find(x => /^(image|video)\//.test(x.type)); const p = h.sel(); if (!f || !p) return
+    const blk = doc.querySelector(`[data-bp="${p}"]`); if (!blk) return
+    const all = [...blk.querySelectorAll(MED)].filter(x => x.closest('[data-bp]') === blk)
+    if (!all.length) return
+    e.preventDefault(); const i = Math.max(0, all.findIndex(x => !x.getAttribute('src')))
+    putMedia(p, i, all.length, f)
+  })
   const act = (a: string) => {
     const p = h.sel(); if (!p) return
+    if (a === 'img') {
+      const blk = doc.querySelector(`[data-bp="${p}"]`); const all = blk ? [...blk.querySelectorAll(MED)].filter(x => x.closest('[data-bp]') === blk) : []
+      if (all.length) { const i = Math.max(0, all.findIndex(x => !x.getAttribute('src'))); pickFile(f => putMedia(p, i, all.length, f)) }
+      return
+    }
     const d = h.get()
     if (a === 'lock') { h.put(setAt(d, p + '.locked', !getAt(d, p)?.locked)); h.toast(getAt(d, p)?.locked ? 'Casilla desbloqueada' : 'Casilla bloqueada 🔒'); return }
     if (lockedAt(d, p)) { h.toast('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
