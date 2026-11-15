@@ -30,6 +30,20 @@ export const listOps = {
     if (j < 0 || j >= a.length) return d
     ;[a[i], a[j]] = [a[j], a[i]]; return setAt(d, list, a)
   },
+  /** Mueve la casilla `p` a antes (after=false) o después de la casilla `to`; puede cambiar de lista. */
+  moveTo(d: Json, p: string, to: string, after: boolean): { d: Json; path: string } | null {
+    const s = parentOf(p), t = parentOf(to)
+    if (p === to || t.list === p || t.list.startsWith(p + '.')) return null            // no soltar dentro de sí misma
+    if (s.list !== t.list && (s.list.startsWith(t.list + '.') || t.list.startsWith(s.list + '.'))) return null  // listas anidadas: ambiguo
+    const item = getAt(d, p); let j = t.i + (after ? 1 : 0)
+    if (s.list === t.list) {
+      const a = [...getAt(d, s.list)]; a.splice(s.i, 1); if (s.i < j) j--; a.splice(j, 0, item)
+      return { d: setAt(d, s.list, a), path: s.list + '.' + j }
+    }
+    const from = getAt(d, s.list).filter((_: Json, k: number) => k !== s.i)
+    const dst = [...(getAt(d, t.list) || [])]; dst.splice(j, 0, item)
+    return { d: setAt(setAt(d, s.list, from), t.list, dst), path: t.list + '.' + j }
+  },
   dup(d: Json, p: string): Json {
     const { list, i } = parentOf(p); const a = [...getAt(d, list)]
     a.splice(i + 1, 0, JSON.parse(JSON.stringify(a[i]))); return setAt(d, list, a)
@@ -97,6 +111,8 @@ const CSS = `
 #rsBar button,#rsBar select{font:600 12px Inter,system-ui,sans-serif;border:0;border-radius:6px;padding:5px 8px;background:#26385c;color:#fff;cursor:pointer}
 #rsBar button:hover{background:#3a5288}#rsBar .x{background:#a82a2a}
 [contenteditable=true]{outline:2px solid #E8711A!important;outline-offset:3px;background:rgba(232,113,26,.08);cursor:text}
+#rsDrop{position:absolute;z-index:99998;display:none;background:#E8711A;border-radius:3px;pointer-events:none;box-shadow:0 0 0 3px rgba(232,113,26,.25)}
+.rs-drag{cursor:grab!important}.rs-b.rs-dragging{opacity:.45}
 #rsTx{position:absolute;z-index:99999;display:none;gap:6px;background:#0f1b33;padding:6px 8px;border-radius:10px;box-shadow:0 6px 20px rgba(0,0,0,.35);align-items:center;color:#fff;font:600 11px Inter,system-ui,sans-serif}
 #rsTx i{width:20px;height:20px;border-radius:50%;border:2px solid #fff;cursor:pointer;display:inline-block}#rsTx i:hover{transform:scale(1.2)}
 #rsTx input[type=color],#rsBar input[type=color]{width:26px;height:24px;padding:0;border:0;background:none;cursor:pointer}
@@ -109,7 +125,7 @@ export function attach(doc: Document, h: Host) {
   if (!doc.body || doc.getElementById('rsBar')) return
   const st = doc.createElement('style'); st.textContent = CSS; doc.head.appendChild(st)
   const mk = (id: string) => { const e = doc.createElement('div'); e.id = id; doc.body.appendChild(e); return e }
-  const hov = mk('rsHov'), sel = mk('rsSel'), bar = mk('rsBar'), tx = mk('rsTx')
+  const hov = mk('rsHov'), sel = mk('rsSel'), bar = mk('rsBar'), tx = mk('rsTx'), drop = mk('rsDrop')
   const win = doc.defaultView!
   const rectOf = (el: Element) => {
     let x1 = 1e9, y1 = 1e9, x2 = -1e9, y2 = -1e9
@@ -136,7 +152,7 @@ export function attach(doc: Document, h: Host) {
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" draggable="true" class="rs-drag" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button><button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
@@ -265,6 +281,40 @@ export function attach(doc: Document, h: Host) {
     const onKey = (ev: KeyboardEvent) => { if (ev.key === 'Enter' && !ev.shiftKey) { ev.preventDefault(); el.blur() } else if (ev.key === 'Escape') { ev.preventDefault(); done(false) } }
     el.addEventListener('blur', onBlur); el.addEventListener('keydown', onKey)
   })
+  // ── arrastrar casillas ──
+  let dragP: string | null = null, dropAt: { to: string; after: boolean } | null = null
+  const clearDrag = () => { drop.style.display = 'none'; dropAt = null; doc.querySelectorAll('.rs-dragging').forEach(x => x.classList.remove('rs-dragging')) }
+  bar.addEventListener('dragstart', e => {
+    const b = (e.target as HTMLElement).closest('button[data-a="drag"]'); const p = h.sel()
+    if (!b || !p) { e.preventDefault(); return }
+    dragP = p; e.dataTransfer?.setData('text/plain', p); if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
+    blockAt(p)?.classList.add('rs-dragging'); hov.style.display = 'none'
+  })
+  doc.addEventListener('dragover', e => {
+    if (!dragP) return
+    const el = (e.target as HTMLElement).closest?.('.rs-b') as HTMLElement | null
+    if (!el) { drop.style.display = 'none'; dropAt = null; return }
+    const to = el.getAttribute('data-bp')!
+    const r = rectOf(el); if (!r || to === dragP) { drop.style.display = 'none'; dropAt = null; return }
+    e.preventDefault()
+    const cx = e.clientX + win.scrollX, cy = e.clientY + win.scrollY
+    const wide = r.w > r.h * 1.4 || r.w > win.innerWidth * 0.6      // bloques anchos: arriba/abajo; angostos (en columnas): izquierda/derecha
+    const after = wide ? cy > r.t + r.h / 2 : cx > r.l + r.w / 2
+    dropAt = { to, after }
+    Object.assign(drop.style, wide
+      ? { display: 'block', left: r.l + 'px', width: r.w + 'px', top: (after ? r.t + r.h + 4 : r.t - 8) + 'px', height: '5px' }
+      : { display: 'block', top: r.t + 'px', height: r.h + 'px', left: (after ? r.l + r.w + 4 : r.l - 8) + 'px', width: '5px' })
+  })
+  doc.addEventListener('drop', e => {
+    if (!dragP) return
+    e.preventDefault()
+    const from = dragP, at = dropAt; dragP = null; clearDrag()
+    if (!at) return
+    const r = listOps.moveTo(h.get(), from, at.to, at.after)
+    if (!r) { h.toast('No se puede soltar ahí'); return }
+    h.put(r.d); h.select(r.path)
+  })
+  doc.addEventListener('dragend', () => { dragP = null; clearDrag() })
   win.addEventListener('resize', drawSel)
   const redraw = () => drawSel()
   ;(doc as any).__rsRedraw = redraw
