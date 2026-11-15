@@ -98,7 +98,7 @@ function Versiones({ id, onRestore, refreshKey }: { id: number; onRestore: () =>
 export default function App() {
   const [rows, setRows] = useState<ReportRow[]>([])
   const [id, setId] = useState<number | null>(null)
-  const [d, setD] = useState<Json | null>(null)
+  const [d, setDRaw] = useState<Json | null>(null)
   const [saved, setSaved] = useState('')
   const [rib, setRib] = useState<RibTab>('inicio')
   const [drawer, setDrawer] = useState<string | null>(() => LS.get<string | null>('drawer', null))
@@ -115,12 +115,38 @@ export default function App() {
   const [toast, setToast] = useState('')
   const [loader, setLoader] = useState<number | null>(null)
   const dRef = useRef<Json | null>(null); dRef.current = d
+  // historial para deshacer / rehacer (Ctrl/Cmd+Z, Mayús+Z o Ctrl+Y); los cambios seguidos en <0,7 s cuentan como uno
+  const past = useRef<Json[]>([]), future = useRef<Json[]>([]), lastPush = useRef(0)
+  const [hn, setHn] = useState({ u: 0, r: 0 })
+  const sync = () => setHn({ u: past.current.length, r: future.current.length })
+  const setD = (v: Json | null) => {
+    const cur = dRef.current
+    if (cur && v && v !== cur) {
+      const now = Date.now()
+      if (now - lastPush.current > 700 || !past.current.length) { past.current.push(cur); if (past.current.length > 100) past.current.shift() }
+      lastPush.current = now; future.current = []; sync()
+    }
+    dRef.current = v; setDRaw(v)
+  }
+  const loadD = (v: Json | null) => { past.current = []; future.current = []; sync(); dRef.current = v; setDRaw(v) }
+  const undo = () => { const u = past.current.pop(); if (!u) return; if (dRef.current) future.current.push(dRef.current); lastPush.current = 0; dRef.current = u; setDRaw(u); sync(); flash('Cambio deshecho') }
+  const redo = () => { const u = future.current.pop(); if (!u) return; if (dRef.current) past.current.push(dRef.current); lastPush.current = 0; dRef.current = u; setDRaw(u); sync(); flash('Cambio rehecho') }
+  const undoRef = useRef({ undo, redo }); undoRef.current = { undo, redo }
+  const onKey = useCallback((e: KeyboardEvent) => {
+    const el = e.target as HTMLElement | null
+    if (el && (/^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) || el.isContentEditable)) return
+    const k = e.key.toLowerCase()
+    if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? undoRef.current.redo() : undoRef.current.undo() }
+    else if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); undoRef.current.redo() }
+  }, [])
+  useEffect(() => { window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey) }, [onKey])
   const selRef = useRef<string | null>(null); selRef.current = sel
   const select = useCallback((p: string | null) => { setSelS(p); setRib(r => (p ? 'casilla' : r === 'casilla' ? 'inicio' : r)); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
   const flash = useCallback((m: string) => { setToast(m); setTimeout(() => setToast(''), 3500) }, [])
   const kinds = useMemo(() => { const k: any = Defs.current?.Chart?.properties?.kind; const r = k?.$ref ? Defs.current[k.$ref.split('/').pop()] : k; return (r?.enum || []) as string[] }, [id, ready])
   const onLoad = () => {
     const doc = frame.current?.contentDocument; if (!doc) return
+    doc.addEventListener('keydown', onKey)
     attach(doc, { get: () => dRef.current, put: v => setD(v), select, sel: () => selRef.current, add: (list, index = 0) => setPicker({ list, index }), kinds, toast: flash })
   }
   useEffect(() => { api.schema().then(s => { Defs.current = s.$defs; setReady(true) }) }, [])
@@ -135,7 +161,7 @@ export default function App() {
     api.get(rid).then(r => {
       const draft = LS.get<Json | null>('draft.' + rid, null)
       setId(rid); setSaved(JSON.stringify(r.data))
-      if (draft) { setD(draft); setMsg('Borrador sin guardar recuperado') } else setD(r.data)
+      if (draft) { loadD(draft); setMsg('Borrador sin guardar recuperado') } else loadD(r.data)
     }).catch(() => LS.del('id'))
   }, [])
   useEffect(() => {  // guarda el borrador mientras haya cambios sin guardar
@@ -145,7 +171,7 @@ export default function App() {
 
   const open = useCallback(async (rid: number) => {
     if (dirty && !confirm('Hay cambios sin guardar. ¿Descartarlos?')) return
-    const r = await api.get(rid); setId(rid); LS.set('id', rid); LS.del('prev'); seen.current = false; setD(LS.get<Json | null>('draft.' + rid, null) ?? r.data); setSaved(JSON.stringify(r.data)); setMsg(''); setVk(k => k + 1)
+    const r = await api.get(rid); setId(rid); LS.set('id', rid); LS.del('prev'); seen.current = false; loadD(LS.get<Json | null>('draft.' + rid, null) ?? r.data); setSaved(JSON.stringify(r.data)); setMsg(''); setVk(k => k + 1)
   }, [dirty])
 
   useEffect(() => {  // vista previa en vivo con retraso
@@ -227,11 +253,11 @@ export default function App() {
   const create = async () => {
     if (!d) { alert('Importa un JSON para crear el primer informe; luego podrás duplicarlo.'); return }
     const copy = JSON.parse(JSON.stringify(d))
-    const r = await api.create(copy, 'Copia'); await refresh(); setId(r.id); LS.set('id', r.id); setD(r.data); setSaved(JSON.stringify(r.data))
+    const r = await api.create(copy, 'Copia'); await refresh(); setId(r.id); LS.set('id', r.id); loadD(r.data); setSaved(JSON.stringify(r.data))
   }
   const remove = async () => {
     if (id === null || !confirm('¿Eliminar este informe y todas sus versiones?')) return
-    await api.remove(id); LS.del('id'); LS.del('draft.' + id); LS.del('prev'); setId(null); setD(null); refresh()
+    await api.remove(id); LS.del('id'); LS.del('draft.' + id); LS.del('prev'); setId(null); loadD(null); refresh()
   }
 
   return <div className="app">
@@ -246,7 +272,7 @@ export default function App() {
       {!rows.length && <p className="mut">Aún no hay informes. Importa el JSON del seed para empezar.</p>}
     </aside>
     {ready && d && id !== null ? <div className="main2">
-      <Ribbon d={d} setD={setD} sel={sel} rib={rib} setRib={setRib} dirty={dirty} blocked={issues.length > 0} msg={msg} id={id} save={save} remove={remove}
+      <Ribbon d={d} setD={setD} undo={undo} redo={redo} nu={hn.u} nr={hn.r} sel={sel} rib={rib} setRib={setRib} dirty={dirty} blocked={issues.length > 0} msg={msg} id={id} save={save} remove={remove}
         openDrawer={openDrawer} insert={insert} op={op} kinds={kinds} />
       {issues.length > 0 && <div className="issues" style={{ margin: '6px 12px' }}><b>Avisos (para guardar hay que corregirlos):</b><ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{issues.map((x, i) => <li key={i}>{x}</li>)}</ul></div>}
       <div className="work">

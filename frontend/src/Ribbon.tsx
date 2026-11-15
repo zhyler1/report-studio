@@ -22,6 +22,7 @@ const INSERTAR: [string, string, string][] = [['chart', '📊', 'Gráfico'], ['m
 
 export type RibProps = {
   d: Json; setD: (d: Json) => void; sel: string | null; rib: RibTab; setRib: (t: RibTab) => void
+  undo: () => void; redo: () => void; nu: number; nr: number
   dirty: boolean; blocked: boolean; msg: string; id: number
   save: () => void; remove: () => void; openDrawer: (t: string) => void
   insert: (type: string, side?: boolean) => void; op: (a: string) => void; kinds: string[]
@@ -53,6 +54,9 @@ export default function Ribbon(p: RibProps) {
       <span className="mut" style={{ marginLeft: 'auto', alignSelf: 'center', paddingRight: 8 }}>{p.dirty ? 'Cambios sin guardar' : p.msg}</span></div>
     <div className="rbody">
       {rib === 'inicio' && <>
+        <Btn i="↶" l={'Deshacer' + (p.nu ? ` (${p.nu})` : '')} title="Ctrl/Cmd + Z" onClick={p.undo} />
+        <Btn i="↷" l="Rehacer" title="Ctrl/Cmd + Mayús + Z" onClick={p.redo} />
+        <span className="rsep" />
         <Btn i="💾" l="Guardar" cls={p.dirty && !p.blocked ? 'pri' : ''} onClick={p.save} />
         <Btn i="📥" l="Cargar documento" onClick={() => p.insert('__doc')} />
         <span className="rsep" />
