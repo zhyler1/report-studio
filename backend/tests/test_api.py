@@ -186,3 +186,45 @@ def test_viz_presupuesto_y_plantas():
     assert 'data-viz="gauge"' in html and '"viz":"donut"' in html and "RSCharts" in html
     base = render(load(json.load(open("seed/report.seed.json", encoding="utf-8")))[0])
     assert 'data-viz=' not in base and "RSCharts" not in base  # el original no cambia ni carga el motor
+
+
+def test_exporta_pptx(c):
+    import io, json
+    from pptx import Presentation
+    d = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    rid = c.post("/api/reports", json={"data": d}).json()["id"]
+    r = c.get(f"/api/reports/{rid}/export.pptx")
+    assert r.status_code == 200 and r.content[:2] == b"PK"
+    prs = Presentation(io.BytesIO(r.content))
+    assert len(prs.slides) >= 8
+    assert "(cont.) (cont.)" not in " ".join(sh.text_frame.text for sl in prs.slides for sh in sl.shapes if sh.has_text_frame)
+
+
+def test_usuarios_y_permisos(c):
+    import json
+    d = json.load(open("seed/report.seed.json", encoding="utf-8"))
+    rid = c.post("/api/reports", json={"data": d}).json()["id"]          # modo abierto: sin usuarios
+    assert c.get("/api/me").json()["open"] is True
+    assert c.post("/api/users", json={"name": "andres", "password": "secreto1", "role": "admin"}).status_code == 201
+    assert c.get("/api/reports").status_code == 401                      # ya exige ingreso
+    assert c.post("/api/login", json={"name": "andres", "password": "mala"}).status_code == 401
+    assert c.post("/api/login", json={"name": "andres", "password": "secreto1"}).status_code == 200
+    assert c.post("/api/users", json={"name": "nomina", "password": "secreto2", "role": "lider", "sections": ["nomina"]}).status_code == 201
+    c.post("/api/logout"); c.cookies.clear()
+    assert c.post("/api/login", json={"name": "nomina", "password": "secreto2"}).status_code == 200
+    cur = c.get(f"/api/reports/{rid}").json()["data"]
+    mine = json.loads(json.dumps(cur))
+    for s in mine["sections"]:
+        if s["id"] == "nomina":
+            s["subtitle"] = "cambiado por el líder"
+    assert c.put(f"/api/reports/{rid}", json={"data": mine}).status_code == 200      # su sección: sí
+    other = json.loads(json.dumps(cur))
+    for s in other["sections"]:
+        if s["id"] == "sst":
+            s["subtitle"] = "intento ajeno"
+    r = c.put(f"/api/reports/{rid}", json={"data": other})
+    assert r.status_code == 403            # la de otro: no
+    th = json.loads(json.dumps(cur)); th["meta"]["title"] = "otro"
+    assert c.put(f"/api/reports/{rid}", json={"data": th}).status_code == 403
+    assert c.delete(f"/api/reports/{rid}").status_code == 403
+    assert c.get("/api/users").status_code == 403

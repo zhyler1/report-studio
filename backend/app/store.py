@@ -25,6 +25,7 @@ class Store:
         CREATE TABLE IF NOT EXISTS reports(id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, created TEXT, updated TEXT, data TEXT NOT NULL);
         CREATE TABLE IF NOT EXISTS versions(id INTEGER PRIMARY KEY AUTOINCREMENT, report_id INTEGER NOT NULL REFERENCES reports(id) ON DELETE CASCADE,
             n INTEGER NOT NULL, created TEXT, note TEXT DEFAULT '', data TEXT NOT NULL, UNIQUE(report_id, n));
+        CREATE TABLE IF NOT EXISTS users(name TEXT PRIMARY KEY, pw TEXT NOT NULL, role TEXT NOT NULL, sections TEXT NOT NULL DEFAULT '[]');
         PRAGMA foreign_keys=ON;
         """)
 
@@ -74,3 +75,23 @@ class Store:
     def version_data(self, rid: int, n: int) -> dict | None:
         r = self.db.execute("SELECT data FROM versions WHERE report_id=? AND n=?", (rid, n)).fetchone()
         return json.loads(r["data"]) if r else None
+
+    # ── usuarios ──
+    def count_users(self) -> int:
+        return self.db.execute("SELECT COUNT(*) FROM users").fetchone()[0]
+
+    def get_user(self, name: str) -> dict | None:
+        r = self.db.execute("SELECT * FROM users WHERE name=?", (name,)).fetchone()
+        return {"name": r["name"], "pw": r["pw"], "role": r["role"], "sections": json.loads(r["sections"])} if r else None
+
+    def list_users(self) -> list[dict]:
+        return [{"name": r["name"], "role": r["role"], "sections": json.loads(r["sections"])} for r in self.db.execute("SELECT * FROM users ORDER BY name")]
+
+    def put_user(self, name: str, pw_hash: str, role: str, sections: list[str]):
+        with self.lock, self.db:
+            self.db.execute("INSERT INTO users(name,pw,role,sections) VALUES(?,?,?,?) ON CONFLICT(name) DO UPDATE SET pw=excluded.pw, role=excluded.role, sections=excluded.sections",
+                            (name, pw_hash, role, json.dumps(sections)))
+
+    def del_user(self, name: str) -> bool:
+        with self.lock, self.db:
+            return self.db.execute("DELETE FROM users WHERE name=?", (name,)).rowcount > 0

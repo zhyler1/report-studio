@@ -1,0 +1,11 @@
+services:
+  report-studio:
+    build: .
+    ports: ["8000:8000"]
+    volumes: ["./data:/data"]
+    environment:
+      # IA opcional y gratuita con tu modelo local (Ollama en el Mac Studio):
+      # RS_OLLAMA_URL: http://host.docker.internal:11434
+      # RS_OLLAMA_MODEL: llama3.1:70b
+      RS_ADMIN_TOKEN: ${RS_ADMIN_TOKEN:-}
+    restart: unless-stopped

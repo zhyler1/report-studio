@@ -14,13 +14,13 @@ import uuid
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, FastAPI, File, HTTPException, Query, UploadFile
+from fastapi import APIRouter, Body, Depends, FastAPI, File, HTTPException, Query, Request, UploadFile
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from pydantic import BaseModel
 
 from .render import render
-from . import ingest, llm
+from . import auth, ingest, llm
 from .schema import json_schema
 from .store import Store
 from .validate import load
@@ -35,7 +35,79 @@ def get_store() -> Store:
     return _store
 
 
-router = APIRouter(prefix="/api", tags=["report-studio"])
+def guard(request: Request, s: Store = Depends(get_store)):
+    """Exige sesión en toda la API cuando ya existen usuarios (login, sesión y estado quedan abiertos)."""
+    if request.url.path.endswith(("/login", "/logout", "/me")):
+        return None
+    return auth.current(request, s)
+
+
+router = APIRouter(prefix="/api", tags=["report-studio"], dependencies=[Depends(guard)])
+
+
+class Login(BaseModel):
+    name: str
+    password: str
+
+
+class NewUser(BaseModel):
+    name: str
+    password: str
+    role: str = "lider"
+    sections: list[str] = []
+
+
+@router.post("/login")
+def login(body: Login, s: Store = Depends(get_store)):
+    u = s.get_user(body.name.strip())
+    if not u or not auth.check_pw(body.password, u["pw"]):
+        raise HTTPException(401, "Usuario o contraseña incorrectos")
+    r = JSONResponse({"name": u["name"], "role": u["role"], "sections": u["sections"]})
+    r.set_cookie("rs_token", auth.make_token(u["name"]), max_age=auth.TTL, httponly=True, samesite="lax")
+    return r
+
+
+@router.post("/logout")
+def logout():
+    r = JSONResponse({"ok": True})
+    r.delete_cookie("rs_token")
+    return r
+
+
+@router.get("/me")
+def me(request: Request, s: Store = Depends(get_store)):
+    if s.count_users() == 0:
+        return {"open": True, "name": "", "role": "admin", "sections": []}
+    u = s.get_user(auth.read_token(request.cookies.get("rs_token")) or "")
+    if not u:
+        raise HTTPException(401, "Ingresa con tu usuario")
+    return {"open": False, "name": u["name"], "role": u["role"], "sections": u["sections"]}
+
+
+@router.get("/users")
+def users(user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
+    return s.list_users()
+
+
+@router.post("/users", status_code=201)
+def add_user(body: NewUser, user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
+    if body.role not in ("admin", "lider") or len(body.password) < 6 or not body.name.strip():
+        raise HTTPException(422, "Nombre, rol (admin o lider) y contraseña de mínimo 6 caracteres")
+    if s.count_users() == 0:
+        body.role = "admin"  # el primero siempre es administrador
+    s.put_user(body.name.strip(), auth.hash_pw(body.password), body.role, body.sections)
+    return {"ok": True}
+
+
+@router.delete("/users/{name}", status_code=204)
+def del_user(name: str, user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
+    if user and user["name"] == name:
+        raise HTTPException(422, "No puedes borrarte a ti mismo")
+    s.del_user(name)
+    return Response(status_code=204)
 
 
 class Save(BaseModel):
@@ -67,7 +139,8 @@ def list_reports(s: Store = Depends(get_store)):
 
 
 @router.post("/reports", status_code=201)
-def create_report(body: Save, s: Store = Depends(get_store)):
+def create_report(body: Save, user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
     rep = _valid(body.data)
     rid = s.create(rep.model_dump(mode="json"), body.note or "Versión inicial")
     return s.get(rid)
@@ -86,15 +159,17 @@ def get_report(rid: int, s: Store = Depends(get_store)):
 
 
 @router.put("/reports/{rid}")
-def update_report(rid: int, body: Save, s: Store = Depends(get_store)):
-    _get(s, rid)
+def update_report(rid: int, body: Save, user=Depends(guard), s: Store = Depends(get_store)):
+    old = _get(s, rid)
     rep = _valid(body.data)
+    auth.check_leader_edit(user, old["data"], rep.model_dump(mode="json"))
     s.update(rid, rep.model_dump(mode="json"), body.note)
     return s.get(rid)
 
 
 @router.delete("/reports/{rid}", status_code=204)
-def delete_report(rid: int, s: Store = Depends(get_store)):
+def delete_report(rid: int, user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
     _get(s, rid)
     s.delete(rid)
     return Response(status_code=204)
@@ -115,7 +190,8 @@ def version(rid: int, n: int, s: Store = Depends(get_store)):
 
 
 @router.post("/reports/{rid}/versions/{n}/restore")
-def restore(rid: int, n: int, s: Store = Depends(get_store)):
+def restore(rid: int, n: int, user=Depends(guard), s: Store = Depends(get_store)):
+    auth.require_admin(user)
     d = s.version_data(rid, n)
     if d is None:
         raise HTTPException(404, "Versión no encontrada")
@@ -159,6 +235,14 @@ def render_draft(body: dict[str, Any] = Body(...), edit: bool = False):
 @router.get("/reports/{rid}/export.html")
 def export_html(rid: int, s: Store = Depends(get_store)):
     return Response(_html(s, rid, embed=True), media_type="text/html; charset=utf-8", headers={"Content-Disposition": f'attachment; filename="informe-{rid}.html"'})
+
+
+@router.get("/reports/{rid}/export.pptx")
+def export_pptx(rid: int, s: Store = Depends(get_store)):
+    from .pptx_export import to_pptx
+    rep = _valid(_get(s, rid)["data"])
+    return Response(to_pptx(rep), media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                    headers={"Content-Disposition": f'attachment; filename="informe-{rid}.pptx"'})
 
 
 @router.get("/reports/{rid}/export.pdf")

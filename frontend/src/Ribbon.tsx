@@ -87,7 +87,7 @@ export default function Ribbon(p: RibProps) {
       {rib === 'inicio' && <>
         <Grp t="Historial"><Btn i="undo" l={'Deshacer' + (p.nu ? ` (${p.nu})` : '')} title="Ctrl/Cmd + Z" onClick={p.undo} disabled={!p.nu} /><Btn i="redo" l="Rehacer" title="Ctrl/Cmd + Mayús + Z" onClick={p.redo} disabled={!p.nr} /></Grp>
         <Grp t="Informe"><Btn i="save" l="Guardar" cls={p.dirty && !p.blocked ? 'pri' : ''} onClick={p.save} /><Btn i="import" l="Cargar documento" onClick={() => p.insert('__doc')} /></Grp>
-        <Grp t="Exportar"><a href={`/api/reports/${p.id}/export.html`}><Btn i="html" l="Exportar HTML" onClick={() => { }} /></a><a href={`/api/reports/${p.id}/export.pdf`}><Btn i="pdf" l="Exportar PDF" onClick={() => { }} /></a></Grp>
+        <Grp t="Exportar"><a href={`/api/reports/${p.id}/export.html`}><Btn i="html" l="Exportar HTML" onClick={() => { }} /></a><a href={`/api/reports/${p.id}/export.pdf`}><Btn i="pdf" l="Exportar PDF" onClick={() => { }} /></a><a href={`/api/reports/${p.id}/export.pptx`}><Btn i="pdf" l="Exportar PowerPoint" onClick={() => { }} /></a></Grp>
         <Grp t="Otros"><Btn i="trash" l="Eliminar informe" cls="danger" onClick={p.remove} /></Grp>
         <span className="rmut"><Ic n="info" /> Para dar color a un texto o cifra (como el «01»): selecciónalo arrastrando el mouse, sin doble clic. Doble clic es para escribir.</span>
       </>}
