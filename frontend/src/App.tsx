@@ -155,10 +155,13 @@ export default function App() {
   const select = useCallback((p: string | null) => { setSelS(p); setRib(r => (p ? 'casilla' : r === 'casilla' ? 'inicio' : r)); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
   const flash = useCallback((m: string) => { setToast(m); setTimeout(() => setToast(''), 3500) }, [])
   const kinds = useMemo(() => { const k: any = Defs.current?.Chart?.properties?.kind; const r = k?.$ref ? Defs.current[k.$ref.split('/').pop()] : k; return (r?.enum || []) as string[] }, [id, ready])
+  const goAfter = useRef<string | null>(null)
   const onLoad = () => {
     const doc = frame.current?.contentDocument; if (!doc) return
     doc.addEventListener('keydown', onKey)
     attach(doc, { get: () => dRef.current, put: v => setD(v), select, sel: () => selRef.current, add: (list, index = 0) => setPicker({ list, index }), kinds, toast: flash })
+    const g = goAfter.current   // sección recién creada: ir a ella en cuanto la vista previa ya la tenga
+    if (g) setTimeout(() => { if (doc.querySelector(`.tab[data-t="${g}"]`)) { goAfter.current = null; goPreview(g) } }, 500)
   }
   useEffect(() => { api.schema().then(s => { Defs.current = s.$defs; setReady(true) }) }, [])
   const dirty = useMemo(() => d !== null && JSON.stringify(d) !== saved, [d, saved])
@@ -249,7 +252,7 @@ export default function App() {
     const slug = name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'seccion'
     const ids: string[] = dd.sections.map((x: Json) => x.id); let nid = slug, n = 2; while (ids.includes(nid)) nid = slug + '-' + n++
     setD({ ...dd, sections: [...dd.sections, { ...sec, id: nid, label: sec.label || name, hidden: false }] })
-    flash('Sección «' + (sec.label || name) + '» creada · cámbiale nombre en Datos › Secciones'); setTimeout(() => goPreview(nid), 1400)
+    flash('Sección «' + (sec.label || name) + '» creada · cámbiale nombre en Datos › Secciones'); goAfter.current = nid
   }
   const addLoaded = (si: number, blocks: Json[]) => {
     const dd = dRef.current; if (!dd) return

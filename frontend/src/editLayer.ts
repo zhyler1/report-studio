@@ -309,7 +309,7 @@ export function attach(doc: Document, h: Host) {
     el.addEventListener('blur', onBlur); el.addEventListener('keydown', onKey)
   })
   // ── arrastrar casillas (eventos de puntero: ratón y táctil, con fantasma, guía y desplazamiento automático) ──
-  type Drop = { kind: 'block'; to: string; after: boolean; side: boolean } | { kind: 'tab'; id: string; el: HTMLElement } | { kind: 'list'; list: string; el: HTMLElement }
+  type Drop = { kind: 'block'; to: string; after: boolean; side: boolean; swap?: boolean } | { kind: 'tab'; id: string; el: HTMLElement } | { kind: 'list'; list: string; el: HTMLElement }
   const ghost = mk('rsGhost')
   let dragP: string | null = null, dropAt: Drop | null = null, last = { x: 0, y: 0 }, raf = 0, dragEnd = 0
   const clearMarks = () => doc.querySelectorAll('.rs-tabdrop').forEach(x => x.classList.remove('rs-tabdrop'))
@@ -339,12 +339,20 @@ export function attach(doc: Document, h: Host) {
     const r = rectOf(el); if (!r) return
     const cx = x + win.scrollX, cy = y + win.scrollY
     const tspan = getAt(h.get(), to)?.span || 'full'
-    const fx = (cx - r.l) / r.w
-    let side: boolean, after: boolean
-    if (tspan !== 'full') { side = true; after = fx > 0.5 }
-    else if (fx < 0.25 || fx > 0.75) { side = true; after = fx > 0.5 }
-    else { side = false; after = cy > r.t + r.h / 2 }
-    dropAt = { kind: 'block', to, after, side }
+    const fx = (cx - r.l) / r.w, fy = (cy - r.t) / r.h
+    const ok = !lockedAt(h.get(), to) && !lockedAt(h.get(), dragP) && !to.startsWith(dragP + '.') && !dragP.startsWith(to + '.')
+    let side: boolean, after: boolean, swap = false
+    if (tspan !== 'full') { side = true; after = fx > 0.5; if (ok && fx > 0.3 && fx < 0.7) { swap = true } }        // en una fila: bordes = antes/después, centro = intercambiar
+    else if (fx < 0.22 || fx > 0.78) { side = true; after = fx > 0.5 }                                           // bordes de un bloque ancho: lado a lado
+    else if (fy > 0.3 && fy < 0.7 && ok) { side = false; after = false; swap = true }                              // centro: intercambiar
+    else { side = false; after = fy > 0.5 }                                                                       // arriba / abajo
+    dropAt = { kind: 'block', to, after, side, swap }
+    if (swap) {
+      hint('Intercambiar ⇄')
+      Object.assign(drop.style, { display: 'block', left: r.l - 4 + 'px', top: r.t - 4 + 'px', width: r.w + 8 + 'px', height: r.h + 8 + 'px', background: 'rgba(232,113,26,.14)', border: '3px dashed #E8711A', borderRadius: '12px', boxShadow: 'none' })
+      return
+    }
+    Object.assign(drop.style, { background: '#E8711A', border: '0', borderRadius: '3px', boxShadow: '' })
     hint(side ? (after ? 'Al lado ▶' : '◀ Al lado') : (after ? 'Debajo' : 'Arriba'))
     Object.assign(drop.style, side
       ? { display: 'block', top: r.t + 'px', height: r.h + 'px', left: (after ? r.l + r.w + 2 : r.l - 8) + 'px', width: '7px' }
@@ -395,6 +403,13 @@ export function attach(doc: Document, h: Host) {
       h.put(setAt(d1, tl, dst)); h.select(tl + '.' + (dst.length - 1))
       if (name) h.toast('Movida a «' + name + '»')
       return
+    }
+    if (at.swap) {
+      const A = getAt(d0, from), B = getAt(d0, at.to)
+      if (lockedAt(d0, from) || lockedAt(d0, at.to) || at.to.startsWith(from + '.') || from.startsWith(at.to + '.')) { h.toast('No se pueden intercambiar esas casillas'); return }
+      let d = setAt(d0, from, { ...B, span: A.span || 'full' })       // cada hueco conserva su ancho
+      d = setAt(d, at.to, { ...A, span: B.span || 'full' })
+      h.put(d); h.select(at.to); h.toast('Casillas intercambiadas'); return
     }
     const tt = getAt(d0, at.to)
     const r = listOps.moveTo(d0, from, at.to, at.after)
