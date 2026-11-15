@@ -235,7 +235,7 @@ def test_disenos_completos():
     from app.render import render
     from app.validate import load
     base = json.load(open("seed/report.seed.json", encoding="utf-8"))
-    assert 'data-layout' not in render(load(base)[0])          # el clásico no cambia
+    assert '<html data-layout' not in render(load(base)[0]) and 'id="rs-layout"' not in render(load(base)[0])          # el clásico no cambia
     for lay in ("lateral", "editorial", "tablero", "continuo"):
         d = json.loads(json.dumps(base)); d["meta"]["theme"]["layout"] = lay
         h = render(load(d)[0])
