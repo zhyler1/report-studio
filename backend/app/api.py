@@ -178,6 +178,25 @@ def list_reports(s: Store = Depends(get_store)):
 _MEDIA_ANY = re.compile(r'/media/([A-Za-z0-9_.-]+)')
 
 
+@router.get("/starters")
+def starters():
+    from .starters import STARTERS
+    return [{"id": x["id"], "name": x["name"], "desc": x["desc"]} for x in STARTERS]
+
+
+@router.post("/reports/from-starter/{sid}", status_code=201)
+def report_from_starter(sid: str, user=Depends(guard), s: Store = Depends(get_store)):
+    """Crea un informe nuevo desde un punto de partida en blanco (sin textos de ninguna área)."""
+    from .starters import STARTERS
+    auth.require_admin(user)
+    st = next((x for x in STARTERS if x["id"] == sid), None)
+    if not st:
+        raise HTTPException(404, "No existe ese punto de partida")
+    rep = _valid(st["data"])
+    rid = s.create(rep.model_dump(mode="json"), "Versión inicial")
+    return s.get(rid)
+
+
 @router.get("/reports/{rid}/export.rsz")
 def export_pack(rid: int, s: Store = Depends(get_store)):
     """Paquete para llevar el informe a otro computador: el JSON y las imágenes/videos que usa."""

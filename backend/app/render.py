@@ -586,6 +586,8 @@ def js_data(rep: Report) -> dict:
                     "texto": ag.summary, "rows": [], "avances": [[x] for x in ag.progress], "aspectos": [[x] for x in ag.watch], "hitoFecha": ag.milestone_date, "hito": [[x] for x in ag.milestone]}
         if ag.viz != "ring":
             d["ACU"]["vizSpec"] = viz_spec(ag.viz, ag.avg, "")
+    else:  # sin bloque de acuerdo: que no viaje el texto de muestra de la plantilla original
+        d["ACU"] = {"tabla": False, "titulo": "", "corte": "", "prom": 0, "col": "", "texto": "", "rows": [], "avances": [], "aspectos": [], "hitoFecha": "", "hito": []}
     pl = ctx.plants
     if pl:
         d["PER"] = {"plantas": [[p.label, p.provistos, p.vacantes] for p in pl.plants], "procesos": pl.procesos, "procLabel": pl.procesos_label,

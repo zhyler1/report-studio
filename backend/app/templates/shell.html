@@ -810,7 +810,7 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
     if(PER.plantas.length)it.push(['<span class="num" data-to="'+planta+'">'+fmt(planta)+'</span>',X('hero.planta','Planta permanente')]);
     if(PER.procLabel)it.push(['<span class="num" data-to="'+(+PER.procesos||0)+'">'+fmt(+PER.procesos||0)+'</span>',esc(PER.procLabel)]);
     if(PER.posLabel)it.push(['<span class="num" data-to="'+(+PER.posesiones||0)+'">'+fmt(+PER.posesiones||0)+'</span>',X('hero.pos','Posesiones realizadas')]);
-    it.push(['<span class="num">'+pc+'</span>',esc(totLbl())+X('pres.frente',' frente al presupuesto')]);
+    if(bud)it.push(['<span class="num">'+pc+'</span>',esc(totLbl())+X('pres.frente',' frente al presupuesto')]);
     hs.innerHTML=it.map(function(x){return '<div class="hstat">'+x[0]+'<span class="lbl">'+x[1]+'</span></div>'}).join('');
   }
   function renderHomeX(){
@@ -935,7 +935,7 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
     });
   });
   document.querySelectorAll('.fbtn').forEach(function(b){b.addEventListener('click',function(){filt=b.getAttribute('data-f');document.querySelectorAll('.fbtn').forEach(function(x){x.classList.toggle('on',x===b)});renderTb()})});
-  document.getElementById('srch').addEventListener('input',function(e){q=e.target.value.trim().toLowerCase();renderTb()});
+  var srch=document.getElementById('srch');if(srch)srch.addEventListener('input',function(e){q=e.target.value.trim().toLowerCase();renderTb()});
   document.getElementById('themeBtn').addEventListener('click',function(){
     var r=document.documentElement,dark=r.getAttribute('data-theme')?r.getAttribute('data-theme')==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
     r.setAttribute('data-theme',dark?'light':'dark');applyLogo();
@@ -1269,7 +1269,8 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
   try{var pq=(location.search.match(/[?&]portada=(\w+)/)||[])[1];if(pq)intro.setAttribute('data-bg',pq)}catch(e){}
   openIntro();
 
-  renderTb();renderPres();renderDev();renderAcu();renderPer();renderHomeX();renderCal();
+  /* cada bloque se dibuja solo si su panel existe: un informe sin actividades, acuerdo o calendario no debe romper el resto */
+  [renderTb,renderPres,renderDev,renderAcu,renderPer,renderHomeX,renderCal].forEach(function(f){try{f()}catch(e){if(window.console)console.warn('render omitido',e&&e.message)}});
   var h='';try{h=(location.hash||'').replace('#','')}catch(e){}
   show(TABS.indexOf(h)>=0?h:'inicio',false);
   window.addEventListener('hashchange',function(){var x='';try{x=location.hash.replace('#','')}catch(e){}if(TABS.indexOf(x)>=0&&x!==cur)show(x,false)});

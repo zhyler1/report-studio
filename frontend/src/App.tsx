@@ -291,6 +291,9 @@ export default function App() {
     const copy = JSON.parse(JSON.stringify(d))
     const r = await api.create(copy, 'Copia'); await refresh(); setId(r.id); LS.set('id', r.id); loadD(r.data); setSaved(JSON.stringify(r.data))
   }
+  const newPersonal = async () => {
+    try { const r = await api.fromStarter('personal'); await refresh(); setId(r.id); LS.set('id', r.id); loadD(r.data); setSaved(JSON.stringify(r.data)) } catch (x: any) { alert(x.message) }
+  }
   const remove = async () => {
     if (id === null || !confirm('¿Eliminar este informe y todas sus versiones?')) return
     await api.remove(id); LS.del('id'); LS.del('draft.' + id); LS.del('prev'); setId(null); loadD(null); refresh()
@@ -299,6 +302,7 @@ export default function App() {
   return <div className="app">
     <aside className="side"><h1>Report Studio</h1>
       <button className="pri" style={{ width: '100%', marginBottom: 12 }} onClick={create}>{d ? 'Duplicar informe' : 'Nuevo informe'}</button>
+      <button style={{ width: '100%', marginBottom: 12 }} title="Un informe en blanco con portada genérica de la Presidencia, sin textos de ningún área" onClick={newPersonal}>Nueva presentación personal</button>
       <label style={{ cursor: 'pointer' }} title="Abre un paquete .rsz (con sus imágenes) o un JSON suelto">Importar paquete o JSON<input type="file" accept=".rsz,.zip,application/json,.json" style={{ display: 'none' }} onChange={async e => {
         const f = e.target.files?.[0]; if (!f) return
         try { const r = await api.importFile(f); await refresh(); open(r.id) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) }

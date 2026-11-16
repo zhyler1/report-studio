@@ -149,3 +149,19 @@ def test_estilos_de_presentacion_se_aplican():
         rep, issues = load(d); assert rep and not issues
         h = render(rep); assert f'data-look="{lk}"' in h and 'id="rs-look"' in h
     h0 = render(load(base)[0]); assert "data-look" not in h0     # el original no cambia
+
+
+def test_presentacion_personal_sale_en_blanco(tmp_path):
+    from app.validate import load
+    from app.render import render
+    st = Store(str(tmp_path / "s.db"))
+    app.dependency_overrides[get_store] = lambda: st
+    try:
+        c = TestClient(app)
+        assert any(x["id"] == "personal" for x in c.get("/api/starters").json())
+        r = c.post("/api/reports/from-starter/personal"); assert r.status_code == 201
+        h = render(load(r.json()["data"])[0])
+        for palabra in ("Talento", "Procuradur", "Molina", "SIGEPRE", "FondoPaz"):
+            assert palabra not in h, palabra
+        assert c.post("/api/reports/from-starter/no-existe").status_code == 404
+    finally: app.dependency_overrides.clear()
