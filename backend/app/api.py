@@ -79,11 +79,11 @@ def logout():
 @router.get("/me")
 def me(request: Request, s: Store = Depends(get_store)):
     if s.count_users() == 0:
-        return {"open": True, "name": "", "role": "admin", "sections": []}
+        return {"open": True, "name": "", "role": "admin", "sections": [], "modo": MODO}
     u = s.get_user(auth.read_token(request.cookies.get("rs_token")) or "")
     if not u:
         raise HTTPException(401, "Ingresa con tu usuario")
-    return {"open": False, "name": u["name"], "role": u["role"], "sections": u["sections"]}
+    return {"open": False, "name": u["name"], "role": u["role"], "sections": u["sections"], "modo": MODO}
 
 
 @router.get("/users")
@@ -172,6 +172,9 @@ def validate(body: dict[str, Any] = Body(...)):
 
 @router.get("/reports")
 def list_reports(s: Store = Depends(get_store)):
+    if MODO == "personal" and not s.list():   # la herramienta personal siempre arranca con una presentación en blanco
+        from .starters import STARTERS
+        s.create(_valid(STARTERS[0]["data"]).model_dump(mode="json"), "Versión inicial")
     return s.list()
 
 
@@ -467,6 +470,8 @@ def ingest_propose(body: dict[str, Any] = Body(...)):
 
 
 MEDIA_DIR = Path(os.environ.get("RS_MEDIA", "data/media"))
+# RS_MODO=personal: instancia para presentaciones personales (sin datos de oficina): ofrece «Nueva presentación personal» y siempre tiene una en blanco
+MODO = os.environ.get("RS_MODO", "oficina").strip().lower()
 OK_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".mp4", ".webm", ".mov", ".mp3", ".wav", ".m4a", ".ogg"}
 
 

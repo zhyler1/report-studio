@@ -101,7 +101,7 @@ function Versiones({ id, onRestore, refreshKey }: { id: number; onRestore: () =>
     {v.n !== vs[0]?.n && <button onClick={async () => { if (confirm(`¿Restaurar la versión ${v.n}? Se guarda como una versión nueva.`)) { await api.restore(id, v.n); onRestore() } }}>Restaurar</button>}</div>)}</div>
 }
 
-export default function App() {
+export default function App({ servidorPersonal = false }: { servidorPersonal?: boolean }) {
   const [rows, setRows] = useState<ReportRow[]>([])
   const [id, setId] = useState<number | null>(null)
   const [d, setDRaw] = useState<Json | null>(null)
@@ -300,7 +300,7 @@ export default function App() {
   }
 
   // El botón de presentaciones personales solo se ofrece cuando la herramienta se abre desde Nexus (?modo=personal); en localhost directo es la herramienta de oficina.
-  const modoPersonal = (() => { try { if (new URLSearchParams(location.search).get('modo') === 'personal') sessionStorage.setItem('rs.modo', 'personal'); return sessionStorage.getItem('rs.modo') === 'personal' } catch { return false } })()
+  const modoPersonal = servidorPersonal || (() => { try { if (new URLSearchParams(location.search).get('modo') === 'personal') sessionStorage.setItem('rs.modo', 'personal'); return sessionStorage.getItem('rs.modo') === 'personal' } catch { return false } })()
 
   return <div className="app">
     <aside className="side"><h1>Report Studio</h1>

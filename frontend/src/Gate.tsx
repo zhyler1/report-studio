@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import App from './App.tsx'
 
-type Me = { open: boolean; name: string; role: string; sections: string[] }
+type Me = { open: boolean; name: string; role: string; sections: string[]; modo?: string }
 
 /** Pide ingreso solo cuando el servidor ya tiene usuarios; en modo local abre directo. */
 export default function Gate() {
@@ -30,6 +30,6 @@ export default function Gate() {
   return <>
     {!me.open && <div style={{ position: 'fixed', right: 12, bottom: 10, zIndex: 9999, font: '600 12px system-ui', background: '#0f1b33', color: '#fff', padding: '6px 12px', borderRadius: 20 }}>
       {me.name} · {me.role === 'admin' ? 'administrador' : `líder (${me.sections.join(', ') || 'sin secciones'})`} · <a href="#" style={{ color: '#FDC800' }} onClick={e => { e.preventDefault(); out() }}>Salir</a></div>}
-    <App />
+    <App servidorPersonal={me.modo === 'personal'} />
   </>
 }
