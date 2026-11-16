@@ -8,12 +8,13 @@ const strip = (o: Json): Json => {  // casillas nuevas sin id (para que no choqu
 }
 export const cloneBlocks = (sec: Json): Json[] => strip(JSON.parse(JSON.stringify(sec.blocks?.length ? sec.blocks : sec.tabs?.[0]?.blocks || []))) as Json[]
 
-export default function Templates({ current, onAdd, onNew, onClose, flash }: {
+export default function Templates({ current, personal, onAdd, onNew, onClose, flash }: {
+  personal?: boolean   // las plantillas de «Presentaciones personales» solo se ofrecen en presentaciones personales
   current: Json | null   // sección que se está viendo (para guardarla como plantilla)
   onAdd: (blocks: Json[]) => void; onNew: (sec: Json, name: string) => void; onClose: () => void; flash: (m: string) => void
 }) {
   const [list, setList] = useState<Tpl[]>([]); const [name, setName] = useState(''); const [busy, setBusy] = useState(false)
-  const load = () => api.templates().then(setList).catch(e => flash(e.message))
+  const load = () => api.templates().then(l => setList(personal ? l : l.filter(t => t.cat !== 'Presentaciones personales'))).catch(e => flash(e.message))
   useEffect(() => { load() }, [])
   const save = async () => {
     if (!current || !name.trim()) return

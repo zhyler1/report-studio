@@ -76,6 +76,7 @@ const TABS: [RibTab, string][] = [['inicio', 'Inicio'], ['insertar', 'Insertar']
 export default function Ribbon(p: RibProps) {
   const { d, setD, sel, rib, setRib } = p
   const th = d.meta.theme
+  const esPersonal = !!d.meta.personal || (th.look && th.look !== 'institucional')   // los estilos personales solo aparecen en presentaciones personales
   const setTh = (patch: Json) => setD(setAt(d, 'meta.theme', { ...th, ...patch }))
   const b = sel ? getAt(d, sel) : null
   const putB = (patch: Json) => sel && setD(setAt(d, sel, { ...b, ...patch }))
@@ -109,12 +110,12 @@ export default function Ribbon(p: RibProps) {
       {rib === 'diseno' && <>
         <Grp t="Temas"><div className="thl">
           {TEMAS.map(x => <Th key={x.n} n={x.n} d={x.d} t={x.th} on={same(x.th)} />)}</div></Grp>
-        <Grp t="Presentaciones personales"><div className="thl">
-          {TEMAS_PERSONALES.map(x => <Th key={x.n} n={x.n} d={x.d} t={x.th} on={same(x.th)} />)}</div></Grp>
+        {esPersonal && <Grp t="Presentaciones personales"><div className="thl">
+          {TEMAS_PERSONALES.map(x => <Th key={x.n} n={x.n} d={x.d} t={x.th} on={same(x.th)} />)}</div></Grp>}
         <Grp t="Mis temas"><div className="thl">
           {temas.map((x, i) => <Th key={'u' + i} n={x.n} t={x.th} on={same(x.th)} del={() => saveTemas(temas.filter((_, j) => j !== i))} />)}
           <button className="thc add" title="Guarda paleta, colores, fuente y portada actuales como tema propio" onClick={() => { const n = window.prompt('Nombre del tema'); if (n && n.trim()) saveTemas([...temas.filter(x => x.n !== n.trim()), { n: n.trim(), th: cur }]) }}><Ic n="plus" /><b>Guardar tema</b></button></div></Grp>
-        <Grp t="Diseño de la plantilla"><div className="fld"><label>Estilo</label><select value={th.look || 'institucional'} onChange={e => setTh({ look: e.target.value })}>{ESTILOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div><div className="fld"><label>Estructura</label><select value={th.layout || 'clasico'} onChange={e => setTh({ layout: e.target.value })}>{DISENOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>
+        <Grp t="Diseño de la plantilla">{esPersonal && <div className="fld"><label>Estilo</label><select value={th.look || 'institucional'} onChange={e => setTh({ look: e.target.value })}>{ESTILOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>}<div className="fld"><label>Estructura</label><select value={th.layout || 'clasico'} onChange={e => setTh({ layout: e.target.value })}>{DISENOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>
         <Grp t="Portada"><div className="fld"><label>Animación</label><select value={th.cover} onChange={e => setTh({ cover: e.target.value })}>{PORTADAS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>
         <Grp t="Colores"><div className="pals">{PALETAS.map(x => <button key={x.k} className={'pal' + (th.palette === x.k && !th.primary && !th.accent ? ' on' : '')} title={x.n} onClick={() => setTh({ palette: x.k, primary: '', accent: '' })}>
           <span className="sws">{x.c.map(c => <i key={c} style={{ background: c }} />)}</span><small>{x.n}</small></button>)}</div>
