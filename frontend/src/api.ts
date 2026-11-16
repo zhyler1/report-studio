@@ -1,6 +1,6 @@
 export type Json = Record<string, any>
 export type ReportRow = { id: number; title: string; updated: string; version: number }
-export type Tpl = { id: string; name: string; desc?: string; builtin: boolean; section: Json }
+export type Tpl = { id: string; name: string; desc?: string; cat?: string; builtin: boolean; section: Json }
 export type Version = { n: number; created: string; note: string }
 
 async function req(url: string, init?: RequestInit) {

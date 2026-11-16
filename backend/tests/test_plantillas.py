@@ -128,3 +128,13 @@ def test_traer_imagen_desde_enlace(tmp_path, monkeypatch):
     assert c.post("/api/media/url", json={"url": base + "/x.txt"}).status_code == 415   # no es imagen
     assert c.post("/api/media/url", json={"url": "ftp://x/y.png"}).status_code == 400
     srv.shutdown()
+
+
+def test_plantillas_incluidas_se_dibujan_dentro_de_un_informe():
+    from app.validate import load
+    from app.render import render
+    base = json.load(open(__file__.rsplit("/backend/", 1)[0] + "/seed/report.seed.json"))
+    for t in BUILTIN:
+        d = json.loads(json.dumps(base)); d["sections"].append({"id": "nueva", "label": "N", "title": "N", **t["section"]})
+        rep, issues = load(d); assert rep and not issues, (t["id"], issues)
+        assert len(render(rep)) > 1000
