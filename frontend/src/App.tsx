@@ -299,10 +299,13 @@ export default function App() {
     await api.remove(id); LS.del('id'); LS.del('draft.' + id); LS.del('prev'); setId(null); loadD(null); refresh()
   }
 
+  // El botón de presentaciones personales solo se ofrece cuando la herramienta se abre desde Nexus (?modo=personal); en localhost directo es la herramienta de oficina.
+  const modoPersonal = (() => { try { if (new URLSearchParams(location.search).get('modo') === 'personal') sessionStorage.setItem('rs.modo', 'personal'); return sessionStorage.getItem('rs.modo') === 'personal' } catch { return false } })()
+
   return <div className="app">
     <aside className="side"><h1>Report Studio</h1>
       <button className="pri" style={{ width: '100%', marginBottom: 12 }} onClick={create}>{d ? 'Duplicar informe' : 'Nuevo informe'}</button>
-      <button style={{ width: '100%', marginBottom: 12 }} title="Un informe en blanco con portada genérica de la Presidencia, sin textos de ningún área" onClick={newPersonal}>Nueva presentación personal</button>
+      {modoPersonal && <button style={{ width: '100%', marginBottom: 12 }} title="Un informe en blanco con portada genérica de la Presidencia, sin textos de ningún área" onClick={newPersonal}>Nueva presentación personal</button>}
       <label style={{ cursor: 'pointer' }} title="Abre un paquete .rsz (con sus imágenes) o un JSON suelto">Importar paquete o JSON<input type="file" accept=".rsz,.zip,application/json,.json" style={{ display: 'none' }} onChange={async e => {
         const f = e.target.files?.[0]; if (!f) return
         try { const r = await api.importFile(f); await refresh(); open(r.id) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) }
