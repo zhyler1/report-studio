@@ -462,6 +462,7 @@ class Alert(Base):
 class Theme(Base):
     default: Literal["light", "dark"] = "light"
     layout: Literal["clasico", "lateral", "editorial", "tablero", "continuo"] = "clasico"   # diseño completo: menú, disposición y densidad
+    look: Literal["institucional", "aire", "vidrio", "audaz", "suave", "revista"] = "institucional"   # estilo de las casillas, títulos y fondo
     cover: Literal["foto", "clasica", "aurora", "ondas", "malla"] = "foto"   # animación de portada; "foto" = la original
     palace_url: str = ""
     logo_dark: str = ""

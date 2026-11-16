@@ -138,3 +138,14 @@ def test_plantillas_incluidas_se_dibujan_dentro_de_un_informe():
         d = json.loads(json.dumps(base)); d["sections"].append({"id": "nueva", "label": "N", "title": "N", **t["section"]})
         rep, issues = load(d); assert rep and not issues, (t["id"], issues)
         assert len(render(rep)) > 1000
+
+
+def test_estilos_de_presentacion_se_aplican():
+    from app.validate import load
+    from app.render import render
+    base = json.load(open(__file__.rsplit("/backend/", 1)[0] + "/seed/report.seed.json"))
+    for lk in ("aire", "vidrio", "audaz", "suave", "revista"):
+        d = json.loads(json.dumps(base)); d["meta"]["theme"]["look"] = lk
+        rep, issues = load(d); assert rep and not issues
+        h = render(rep); assert f'data-look="{lk}"' in h and 'id="rs-look"' in h
+    h0 = render(load(base)[0]); assert "data-look" not in h0     # el original no cambia

@@ -687,6 +687,9 @@ def render(rep: Report, edit: bool = False) -> str:
     for name, v in js_data(rep).items():
         out = re.sub(r"/\*@%s\*/.*?/\*@/%s\*/" % (name, name), lambda _m, n=name, j=_json(v): f"/*@{n}*/{j}/*@/{n}*/", out, flags=re.S)
     out = out.replace("</head>", "<style id=\"rs-mobile\">" + (SHELL.parent / "mobile.css").read_text(encoding="utf-8") + "</style></head>", 1)
+    if m.theme.look != "institucional":
+        out = out.replace("<html ", f'<html data-look="{m.theme.look}" ', 1)
+        out = out.replace("</head>", "<style id=\"rs-look\">" + (SHELL.parent / "looks.css").read_text(encoding="utf-8") + "</style></head>", 1)
     if m.theme.layout != "clasico":
         out = out.replace("<html ", f'<html data-layout="{m.theme.layout}" ', 1)
         out = out.replace("</head>", "<style id=\"rs-layout\">" + (SHELL.parent / "layouts.css").read_text(encoding="utf-8") + "</style></head>", 1)

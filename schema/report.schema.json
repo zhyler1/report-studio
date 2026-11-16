@@ -2170,6 +2170,7 @@
      "default": {
       "default": "light",
       "layout": "clasico",
+      "look": "institucional",
       "cover": "foto",
       "palace_url": "",
       "logo_dark": "",
@@ -4212,6 +4213,19 @@
       "continuo"
      ],
      "title": "Layout",
+     "type": "string"
+    },
+    "look": {
+     "default": "institucional",
+     "enum": [
+      "institucional",
+      "aire",
+      "vidrio",
+      "audaz",
+      "suave",
+      "revista"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "cover": {

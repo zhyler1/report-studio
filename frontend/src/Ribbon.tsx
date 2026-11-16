@@ -14,9 +14,10 @@ export const PALETAS: { k: string; n: string; c: [string, string, string] }[] = 
 const FUENTES: [string, string][] = [['public', 'Public Sans (original)'], ['sistema', 'Sistema'], ['georgia', 'Georgia (con serifa)'], ['verdana', 'Verdana'], ['trebuchet', 'Trebuchet'], ['mono', 'Monoespaciada']]
 const ANCHOS: [string, string][] = [['full', 'Ancho completo'], ['1/2', 'Mitad (1/2)'], ['1/3', 'Un tercio (1/3)'], ['2/3', 'Dos tercios (2/3)'], ['1/4', 'Un cuarto (1/4)'], ['3/4', 'Tres cuartos (3/4)']]
 const DISENOS: [string, string][] = [['clasico', 'Clásico: pestañas arriba (original)'], ['lateral', 'Menú lateral fijo'], ['editorial', 'Editorial: estilo revista'], ['tablero', 'Tablero denso'], ['continuo', 'Página continua con menú fijo']]
+const ESTILOS: [string, string][] = [['institucional', 'Institucional (original)'], ['aire', 'Aire: blanco y líneas finas'], ['vidrio', 'Vidrio: cristal sobre luz'], ['audaz', 'Audaz: bordes gruesos y sombra dura'], ['suave', 'Suave: redondeado y pastel'], ['revista', 'Revista: papel y serifa']]
 const PORTADAS: [string, string][] = [['foto', 'Palacio (predeterminada)'], ['clasica', 'Clásica: partículas'], ['aurora', 'Aurora'], ['ondas', 'Ondas'], ['malla', 'Malla 3D']]
 // Tema predeterminado: el original de la plantilla. Los demás son combinaciones completas (paleta + fuente + portada + modo).
-export const TEMA_BASE = { palette: 'presidencia', primary: '', accent: '', font: 'public', cover: 'foto', default: 'light', layout: 'clasico' }
+export const TEMA_BASE = { look: 'institucional', palette: 'presidencia', primary: '', accent: '', font: 'public', cover: 'foto', default: 'light', layout: 'clasico' }
 export const TEMAS: { n: string; d: string; th: Json }[] = [
   { n: 'Predeterminado', d: 'Presidencia · claro · portada con foto', th: TEMA_BASE },
   { n: 'Océano nocturno', d: 'Menú lateral · azul petróleo · oscuro · aurora', th: { palette: 'oceano', primary: '', accent: '', font: 'sistema', cover: 'aurora', default: 'dark' , layout: 'lateral' } },
@@ -25,7 +26,14 @@ export const TEMAS: { n: string; d: string; th: Json }[] = [
   { n: 'Grafito sobrio', d: 'Tablero denso · gris · claro · partículas', th: { palette: 'grafito', primary: '', accent: '', font: 'verdana', cover: 'clasica', default: 'light' , layout: 'tablero' } },
   { n: 'Atardecer creativo', d: 'Violeta y naranja · claro · aurora', th: { palette: 'atardecer', primary: '', accent: '', font: 'public', cover: 'aurora', default: 'light' , layout: 'clasico' } },
 ]
-const TKEYS = ['palette', 'primary', 'accent', 'font', 'cover', 'default', 'layout']
+export const TEMAS_PERSONALES: { n: string; d: string; th: Json }[] = [
+  { n: 'Aire', d: 'Minimalista · blanco · grafito · líneas finas', th: { look: 'aire', palette: 'grafito', primary: '', accent: '', font: 'sistema', cover: 'clasica', default: 'light', layout: 'clasico' } },
+  { n: 'Vidrio', d: 'Cristal sobre luz · azul petróleo · oscuro · aurora · menú lateral', th: { look: 'vidrio', palette: 'oceano', primary: '', accent: '', font: 'sistema', cover: 'aurora', default: 'dark', layout: 'lateral' } },
+  { n: 'Audaz', d: 'Bordes gruesos · violeta y naranja · claro · malla 3D', th: { look: 'audaz', palette: 'atardecer', primary: '', accent: '', font: 'trebuchet', cover: 'malla', default: 'light', layout: 'clasico' } },
+  { n: 'Suave', d: 'Redondeado y pastel · verde · claro · ondas', th: { look: 'suave', palette: 'bosque', primary: '', accent: '', font: 'public', cover: 'ondas', default: 'light', layout: 'clasico' } },
+  { n: 'Revista', d: 'Papel y serifa · granate · claro · estilo editorial', th: { look: 'revista', palette: 'vino', primary: '', accent: '', font: 'georgia', cover: 'clasica', default: 'light', layout: 'editorial' } },
+]
+const TKEYS = ['look', 'palette', 'primary', 'accent', 'font', 'cover', 'default', 'layout']
 const loadTemas = (): { n: string; th: Json }[] => { try { return JSON.parse(localStorage.getItem('rs.themes') || '[]') } catch { return [] } }
 
 // íconos de trazo (24×24)
@@ -100,10 +108,13 @@ export default function Ribbon(p: RibProps) {
       </>}
       {rib === 'diseno' && <>
         <Grp t="Temas"><div className="thl">
-          {TEMAS.map(x => <Th key={x.n} n={x.n} d={x.d} t={x.th} on={same(x.th)} />)}
+          {TEMAS.map(x => <Th key={x.n} n={x.n} d={x.d} t={x.th} on={same(x.th)} />)}</div></Grp>
+        <Grp t="Presentaciones personales"><div className="thl">
+          {TEMAS_PERSONALES.map(x => <Th key={x.n} n={x.n} d={x.d} t={x.th} on={same(x.th)} />)}</div></Grp>
+        <Grp t="Mis temas"><div className="thl">
           {temas.map((x, i) => <Th key={'u' + i} n={x.n} t={x.th} on={same(x.th)} del={() => saveTemas(temas.filter((_, j) => j !== i))} />)}
           <button className="thc add" title="Guarda paleta, colores, fuente y portada actuales como tema propio" onClick={() => { const n = window.prompt('Nombre del tema'); if (n && n.trim()) saveTemas([...temas.filter(x => x.n !== n.trim()), { n: n.trim(), th: cur }]) }}><Ic n="plus" /><b>Guardar tema</b></button></div></Grp>
-        <Grp t="Diseño de la plantilla"><div className="fld"><label>Estructura</label><select value={th.layout || 'clasico'} onChange={e => setTh({ layout: e.target.value })}>{DISENOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>
+        <Grp t="Diseño de la plantilla"><div className="fld"><label>Estilo</label><select value={th.look || 'institucional'} onChange={e => setTh({ look: e.target.value })}>{ESTILOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div><div className="fld"><label>Estructura</label><select value={th.layout || 'clasico'} onChange={e => setTh({ layout: e.target.value })}>{DISENOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>
         <Grp t="Portada"><div className="fld"><label>Animación</label><select value={th.cover} onChange={e => setTh({ cover: e.target.value })}>{PORTADAS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div></Grp>
         <Grp t="Colores"><div className="pals">{PALETAS.map(x => <button key={x.k} className={'pal' + (th.palette === x.k && !th.primary && !th.accent ? ' on' : '')} title={x.n} onClick={() => setTh({ palette: x.k, primary: '', accent: '' })}>
           <span className="sws">{x.c.map(c => <i key={c} style={{ background: c }} />)}</span><small>{x.n}</small></button>)}</div>
