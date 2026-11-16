@@ -26,7 +26,6 @@
       "accent": "",
       "font": "public"
     },
-    "personal": false,
     "show_alerts": false,
     "thresholds": [
       90,

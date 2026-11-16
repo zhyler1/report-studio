@@ -13,7 +13,7 @@ STARTERS: list[dict] = [
                 "org": "Presidencia de la República", "boss_role": "", "boss": "",
                 "tagline": "Presidencia de la República · Presentación",
                 "hero_kicker": "PRESIDENCIA DE LA REPÚBLICA", "hero_title": "Contenido", "hero_text": "Elige una sección para verla.",
-                "footer": "www.presidencia.gov.co", "share_url": "", "personal": True,
+                "footer": "www.presidencia.gov.co", "share_url": "",
                 "theme": {"look": "aire", "palette": "presidencia", "font": "sistema", "cover": "clasica", "default": "light", "layout": "clasico",
                           "intro_word": "Presentación",
                           "logo_dark": "https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/LOGO%20BLANCO.png",

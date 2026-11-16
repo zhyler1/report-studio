@@ -329,7 +329,7 @@ export default function App() {
           {drawer === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}
         </div>}
       </div>
-      {tpl && <Templates personal={!!d.meta.personal || (d.meta.theme.look && d.meta.theme.look !== 'institucional')} current={tpl.si >= 0 ? d.sections[tpl.si] : null} flash={flash} onClose={() => setTpl(null)}
+      {tpl && <Templates current={tpl.si >= 0 ? d.sections[tpl.si] : null} flash={flash} onClose={() => setTpl(null)}
         onAdd={blocks => { const si = tpl.si >= 0 ? tpl.si : 0; addLoaded(si, blocks) }} onNew={newSection} />}
       {picker && <div className="modal" onClick={() => setPicker(null)}><div className="modal-b" onClick={e => e.stopPropagation()}>
         <h2 style={{ marginTop: 0 }}>¿Qué quieres poner aquí?</h2>

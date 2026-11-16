@@ -2182,11 +2182,6 @@
       "font": "public"
      }
     },
-    "personal": {
-     "default": false,
-     "title": "Personal",
-     "type": "boolean"
-    },
     "show_alerts": {
      "default": false,
      "title": "Show Alerts",
