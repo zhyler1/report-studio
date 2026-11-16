@@ -20,11 +20,11 @@ const PORTADAS: [string, string][] = [['foto', 'Palacio (predeterminada)'], ['cl
 export const TEMA_BASE = { look: 'institucional', palette: 'presidencia', primary: '', accent: '', font: 'public', cover: 'foto', default: 'light', layout: 'clasico' }
 export const TEMAS: { n: string; d: string; th: Json }[] = [
   { n: 'Predeterminado', d: 'Presidencia · claro · portada con foto', th: TEMA_BASE },
-  { n: 'Océano nocturno', d: 'Menú lateral · azul petróleo · oscuro · aurora', th: { palette: 'oceano', primary: '', accent: '', font: 'sistema', cover: 'aurora', default: 'dark' , layout: 'lateral' } },
-  { n: 'Bosque institucional', d: 'Estilo revista · verde · claro · ondas', th: { palette: 'bosque', primary: '', accent: '', font: 'georgia', cover: 'ondas', default: 'light' , layout: 'editorial' } },
-  { n: 'Vino ejecutivo', d: 'Página continua · granate · oscuro · malla 3D', th: { palette: 'vino', primary: '', accent: '', font: 'trebuchet', cover: 'malla', default: 'dark' , layout: 'continuo' } },
-  { n: 'Grafito sobrio', d: 'Tablero denso · gris · claro · partículas', th: { palette: 'grafito', primary: '', accent: '', font: 'verdana', cover: 'clasica', default: 'light' , layout: 'tablero' } },
-  { n: 'Atardecer creativo', d: 'Violeta y naranja · claro · aurora', th: { palette: 'atardecer', primary: '', accent: '', font: 'public', cover: 'aurora', default: 'light' , layout: 'clasico' } },
+  { n: 'Océano nocturno', d: 'Menú lateral · azul petróleo · oscuro · aurora', th: { look: 'institucional', palette: 'oceano', primary: '', accent: '', font: 'sistema', cover: 'aurora', default: 'dark' , layout: 'lateral' } },
+  { n: 'Bosque institucional', d: 'Estilo revista · verde · claro · ondas', th: { look: 'institucional', palette: 'bosque', primary: '', accent: '', font: 'georgia', cover: 'ondas', default: 'light' , layout: 'editorial' } },
+  { n: 'Vino ejecutivo', d: 'Página continua · granate · oscuro · malla 3D', th: { look: 'institucional', palette: 'vino', primary: '', accent: '', font: 'trebuchet', cover: 'malla', default: 'dark' , layout: 'continuo' } },
+  { n: 'Grafito sobrio', d: 'Tablero denso · gris · claro · partículas', th: { look: 'institucional', palette: 'grafito', primary: '', accent: '', font: 'verdana', cover: 'clasica', default: 'light' , layout: 'tablero' } },
+  { n: 'Atardecer creativo', d: 'Violeta y naranja · claro · aurora', th: { look: 'institucional', palette: 'atardecer', primary: '', accent: '', font: 'public', cover: 'aurora', default: 'light' , layout: 'clasico' } },
 ]
 export const TEMAS_PERSONALES: { n: string; d: string; th: Json }[] = [
   { n: 'Aire', d: 'Minimalista · blanco · grafito · líneas finas', th: { look: 'aire', palette: 'grafito', primary: '', accent: '', font: 'sistema', cover: 'clasica', default: 'light', layout: 'clasico' } },
