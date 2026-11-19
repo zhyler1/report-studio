@@ -109,7 +109,7 @@ def embedded_report(name: str, data: bytes) -> dict | None:
 # ───────────── lectura básica (sin IA) ─────────────
 # Encabezados de la guía de la reunión → estilo de lista
 GUIA = [
-    (r"alertas? (nuevas?|emergentes?)|riesgos?|alertas?", "warn", "Alertas y riesgos"),
+    (r"(?:seguimiento\s+(?:a\s+)?(?:las?\s+)?)?(?:alertas?\s+(?:nuevas?|emergentes?)|riesgos?|alertas?)", "warn", "Alertas y riesgos"),
     (r"requerimientos?|decisiones|apoyo requerido|necesidades", "warn", "Requerimientos y decisiones"),
     (r"compromisos?|pr[oó]ximos?|pendientes? prioritarios?", "checks", "Compromisos próximos"),
     (r"logros?|resultados?|avances?|estado general|acciones? de gesti[oó]n|procesos generales", "checks", "Estado general y logros"),
@@ -132,7 +132,7 @@ def _guide_blocks(plain: str) -> list[dict]:
         if head:
             cur = {"title": head[2].title() if head[2].isupper() else head[2], "style": head[1], "items": []}
             sections.append(cur)
-        elif cur is not None and len(l) > 25:
+        elif cur is not None and len(l) > 25 and not re.match(r"^\s*[^:\d]{4,80}?\s*[:\-–]\s*(\$?\s*[\d.,]+\s*%?)\s*$", l):   # las líneas «Nombre: valor» ya van a las cifras destacadas
             cur["items"].append(re.sub(r"^\s*[-•*▪●·]\s*|^\s*\d+[.)]\s+", "", l))
     return [{"type": "card_list", "title": c["title"], "style": c["style"], "items": c["items"][:30]} for c in sections if len(c["items"]) >= 1]
 
