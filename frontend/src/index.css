@@ -104,4 +104,8 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px;text-
 .item:hover .itdel,.item .itdel:focus-visible{opacity:1}.item .itdel:hover{background:#FDE8E8;color:#C62828}
 @media (hover:none){.item .itdel{opacity:1}}
 .item{padding-right:34px}
+.item .itedit{position:absolute;top:6px;right:32px;width:24px;height:24px;padding:0;border:0;border-radius:6px;background:transparent;color:#9AA3B5;font-size:13px;line-height:1;cursor:pointer;opacity:0}
+.item:hover .itedit,.item .itedit:focus-visible{opacity:1}.item .itedit:hover{background:#E6EEF9;color:#1F5FAF}
+@media (hover:none){.item .itedit{opacity:1}}
+.item{padding-right:60px}
 .item .itren{width:100%;font:inherit;font-weight:700;padding:3px 6px;border:1px solid var(--pri,#1F5FAF);border-radius:6px;background:#fff;color:inherit}

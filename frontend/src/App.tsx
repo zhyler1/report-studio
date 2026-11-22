@@ -102,7 +102,7 @@ function Versiones({ id, onRestore, refreshKey }: { id: number; onRestore: () =>
     {v.n !== vs[0]?.n && <button onClick={async () => { if (confirm(`¿Restaurar la versión ${v.n}? Se guarda como una versión nueva.`)) { await api.restore(id, v.n); onRestore() } }}>Restaurar</button>}</div>)}</div>
 }
 
-export default function App({ servidorPersonal = false, esAdmin = true }: { servidorPersonal?: boolean; esAdmin?: boolean }) {
+export default function App({ esAdmin = true }: { servidorPersonal?: boolean; esAdmin?: boolean }) {
   const [rows, setRows] = useState<ReportRow[]>([])
   const [id, setId] = useState<number | null>(null)
   const [d, setDRaw] = useState<Json | null>(null)
@@ -296,6 +296,8 @@ export default function App({ servidorPersonal = false, esAdmin = true }: { serv
     try { const r = await api.fromStarter('personal'); await refresh(); setId(r.id); LS.set('id', r.id); loadD(r.data); setSaved(JSON.stringify(r.data)) } catch (x: any) { alert(x.message) }
   }
   const [ren, setRen] = useState<{ id: number; text: string } | null>(null)   // renombrar con doble clic en la barra lateral
+  const renAt = useRef(0)
+  const startRen = (r: { id: number; title: string }) => { renAt.current = Date.now(); setRen({ id: r.id, text: r.title }) }
   const commitRename = async () => {
     if (!ren) return
     const r = ren; setRen(null)
@@ -319,19 +321,17 @@ export default function App({ servidorPersonal = false, esAdmin = true }: { serv
   }
   const remove = async () => { if (id !== null) { const r = rows.find(x => x.id === id); await removeRow(r || { id, title: 'este informe' }) } }
 
-  // El botón de presentaciones personales solo se ofrece cuando la herramienta se abre desde Nexus (?modo=personal); en localhost directo es la herramienta de oficina.
-  const modoPersonal = servidorPersonal || (() => { try { if (new URLSearchParams(location.search).get('modo') === 'personal') sessionStorage.setItem('rs.modo', 'personal'); return sessionStorage.getItem('rs.modo') === 'personal' } catch { return false } })()
 
   return <div className="app">
     <aside className="side"><h1>Report Studio</h1>
-      <button className="pri" style={{ width: '100%', marginBottom: 12 }} onClick={create}>{d ? 'Duplicar informe' : 'Nuevo informe'}</button>
-      {modoPersonal && <button style={{ width: '100%', marginBottom: 12 }} title="Un informe en blanco con portada genérica de la Presidencia, sin textos de ningún área" onClick={newPersonal}>Nueva presentación personal</button>}
+      <button className="pri" style={{ width: '100%', marginBottom: 8 }} title="Un informe en blanco con portada genérica, sin textos de ningún área" onClick={newPersonal}>＋ Nuevo informe</button>
+      {d && <button style={{ width: '100%', marginBottom: 12 }} title="Copia el informe que tienes abierto" onClick={create}>Duplicar informe</button>}
       <label style={{ cursor: 'pointer' }} title="Abre un paquete .rsz (con sus imágenes) o un JSON suelto">Importar paquete o JSON<input type="file" accept=".rsz,.zip,application/json,.json" style={{ display: 'none' }} onChange={async e => {
         const f = e.target.files?.[0]; if (!f) return
         try { const r = await api.importFile(f); await refresh(); open(r.id) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) }
         e.target.value = ''
       }} /></label>
-      {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={e => { if (e.detail < 2 && ren?.id !== r.id) open(r.id) }} onDoubleClick={() => setRen({ id: r.id, text: r.title })} title="Doble clic para cambiar el nombre"><button className="itdel" title="Eliminar este informe" aria-label={'Eliminar ' + r.title} onClick={e => { e.stopPropagation(); removeRow(r) }}>✕</button>{ren?.id === r.id ? <input className="itren" autoFocus value={ren.text} onClick={e => e.stopPropagation()} onChange={e => setRen({ id: r.id, text: e.target.value })} onFocus={e => e.target.select()} onBlur={commitRename} onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setRen(null) }} /> : r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
+      {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={e => { if (e.detail < 2 && ren?.id !== r.id) open(r.id) }} onDoubleClick={() => startRen(r)} title="Doble clic para cambiar el nombre"><button className="itedit" title="Cambiar el nombre" aria-label={'Renombrar ' + r.title} onClick={e => { e.stopPropagation(); startRen(r) }}>✎</button><button className="itdel" title="Eliminar este informe" aria-label={'Eliminar ' + r.title} onClick={e => { e.stopPropagation(); removeRow(r) }}>✕</button>{ren?.id === r.id ? <input className="itren" autoFocus value={ren.text} onClick={e => e.stopPropagation()} onChange={e => setRen({ id: r.id, text: e.target.value })} onFocus={e => e.target.select()} onBlur={() => { if (Date.now() - renAt.current > 400) commitRename() }} onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setRen(null) }} /> : r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
       {!rows.length && <p className="mut">Aún no hay informes. Importa el JSON del seed para empezar.</p>}
     </aside>
     {ready && d && id !== null ? <div className="main2">
