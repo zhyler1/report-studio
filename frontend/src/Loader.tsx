@@ -9,14 +9,15 @@ const brief = (b: Json): string => {
 }
 
 export default function Loader({ sections, defSection, onAdd, onOpenReport, onClose }: {
-  sections: { label: string }[]; defSection: number
-  onAdd: (si: number, blocks: Json[]) => void; onOpenReport: (d: Json) => void; onClose: () => void
+  sections: { label: string; tabs?: { label?: string }[] }[]; defSection: number
+  onAdd: (si: number, blocks: Json[], ti?: number) => void; onOpenReport: (d: Json) => void; onClose: () => void
 }) {
   const [engine, setEngine] = useState<string | null | undefined>(undefined)
   const [text, setText] = useState('')
   const [name, setName] = useState('')
   const [hint, setHint] = useState('')
   const [si, setSi] = useState(defSection)
+  const [ti, setTi] = useState(0)   // pestaña interna de la sección (p. ej. Bienestar: Actividades, Calendario…)
   const [busy, setBusy] = useState('')
   const [err, setErr] = useState('')
   const [res, setRes] = useState<{ blocks: Json[]; issues: string[] } | null>(null)
@@ -48,7 +49,8 @@ export default function Loader({ sections, defSection, onAdd, onOpenReport, onCl
       <textarea style={{ minHeight: 140 }} value={text} onChange={e => setText(e.target.value)} placeholder="Pega aquí el contenido del informe del grupo…" />
       <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <label className="mut">Agregar a la sección</label>
-        <select style={{ width: 'auto' }} value={si} onChange={e => setSi(Number(e.target.value))}>{sections.map((s, i) => <option key={i} value={i}>{s.label}</option>)}</select>
+        <select style={{ width: 'auto' }} value={si} onChange={e => { setSi(Number(e.target.value)); setTi(0) }}>{sections.map((s, i) => <option key={i} value={i}>{s.label}</option>)}</select>
+        {!!sections[si]?.tabs?.length && <><label className="mut">en la pestaña</label><select style={{ width: 'auto' }} value={ti} onChange={e => setTi(Number(e.target.value))}>{sections[si].tabs!.map((t, i) => <option key={i} value={i}>{t.label || 'Pestaña ' + (i + 1)}</option>)}</select></>}
         <input style={{ flex: 1, minWidth: 180 }} value={hint} onChange={e => setHint(e.target.value)} placeholder="¿De qué trata? (opcional, ayuda a la IA)" />
       </div>
       {err && <div className="issues" style={{ marginTop: 10 }}>{err}</div>}
@@ -60,7 +62,7 @@ export default function Loader({ sections, defSection, onAdd, onOpenReport, onCl
       {res.blocks.map((b, i) => <label key={i} className="sub-card" style={{ display: 'flex', gap: 10, padding: 10, alignItems: 'center', cursor: 'pointer' }}>
         <input type="checkbox" style={{ width: 'auto' }} checked={ok[i]} onChange={e => setOk(ok.map((x, j) => (j === i ? e.target.checked : x)))} />
         <span><b>{BLOCK[b.type] || b.type}</b><br /><span className="mut">{brief(b)}</span></span></label>)}
-      <div style={{ textAlign: 'right', marginTop: 12 }}><button onClick={() => setRes(null)}>← Volver</button> <button className="pri" disabled={!chosen.length} onClick={() => onAdd(si, chosen)}>Agregar {chosen.length} casilla{chosen.length === 1 ? '' : 's'} a «{sections[si]?.label}»</button></div>
+      <div style={{ textAlign: 'right', marginTop: 12 }}><button onClick={() => setRes(null)}>← Volver</button> <button className="pri" disabled={!chosen.length} onClick={() => onAdd(si, chosen, ti)}>Agregar {chosen.length} casilla{chosen.length === 1 ? '' : 's'} a «{sections[si]?.label}»</button></div>
     </>}
   </div></div>
 }

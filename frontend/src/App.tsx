@@ -262,10 +262,10 @@ export default function App({ servidorPersonal = false }: { servidorPersonal?: b
     setD({ ...dd, sections: [...dd.sections, { ...sec, id: nid, label, home, hidden: false }] })
     flash('Sección «' + label + '» creada, con su tarjeta en Inicio · cambia el nombre en Datos › Secciones'); goAfter.current = nid
   }
-  const addLoaded = (si: number, blocks: Json[]) => {
+  const addLoaded = (si: number, blocks: Json[], ti = 0) => {
     const dd = dRef.current; if (!dd) return
     const s = dd.sections[si]
-    const list = s.tabs?.length ? `sections.${si}.tabs.0.blocks` : `sections.${si}.blocks`
+    const list = s.tabs?.length ? `sections.${si}.tabs.${Math.min(ti, s.tabs.length - 1)}.blocks` : `sections.${si}.blocks`
     const at = (getAt(dd, list) || []).length
     setD(blocks.reduce((acc, b, k) => listOps.insert(acc, list, at + k, b), dd)); setLoader(null)
     goPreview(s.id); select(list + '.' + at)
