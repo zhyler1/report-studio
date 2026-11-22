@@ -47,8 +47,20 @@ def money_int(s: str) -> int:
     return int(d) if d else 0
 
 
+def pct_num(v):
+    """Número 0–100 desde 80, 80.5, «80 %» o «80,5%»; None si no hay un valor numérico."""
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, (int, float)):
+        return float(v)
+    m = re.search(r"-?\d+(?:[.,]\d+)?", str(v or ""))
+    return float(m.group().replace(",", ".")) if m else None
+
+
 def semc(p, th=(90, 80, 50)) -> str:
-    p = float(p)
+    p = pct_num(p)
+    if p is None:
+        return RED
     return GREEN if p >= th[0] else YEL if p >= th[1] else ORG if p >= th[2] else RED
 
 
@@ -300,8 +312,12 @@ def r_table(b: Table, ctx: Ctx) -> str:
             if c.format == "pill":
                 cell = f'<span class="tag-v">{esc(v)}</span>'
             elif c.format == "pct_bar":
-                k = semc(v, ctx.th)
-                cell = f'<div class="pc sg-{k}"><div class="bar sg-{k}" style="--w:{float(v):g}%"><i></i></div><b class="sgt">{float(v):g}%</b></div>'
+                n = pct_num(v)
+                if n is None:
+                    cell = "—"
+                else:
+                    k = semc(n, ctx.th)
+                    cell = f'<div class="pc sg-{k}"><div class="bar sg-{k}" style="--w:{n:g}%"><i></i></div><b class="sgt">{n:g}%</b></div>'
             elif c.format == "money" or c.format == "number":
                 cell = esc(v)
             else:
