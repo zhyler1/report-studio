@@ -294,10 +294,14 @@ export default function App({ servidorPersonal = false }: { servidorPersonal?: b
   const newPersonal = async () => {
     try { const r = await api.fromStarter('personal'); await refresh(); setId(r.id); LS.set('id', r.id); loadD(r.data); setSaved(JSON.stringify(r.data)) } catch (x: any) { alert(x.message) }
   }
-  const remove = async () => {
-    if (id === null || !confirm('¿Eliminar este informe y todas sus versiones?')) return
-    await api.remove(id); LS.del('id'); LS.del('draft.' + id); LS.del('prev'); setId(null); loadD(null); refresh()
+  const removeRow = async (r: { id: number; title: string }) => {   // eliminar desde la barra lateral cualquier informe de la lista
+    if (!confirm('¿Eliminar «' + r.title + '» y todas sus versiones? Esto no se puede deshacer.')) return
+    try { await api.remove(r.id) } catch (x: any) { alert(x.message || 'No se pudo eliminar'); return }
+    LS.del('draft.' + r.id)
+    if (r.id === id) { LS.del('id'); LS.del('prev'); setId(null); loadD(null) }
+    refresh()
   }
+  const remove = async () => { if (id !== null) { const r = rows.find(x => x.id === id); await removeRow(r || { id, title: 'este informe' }) } }
 
   // El botón de presentaciones personales solo se ofrece cuando la herramienta se abre desde Nexus (?modo=personal); en localhost directo es la herramienta de oficina.
   const modoPersonal = servidorPersonal || (() => { try { if (new URLSearchParams(location.search).get('modo') === 'personal') sessionStorage.setItem('rs.modo', 'personal'); return sessionStorage.getItem('rs.modo') === 'personal' } catch { return false } })()
@@ -311,7 +315,7 @@ export default function App({ servidorPersonal = false }: { servidorPersonal?: b
         try { const r = await api.importFile(f); await refresh(); open(r.id) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) }
         e.target.value = ''
       }} /></label>
-      {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={() => open(r.id)}>{r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
+      {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={() => open(r.id)}><button className="itdel" title="Eliminar este informe" aria-label={'Eliminar ' + r.title} onClick={e => { e.stopPropagation(); removeRow(r) }}>✕</button>{r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
       {!rows.length && <p className="mut">Aún no hay informes. Importa el JSON del seed para empezar.</p>}
     </aside>
     {ready && d && id !== null ? <div className="main2">
