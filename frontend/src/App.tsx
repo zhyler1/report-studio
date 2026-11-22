@@ -3,6 +3,7 @@ import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './Sch
 import { attach, getAt, setAt, listOps, lockedAt, splitBlock, ungroup, groupNext, parentBlock } from './editLayer'
 import { BLOCK, ICONOS } from './labels'
 import Loader from './Loader'
+import AiSettings from './AiSettings'
 import Templates from './Templates'
 import Ribbon, { type RibTab } from './Ribbon'
 import { STARTERS } from './starters'
@@ -101,7 +102,7 @@ function Versiones({ id, onRestore, refreshKey }: { id: number; onRestore: () =>
     {v.n !== vs[0]?.n && <button onClick={async () => { if (confirm(`¿Restaurar la versión ${v.n}? Se guarda como una versión nueva.`)) { await api.restore(id, v.n); onRestore() } }}>Restaurar</button>}</div>)}</div>
 }
 
-export default function App({ servidorPersonal = false }: { servidorPersonal?: boolean }) {
+export default function App({ servidorPersonal = false, esAdmin = true }: { servidorPersonal?: boolean; esAdmin?: boolean }) {
   const [rows, setRows] = useState<ReportRow[]>([])
   const [id, setId] = useState<number | null>(null)
   const [d, setDRaw] = useState<Json | null>(null)
@@ -320,12 +321,12 @@ export default function App({ servidorPersonal = false }: { servidorPersonal?: b
     </aside>
     {ready && d && id !== null ? <div className="main2">
       <Ribbon d={d} setD={setD} undo={undo} redo={redo} nu={hn.u} nr={hn.r} sel={sel} rib={rib} setRib={setRib} dirty={dirty} blocked={issues.length > 0} msg={msg} id={id} save={save} remove={remove}
-        openDrawer={openDrawer} insert={insert} openTpl={openTpl} op={op} kinds={kinds} />
+        admin={esAdmin} openDrawer={openDrawer} insert={insert} openTpl={openTpl} op={op} kinds={kinds} />
       {issues.length > 0 && <div className="issues" style={{ margin: '6px 12px' }}><b>Avisos (para guardar hay que corregirlos):</b><ul style={{ margin: '4px 0 0', paddingLeft: 18 }}>{issues.map((x, i) => <li key={i}>{x}</li>)}</ul></div>}
       <div className="work">
         <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
         {drawer && <div className="drawer">
-          <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', textos: 'Textos fijos', secciones: 'Secciones', alertas: 'Alertas', json: 'JSON', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
+          <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', textos: 'Textos fijos', secciones: 'Secciones', alertas: 'Alertas', json: 'JSON', ia: 'Motor de IA', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
           {drawer === 'casilla' && (sel && getAt(d, sel) ? <div className="card"><p className="mut" style={{ marginTop: 0 }}>Doble clic sobre cualquier texto de la vista previa para editarlo ahí mismo.</p>
             <BlockForm block={getAt(d, sel)} set={v => setD(setAt(d, sel, v))} /></div> : <div className="card"><p className="mut">Haz clic en una casilla de la vista previa.</p></div>)}
           {drawer === 'general' && <General d={d} set={setD} />}
@@ -333,6 +334,7 @@ export default function App({ servidorPersonal = false }: { servidorPersonal?: b
           {drawer === 'textos' && <Textos d={d} set={setD} />}
           {drawer === 'alertas' && <Alertas d={d} set={setD} />}
           {drawer === 'json' && <JsonEditor d={d} set={setD} />}
+          {drawer === 'ia' && esAdmin && <AiSettings />}
           {drawer === 'versiones' && <Versiones id={id} refreshKey={vk} onRestore={async () => { const r = await api.get(id); setD(r.data); setSaved(JSON.stringify(r.data)); setVk(k => k + 1); refresh() }} />}
         </div>}
       </div>

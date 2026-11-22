@@ -56,7 +56,7 @@ export type RibProps = {
   d: Json; setD: (d: Json) => void; sel: string | null; rib: RibTab; setRib: (t: RibTab) => void
   undo: () => void; redo: () => void; nu: number; nr: number
   dirty: boolean; blocked: boolean; msg: string; id: number
-  save: () => void; remove: () => void; openDrawer: (t: string) => void
+  save: () => void; remove: () => void; admin?: boolean; openDrawer: (t: string) => void
   insert: (type: string, side?: boolean) => void; openTpl: () => void; op: (a: string) => void; kinds: string[]
 }
 
@@ -142,7 +142,7 @@ export default function Ribbon(p: RibProps) {
       {rib === 'datos' && <>
         <Grp t="Informe"><Btn i="info" l="General" onClick={() => p.openDrawer('general')} /><Btn i="layers" l="Secciones" onClick={() => p.openDrawer('secciones')} /><Btn i="type" l="Textos fijos" onClick={() => p.openDrawer('textos')} /></Grp>
         <Grp t="Contenido"><Btn i="alert" l="Alertas" onClick={() => p.openDrawer('alertas')} /></Grp>
-        <Grp t="Avanzado"><Btn i="braces" l="JSON" onClick={() => p.openDrawer('json')} /><Btn i="history" l="Versiones" onClick={() => p.openDrawer('versiones')} /></Grp>
+        <Grp t="Avanzado"><Btn i="braces" l="JSON" onClick={() => p.openDrawer('json')} /><Btn i="history" l="Versiones" onClick={() => p.openDrawer('versiones')} />{p.admin && <Btn i="sliders" l="Motor de IA" title="Clave de la API de Claude para cargar documentos (solo administrador)" onClick={() => p.openDrawer('ia')} />}</Grp>
       </>}
     </div>
   </div>

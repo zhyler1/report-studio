@@ -435,6 +435,56 @@ def fixed_texts():
     return [{"key": k, "default": v[0], "group": v[1]} for k, v in TEXTS.items()]
 
 
+class AiBody(BaseModel):
+    key: str = ""
+    model: str = ""
+
+
+def _mask(k: str) -> str:
+    return (k[:7] + "…" + k[-4:]) if len(k) > 14 else ("…" if k else "")
+
+
+@router.get("/ai")
+def ai_get(user=Depends(guard)):
+    """Estado del motor de IA. Nunca devuelve la clave completa; solo el administrador la ve."""
+    auth.require_admin(user)
+    k, src = llm.api_key()
+    return {"engine": llm.engine(), "source": src, "key_hint": _mask(k), "model": llm.model_name()}
+
+
+@router.put("/ai")
+def ai_put(body: AiBody, user=Depends(guard)):
+    auth.require_admin(user)
+    key = body.key.strip()
+    if not key and not llm.load_settings().get("anthropic_key"):
+        raise HTTPException(422, "Pega la clave de la API")
+    if key and not key.startswith("sk-"):
+        raise HTTPException(422, "La clave debería empezar por sk-")
+    llm.save_settings(key or llm.load_settings().get("anthropic_key", ""), body.model)
+    return ai_get(user)
+
+
+@router.delete("/ai", status_code=204)
+def ai_del(user=Depends(guard)):
+    auth.require_admin(user)
+    llm.clear_settings()
+    return Response(status_code=204)
+
+
+@router.post("/ai/test")
+def ai_test(user=Depends(guard)):
+    """Una llamada mínima para comprobar que la clave y el modelo funcionan."""
+    auth.require_admin(user)
+    if llm.engine() != "anthropic":
+        raise HTTPException(422, "No hay clave de la API configurada")
+    try:
+        llm.complete("Responde solo con la palabra ok.", "ok", max_tokens=10)
+    except Exception as e:
+        msg = str(e).replace(llm.api_key()[0], "***")[:200]
+        raise HTTPException(502, f"No funcionó: {type(e).__name__}: {msg}")
+    return {"ok": True}
+
+
 @router.get("/ingest/status")
 def ingest_status():
     return {"engine": llm.engine(), "formats": sorted(ingest.EXT)}
