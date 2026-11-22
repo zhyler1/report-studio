@@ -9,7 +9,7 @@ const brief = (b: Json): string => {
 }
 
 export default function Loader({ sections, defSection, onAdd, onOpenReport, onClose }: {
-  sections: { label: string; tabs?: { label?: string }[] }[]; defSection: number
+  sections: { id?: string; label: string; tabs?: { label?: string }[] }[]; defSection: number
   onAdd: (si: number, blocks: Json[], ti?: number) => void; onOpenReport: (d: Json) => void; onClose: () => void
 }) {
   const [engine, setEngine] = useState<string | null | undefined>(undefined)
@@ -34,7 +34,7 @@ export default function Loader({ sections, defSection, onAdd, onOpenReport, onCl
   }
   const analyze = async () => {
     setErr(''); setBusy(engine ? 'Analizando con IA… puede tardar un minuto' : 'Leyendo…')
-    try { const r = await api.propose(text, hint); setRes(r); setOk(r.blocks.map(() => true)) } catch (e: any) { setErr(e.message) } finally { setBusy('') }
+    try { const r = await api.propose(text, hint, sections[si]?.id || ''); setRes(r); setOk(r.blocks.map(() => true)) } catch (e: any) { setErr(e.message) } finally { setBusy('') }
   }
   const chosen = res ? res.blocks.filter((_, i) => ok[i]) : []
 

@@ -188,7 +188,32 @@ Responde SOLO con un objeto JSON {"blocks":[...]} sin texto adicional. Reglas:
   {"type":"chart","title":"...","kind":"bar|hbar|line|pie|donut|stacked|area|kpi","labels":["..."],"series":[{"name":"...","values":[1,2]}],"unit":""}
     (solo si el documento trae series numéricas comparables; cada serie con tantos valores como etiquetas)
 - Las tablas del documento aparecen entre [TABLA] y [/TABLA] con columnas separadas por tabulador.
-- Si algo no encaja, déjalo fuera antes que inventarlo."""
+- Si algo no encaja, déjalo fuera antes que inventarlo.
+
+Casillas especiales (úsalas cuando el documento traiga ese contenido; son mejores que una lista genérica):
+  {"type":"plants","plants":[{"label":"Planta Permanente","provistos":586,"vacantes":283}],"procesos":121,"procesos_label":"Procesos de vinculación","posesiones":60,"posesiones_label":"Posesiones realizadas del 14 de octubre al 11 de noviembre","logro":"texto del logro"}
+    (estado de la planta: provistos y vacantes por tipo de planta; procesos y posesiones del periodo)
+  {"type":"table","title":"Alertas y riesgos","columns":[{"key":"codigo","label":"Código","format":"text"},{"key":"estado","label":"Estado","format":"pill"},{"key":"avance","label":"Avance","format":"pct_bar"},{"key":"cierre","label":"Fecha de cierre","format":"text"}],"rows":[{"codigo":"NCR-1359","estado":"Vencida","avance":80,"cierre":"20/11/2026"}]}
+    (seguimiento de alertas: avance es un número de 0 a 100; usa format pct_bar para avances y pill para estados)
+  {"type":"workflow","heading":"Planta transitoria","modal_title":"...","subtitle":"Seguimiento de actividades","teaser":"...","button_label":"Ver detalle ↗","steps":[{"n":1,"title":"paso","owner":"responsable","status":"ejecutado|proceso|espera","times":"","hours":"4","other":""}]}
+    (flujo de pasos con responsable y estado; status solo puede ser ejecutado, proceso o espera)
+  {"type":"callout","heading":"Logro destacado:","text":"..."}  (un logro o resultado central)
+
+Además del JSON de casillas agrega "dudas": lista de textos cortos con lo que dejaste vacío, lo que no estaba claro o lo que el documento no trae (por ejemplo «No hay fecha de cierre para X»). Si no hay dudas, [].
+La respuesta es {"blocks":[...],"dudas":[...]}."""
+
+# Instrucciones propias de cada grupo (de la guía de la reunión de seguimiento). Se agregan al prompt según la sección donde se carga.
+GRUPOS: dict[str, str] = {
+    "personal": "Grupo de Gestión de Personal. Busca: estado de la planta actual (provistos y vacantes por tipo, procesos en trámite), posesiones e ingresos del periodo, riesgos de plantas temporales o necesidades de personal, alertas de OPS, y avance de las alertas vencidas en SIGEPRE (código, estado, avance, fecha de cierre).",
+    "nomina": "Grupo de Nómina. Busca: procesos generales (prestaciones, proyecciones, cierres), radiografía de las coordinaciones, avance de la no conformidad NCR1318, estado de la cartera de recobro de incapacidades y estado de OPS con alerta.",
+    "historias": "Grupo de Historias Laborales. Busca: avance frente a la NCR1312, volumen de historias pendientes, solicitudes recibidas y tiempos de respuesta, riesgos documentales con su plan de contingencia, y estado de OPS - contratos.",
+    "bienestar": "Grupo de Bienestar y Desarrollo. Busca: avances de Presidencia te escucha (socialización con sindicatos PIC y PDB), estado de las actividades pendientes y cronograma de cierre de diciembre, y riesgos por vencimientos o ejecución de actividades programadas.",
+    "sst": "Grupo de Seguridad y Salud en el Trabajo. Busca: estado del SG-SST, cumplimiento del plan anual de trabajo, resultados de inspecciones y acciones correctivas, seguimiento de ARL (casos críticos) y estado de contratos.",
+}
+GUIA_GENERAL = ("Cada diapositiva de seguimiento debe responder: qué alertas tenía el área, qué se ha hecho para gestionarlas, qué resultados concretos se obtuvieron "
+                "y qué apoyo o decisión requiere la dependencia para cerrar los riesgos. Estructura esperada: estado general, seguimiento a alertas y riesgos "
+                "(situación, acciones, avance %, fecha de cierre, riesgo alto/medio/bajo), alertas nuevas, requerimientos y decisiones, y compromisos de 15 a 30 días "
+                "(actividad, responsable, fecha, resultado esperado).")
 
 
 def _json_from(s: str) -> dict:
@@ -198,18 +223,21 @@ def _json_from(s: str) -> dict:
     return json.loads(s[i:j + 1])
 
 
-def propose(text: str, hint: str = "") -> dict:
+def propose(text: str, hint: str = "", section: str = "") -> dict:
     eng = llm.engine()
     if not eng:
         return {"engine": None, "blocks": _validate(basic_blocks(text))[0], "issues": ["Sin motor de IA configurado: lectura básica (tablas, listas y cifras sueltas)."]}
+    system = SYSTEM + "\n\nGuía de la reunión: " + GUIA_GENERAL + (("\n" + GRUPOS[section]) if section in GRUPOS else "")
     user = (f"Contexto adicional: {hint}\n\n" if hint else "") + "DOCUMENTO:\n" + text[:60000]
-    raw = llm.complete(SYSTEM, user)
+    raw = llm.complete(system, user)
     try:
-        items = _json_from(raw).get("blocks", [])
+        data = _json_from(raw)
+        items = data.get("blocks", [])
     except ValueError:
         return {"engine": eng, "blocks": [], "issues": ["La IA no devolvió un JSON válido; intenta de nuevo o usa texto más corto."]}
     blocks, issues = _validate(items)
-    return {"engine": eng, "blocks": blocks, "issues": issues}
+    dudas = [f"Revisar: {d}" for d in (data.get("dudas") or []) if isinstance(d, str) and d.strip()][:15]
+    return {"engine": eng, "blocks": blocks, "issues": dudas + issues}
 
 
 _TA = TypeAdapter(Block)

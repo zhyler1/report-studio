@@ -464,7 +464,7 @@ def ingest_propose(body: dict[str, Any] = Body(...)):
     if len(text) < 10:
         raise HTTPException(400, "No hay texto para analizar")
     try:
-        return ingest.propose(text, str(body.get("hint", "")))
+        return ingest.propose(text, str(body.get("hint", "")), str(body.get("section", "")))
     except Exception as e:
         raise HTTPException(502, f"El motor de IA falló: {type(e).__name__}: {str(e)[:200]}")
 
