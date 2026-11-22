@@ -487,6 +487,7 @@ class Meta(Base):
     footer: str = ""
     share_url: str = ""
     theme: Theme = Theme()
+    name: Optional[str] = None    # nombre en la lista de la barra lateral (si no, «título · subtítulo»); no cambia la portada
     show_alerts: bool = False
     thresholds: tuple[int, int, int] = (90, 80, 50)   # verde, amarillo, naranja; menos = rojo
     texts: dict[str, str] = {}      # rótulos fijos de las casillas especiales que la persona cambió (clave → texto)

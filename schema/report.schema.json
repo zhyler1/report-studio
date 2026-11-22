@@ -2182,6 +2182,18 @@
       "font": "public"
      }
     },
+    "name": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Name"
+    },
     "show_alerts": {
      "default": false,
      "title": "Show Alerts",

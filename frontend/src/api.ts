@@ -23,6 +23,7 @@ export const api = {
   importFile: (f: File) => { const fd = new FormData(); fd.append('file', f); return fetch('/api/reports/import', { method: 'POST', body: fd }).then(async r => { if (!r.ok) { const j = await r.json().catch(() => ({})); throw { message: j.detail?.toString() || 'No se pudo importar', issues: j.issues } } return r.json() }) },
   create: (data: Json, note = '') => req('/api/reports', J({ data, note })).then(r => r.json()),
   save: (id: number, data: Json, note: string) => req(`/api/reports/${id}`, { ...J({ data, note }), method: 'PUT' }).then(r => r.json()),
+  rename: (id: number, name: string) => req(`/api/reports/${id}/name`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name }) }).then(r => r.json()),
   remove: (id: number) => req(`/api/reports/${id}`, { method: 'DELETE' }),
   versions: (id: number): Promise<Version[]> => req(`/api/reports/${id}/versions`).then(r => r.json()),
   restore: (id: number, n: number) => req(`/api/reports/${id}/versions/${n}/restore`, { method: 'POST' }).then(r => r.json()),

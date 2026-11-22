@@ -104,3 +104,4 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px;text-
 .item:hover .itdel,.item .itdel:focus-visible{opacity:1}.item .itdel:hover{background:#FDE8E8;color:#C62828}
 @media (hover:none){.item .itdel{opacity:1}}
 .item{padding-right:34px}
+.item .itren{width:100%;font:inherit;font-weight:700;padding:3px 6px;border:1px solid var(--pri,#1F5FAF);border-radius:6px;background:#fff;color:inherit}

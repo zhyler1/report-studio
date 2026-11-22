@@ -295,6 +295,21 @@ export default function App({ servidorPersonal = false, esAdmin = true }: { serv
   const newPersonal = async () => {
     try { const r = await api.fromStarter('personal'); await refresh(); setId(r.id); LS.set('id', r.id); loadD(r.data); setSaved(JSON.stringify(r.data)) } catch (x: any) { alert(x.message) }
   }
+  const [ren, setRen] = useState<{ id: number; text: string } | null>(null)   // renombrar con doble clic en la barra lateral
+  const commitRename = async () => {
+    if (!ren) return
+    const r = ren; setRen(null)
+    const row = rows.find(x => x.id === r.id); const name = r.text.trim()
+    if (!row || name === row.title) return
+    try {
+      await api.rename(r.id, name)
+      if (r.id === id && d) {   // el informe abierto lleva el nombre nuevo sin marcar cambios pendientes que no existían
+        const put = (j: Json) => { const m = { ...j, meta: { ...j.meta } }; if (name) m.meta.name = name; else delete m.meta.name; return m }
+        setD(put(d)); try { setSaved(JSON.stringify(put(JSON.parse(saved)))) } catch { /* sin base guardada */ }
+      }
+      refresh()
+    } catch (x: any) { alert(x.message || 'No se pudo renombrar') }
+  }
   const removeRow = async (r: { id: number; title: string }) => {   // eliminar desde la barra lateral cualquier informe de la lista
     if (!confirm('¿Eliminar «' + r.title + '» y todas sus versiones? Esto no se puede deshacer.')) return
     try { await api.remove(r.id) } catch (x: any) { alert(x.message || 'No se pudo eliminar'); return }
@@ -316,7 +331,7 @@ export default function App({ servidorPersonal = false, esAdmin = true }: { serv
         try { const r = await api.importFile(f); await refresh(); open(r.id) } catch (x: any) { alert((x.issues || [x.message]).join('\n')) }
         e.target.value = ''
       }} /></label>
-      {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={() => open(r.id)}><button className="itdel" title="Eliminar este informe" aria-label={'Eliminar ' + r.title} onClick={e => { e.stopPropagation(); removeRow(r) }}>✕</button>{r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
+      {rows.map(r => <div key={r.id} className={'item' + (r.id === id ? ' on' : '')} onClick={e => { if (e.detail < 2 && ren?.id !== r.id) open(r.id) }} onDoubleClick={() => setRen({ id: r.id, text: r.title })} title="Doble clic para cambiar el nombre"><button className="itdel" title="Eliminar este informe" aria-label={'Eliminar ' + r.title} onClick={e => { e.stopPropagation(); removeRow(r) }}>✕</button>{ren?.id === r.id ? <input className="itren" autoFocus value={ren.text} onClick={e => e.stopPropagation()} onChange={e => setRen({ id: r.id, text: e.target.value })} onFocus={e => e.target.select()} onBlur={commitRename} onKeyDown={e => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') setRen(null) }} /> : r.title}<small>v{r.version} · {new Date(r.updated).toLocaleDateString('es-CO')}</small></div>)}
       {!rows.length && <p className="mut">Aún no hay informes. Importa el JSON del seed para empezar.</p>}
     </aside>
     {ready && d && id !== null ? <div className="main2">

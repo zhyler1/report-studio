@@ -270,6 +270,24 @@ def update_report(rid: int, body: Save, user=Depends(guard), s: Store = Depends(
     return s.get(rid)
 
 
+class NameBody(BaseModel):
+    name: str = ""
+
+
+@router.patch("/reports/{rid}/name")
+def rename_report(rid: int, body: NameBody, user=Depends(guard), s: Store = Depends(get_store)):
+    """Cambia el nombre con el que aparece en la barra lateral, sin tocar la portada. Vacío = vuelve a «título · subtítulo»."""
+    auth.require_admin(user)
+    data = _get(s, rid)["data"]
+    name = " ".join(body.name.split())[:120]
+    if name:
+        data["meta"]["name"] = name
+    else:
+        data["meta"].pop("name", None)
+    s.update(rid, _valid(data).model_dump(mode="json"), "Renombrado")
+    return s.get(rid)
+
+
 @router.delete("/reports/{rid}", status_code=204)
 def delete_report(rid: int, user=Depends(guard), s: Store = Depends(get_store)):
     auth.require_admin(user)

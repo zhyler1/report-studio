@@ -32,6 +32,8 @@ class Store:
 
     def _title(self, data: dict) -> str:
         m = data.get("meta", {})
+        if (m.get("name") or "").strip():
+            return m["name"].strip()
         return f'{m.get("title", "Informe")} · {m.get("subtitle", "")}'.strip(" ·")
 
     def create(self, data: dict, note: str = "Versión inicial") -> int:
