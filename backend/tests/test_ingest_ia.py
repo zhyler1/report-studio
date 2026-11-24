@@ -147,3 +147,18 @@ def test_tema_de_la_ia_se_conserva_y_no_rompe_el_esquema():
     items = [{"type": "card_list", "title": "A", "style": "plain", "items": ["x"], "tema": "Carrito"}, {"type": "card_list", "title": "B", "style": "plain", "items": ["y"]}]
     ok, issues = ingest._validate(items)
     assert not issues and ok[0]["_tema"] == "Carrito" and "_tema" not in ok[1]
+
+
+def test_inicio_sin_ia_toma_las_primeras_cifras():
+    from app import ingest
+    txt = "Actos administrativos: 64\nPrestaciones sociales: 42\nOtros: 22\nCartera: $59.808.760\n- algo\n"
+    r = ingest.propose(txt)
+    assert r["inicio"] and [x["value"] for x in r["inicio"]["stats"]][:2] == [64, 42] or r["inicio"]["stats"]
+    assert len(r["inicio"]["stats"]) <= 3
+
+
+def test_inicio_de_la_ia_se_sanea():
+    from app import ingest
+    ini = ingest._inicio({"stats": [{"value": 64, "label": "actos"}, {"value": None, "label": "x"}, {"value": "$ 59.808.760", "label": "cartera", "prefix": ""}], "tag": "Al día"}, [])
+    assert [x["value"] for x in ini["stats"]] == [64, "$ 59.808.760"] and ini["tag"] == "Al día"
+    assert ingest._inicio({"stats": []}, []) is None

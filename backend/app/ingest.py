@@ -214,8 +214,10 @@ Casillas especiales (úsalas cuando el documento traiga ese contenido; son mejor
     (flujo de pasos con responsable y estado; status solo puede ser ejecutado, proceso o espera)
   {"type":"callout","heading":"Logro destacado:","text":"..."}  (un logro o resultado central)
 
+Agrega también "inicio": la tarjeta-resumen del grupo para la página de Inicio, con las 2 o 3 cifras más representativas del documento (copiadas tal cual): {"stats":[{"value":64,"label":"actos administrativos en los últimos 15 días","prefix":"","suffix":""}],"tag":""}. value es número o texto corto (por ejemplo "$ 59.808.760"); "tag" es opcional (una frase corta de estado) y puede ir vacío. Si el documento no trae cifras, "inicio":null.
+
 Además del JSON de casillas agrega "dudas": lista de textos cortos con lo que dejaste vacío, lo que no estaba claro o lo que el documento no trae (por ejemplo «No hay fecha de cierre para X»). Si no hay dudas, [].
-La respuesta es {"blocks":[...],"dudas":[...]}."""
+La respuesta es {"blocks":[...],"dudas":[...],"inicio":{...}}."""
 
 # Instrucciones propias de cada grupo (de la guía de la reunión de seguimiento). Se agregan al prompt según la sección donde se carga.
 GRUPOS: dict[str, str] = {
@@ -238,10 +240,27 @@ def _json_from(s: str) -> dict:
     return json.loads(s[i:j + 1])
 
 
+def _inicio(raw, blocks: list[dict]) -> dict | None:
+    """Tarjeta de Inicio del grupo: la que propone la IA o, sin IA, las primeras cifras de la primera casilla de cifras."""
+    stats: list[dict] = []
+    tag = ""
+    if isinstance(raw, dict):
+        tag = str(raw.get("tag") or "").strip()[:80]
+        for x in (raw.get("stats") or [])[:4]:
+            if isinstance(x, dict) and isinstance(x.get("value"), (str, int, float)) and not isinstance(x.get("value"), bool) and str(x.get("label") or "").strip():
+                stats.append({"value": x["value"], "label": str(x["label"]).strip()[:120], "prefix": str(x.get("prefix") or ""), "suffix": str(x.get("suffix") or "")})
+    if not stats:
+        sg = next((b for b in blocks if b.get("type") == "stat_grid"), None)
+        for x in ((sg or {}).get("items") or [])[:3]:
+            stats.append({"value": x.get("value"), "label": x.get("label", ""), "prefix": x.get("prefix", ""), "suffix": x.get("suffix", "")})
+    return {"stats": stats, "tag": tag} if stats else None
+
+
 def propose(text: str, hint: str = "", section: str = "") -> dict:
     eng = llm.engine()
     if not eng:
-        return {"engine": None, "blocks": _validate(basic_blocks(text))[0], "issues": ["Sin motor de IA configurado: lectura básica (tablas, listas y cifras sueltas)."]}
+        ok = _validate(basic_blocks(text))[0]
+        return {"engine": None, "blocks": ok, "inicio": _inicio(None, ok), "issues": ["Sin motor de IA configurado: lectura básica (tablas, listas y cifras sueltas)."]}
     system = SYSTEM + "\n\nGuía de la reunión: " + GUIA_GENERAL + (("\n" + GRUPOS[section]) if section in GRUPOS else "")
     user = (f"Contexto adicional: {hint}\n\n" if hint else "") + "DOCUMENTO:\n" + text[:60000]
     raw = llm.complete(system, user)
@@ -252,7 +271,7 @@ def propose(text: str, hint: str = "", section: str = "") -> dict:
         return {"engine": eng, "blocks": [], "issues": ["La IA no devolvió un JSON válido; intenta de nuevo o usa texto más corto."]}
     blocks, issues = _validate(items)
     dudas = [f"Revisar: {d}" for d in (data.get("dudas") or []) if isinstance(d, str) and d.strip()][:15]
-    return {"engine": eng, "blocks": blocks, "issues": dudas + issues}
+    return {"engine": eng, "blocks": blocks, "inicio": _inicio(data.get("inicio"), blocks), "issues": dudas + issues}
 
 
 _TA = TypeAdapter(Block)
