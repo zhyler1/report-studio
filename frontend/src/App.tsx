@@ -327,6 +327,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     if (dudas.length) setTimeout(() => alert('Quedó cargado. Revisa estos puntos que la IA no pudo resolver:\n\n' + dudas.map(x => '• ' + x.replace(/^Revisar:\s*/i, '')).join('\n')), 300)
     const dd = dRef.current; if (!dd) return
     const s = dd.sections[si]
+    const keep = (b: Json) => ['activities', 'budget', 'calendar'].includes(b.type)   // «reemplazar» no borra los bloques de datos (actividades) ni los que dependen de ellos
     const conHome = (sec: Json): Json => {   // tarjeta-resumen de Inicio con las cifras nuevas (si las cifras actuales son calculadas de una casilla de planta y llega otra, se respetan)
       if (!inicio?.stats?.length) return sec
       const calc = (sec.home?.stats || []).some((x: Json) => x.bind) && blocks.some(b => b.type === 'plants')
@@ -345,7 +346,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
         const { _tema, ...blk } = b; const label = String(_tema || 'General')
         let t = tabs.find(x => norm(x.label) === norm(label))
         if (!t) { let id = slug(label), n = 2; while (tabs.some(x => x.id === id)) id = slug(label) + '-' + n++; t = { id, label, blocks: [] }; tabs.push(t) }
-        if (reemplazar && !limpios.has(t.id)) { t.blocks = []; limpios.add(t.id) }
+        if (reemplazar && !limpios.has(t.id)) { t.blocks = t.blocks.filter(keep); limpios.add(t.id) }
         t.blocks.push(blk)
       })
       setD({ ...dd, sections: dd.sections.map((x: Json, k: number) => k === si ? conHome({ ...x, tabs, blocks: [] }) : x) }); setLoader(null)
@@ -353,7 +354,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     }
     const list = s.tabs?.length ? `sections.${si}.tabs.${Math.min(ti, s.tabs.length - 1)}.blocks` : `sections.${si}.blocks`
     blocks = blocks.map(({ _tema, ...b }) => b)
-    const base = reemplazar ? setAt(dd, list, []) : dd
+    const base = reemplazar ? setAt(dd, list, (getAt(dd, list) || []).filter(keep)) : dd
     const at = (getAt(base, list) || []).length
     const nd = blocks.reduce((acc, b, k) => listOps.insert(acc, list, at + k, b), base)
     setD(inicio?.stats?.length ? { ...nd, sections: nd.sections.map((x: Json, k: number) => k === si ? conHome(x) : x) } : nd); setLoader(null)
