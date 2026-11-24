@@ -129,3 +129,14 @@ def test_solo_el_administrador_ve_o_cambia_la_clave(cli):
     c.post("/api/login", json={"name": "nomina", "password": "secreto2"})
     for r in (c.get("/api/ai"), c.put("/api/ai", json={"key": "sk-otra-clave-0000000"}), c.delete("/api/ai"), c.post("/api/ai/test")):
         assert r.status_code == 403
+
+
+def test_marcador_imagen_basico():
+    from app import ingest
+    t = "- Algo\n[IMAGEN: carrito-1.jpg | Carrito de Compensar]\n[IMAGEN: feria.jpg]\n"
+    bl = ingest.basic_blocks(t)
+    m = [b for b in bl if b["type"] == "media"]
+    assert [x["media"]["slot"] for x in m] == ["carrito-1.jpg", "feria.jpg"]
+    assert m[0]["media"]["src"] == "" and m[0]["media"]["caption"] == "Carrito de Compensar"
+    ok, issues = ingest._validate(m)
+    assert len(ok) == 2 and not issues

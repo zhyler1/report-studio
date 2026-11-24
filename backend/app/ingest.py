@@ -143,6 +143,18 @@ def _noisy(rows: list[list[str]]) -> bool:
     return not cells or sum(1 for c in cells if c.strip()) / len(cells) < 0.45
 
 
+_IMG = re.compile(r"^\s*\[IMAGEN:\s*([^\]|]+?)\s*(?:\|\s*([^\]]*?))?\s*\]\s*$", re.M)
+
+
+def image_blocks(text: str) -> list[dict]:
+    """Líneas «[IMAGEN: archivo.jpg | pie opcional]» → espacio reservado para la imagen (el archivo se sube después)."""
+    out = []
+    for m in _IMG.finditer(text):
+        name, cap = m.group(1).strip(), (m.group(2) or "").strip()
+        out.append({"type": "media", "media": {"kind": "image", "slot": name, "src": "", "alt": f"[IMAGEN: {name}] {cap}".strip(), "caption": cap, "zoom": True, "height": 170}})
+    return out
+
+
 def basic_blocks(text: str) -> list[dict]:
     blocks: list[dict] = []
     for m in re.finditer(r"\[TABLA\]\n(.*?)\n\[/TABLA\]", text, re.S):
@@ -171,6 +183,7 @@ def basic_blocks(text: str) -> list[dict]:
         paras = [p.strip() for p in re.split(r"\n\s*\n", plain) if len(p.strip()) > 20]
         if paras:
             blocks.append({"type": "note_list", "header": "TEXTO IMPORTADO", "items": paras[:20]})
+    blocks.extend(image_blocks(text))
     return blocks
 
 
@@ -189,6 +202,7 @@ Responde SOLO con un objeto JSON {"blocks":[...]} sin texto adicional. Reglas:
     (solo si el documento trae series numéricas comparables; cada serie con tantos valores como etiquetas)
 - Las tablas del documento aparecen entre [TABLA] y [/TABLA] con columnas separadas por tabulador.
 - Si algo no encaja, déjalo fuera antes que inventarlo.
+- Las líneas «[IMAGEN: archivo.jpg | descripción]» son espacios para imágenes que se suben después: crea por cada una {"type":"media","media":{"kind":"image","slot":"archivo.jpg","src":"","alt":"[IMAGEN: archivo.jpg] descripción","caption":"descripción","zoom":true,"height":170}} y colócala justo después de la casilla del texto al que acompaña. Nunca inventes una URL en src.
 
 Casillas especiales (úsalas cuando el documento traiga ese contenido; son mejores que una lista genérica):
   {"type":"plants","plants":[{"label":"Planta Permanente","provistos":586,"vacantes":283}],"procesos":121,"procesos_label":"Procesos de vinculación","posesiones":60,"posesiones_label":"Posesiones realizadas del 14 de octubre al 11 de noviembre","logro":"texto del logro"}
