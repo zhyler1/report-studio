@@ -393,7 +393,11 @@ def r_activities(b: Activities, ctx: Ctx) -> str:
 
 
 def r_budget(b: Budget, ctx: Ctx) -> str:
-    a = ctx.acts[b.source]
+    a = ctx.acts.get(b.source) or next(iter(ctx.acts.values()), None)
+    if a is None:
+        return (f'<div class="bar-h">{esc(b.title or "PRESUPUESTO")}</div>'
+                '<div class="rs-empty" style="padding:14px;opacity:.7">Este bloque de presupuesto no tiene un bloque de actividades '
+                f'con id «{esc(b.source)}». Agrega uno o cambia el «source».</div>')
     tot = f' data-total="{attr(a.total)}"' if a.total.strip() else ""
     vz = f' data-viz="{b.viz}"' if b.viz != "donut" else ""
     return f'<div class="bar-h">{esc(b.title or "PRESUPUESTO")}</div><div id="presBox" data-budget="{attr(a.budget)}"{tot}{vz} data-totlabel="{attr(a.total_label)}"></div>'

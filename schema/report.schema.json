@@ -2221,6 +2221,34 @@
      "title": "Thresholds",
      "type": "array"
     },
+    "hero_mode": {
+     "anyOf": [
+      {
+       "const": "grupos",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Hero Mode"
+    },
+    "hero_stats": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/Stat"
+       },
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Hero Stats"
+    },
     "texts": {
      "additionalProperties": {
       "type": "string"
