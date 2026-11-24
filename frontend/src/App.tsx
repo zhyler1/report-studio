@@ -28,6 +28,29 @@ function General({ d, set }: { d: Json; set: (d: Json) => void }) {
   return <div className="card"><MetaForm meta={d.meta} set={m => set({ ...d, meta: m })} /></div>
 }
 
+// Botones (pestañas internas) de una sección: agregar, renombrar, mover y quitar. Quitar un botón borra sus casillas.
+function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
+  const tabs: Json[] = s.tabs || []
+  const slug = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'boton'
+  const put = (t: Json[]) => set({ ...s, tabs: t })
+  const add = () => {
+    const label = (prompt('Nombre del botón nuevo (por ejemplo «Novenas»)') || '').trim(); if (!label) return
+    let base = tabs.length || !s.blocks?.length ? tabs : [{ id: 'general', label: 'General', blocks: s.blocks }]
+    let id = slug(label), n = 2; while (base.some(t => t.id === id)) id = slug(label) + '-' + n++
+    set({ ...s, blocks: [], tabs: [...base, { id, label, blocks: [] }] })
+  }
+  const mv = (i: number, dx: number) => { const a = [...tabs], j = i + dx; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; put(a) }
+  return <>
+    <div className="rgl" style={{ margin: '12px 0 6px' }}>Botones de esta sección ({tabs.length})</div>
+    {!tabs.length && <p className="mut" style={{ margin: '0 0 6px' }}>Esta sección no tiene botones: sus casillas van seguidas. Agrega un botón para separarlas por tema.</p>}
+    {tabs.map((t, i) => <div key={t.id} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+      <input style={{ flex: 1 }} value={t.label} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
+      <span className="mut">{t.blocks?.length || 0} casillas</span>
+      <button onClick={() => mv(i, -1)} aria-label="Subir botón">↑</button><button onClick={() => mv(i, 1)} aria-label="Bajar botón">↓</button>
+      <button className="danger" aria-label={'Quitar ' + t.label} onClick={() => confirm(`¿Quitar el botón «${t.label}» y sus ${t.blocks?.length || 0} casillas? Puedes deshacer con Ctrl+Z.`) && put(tabs.filter((_, k) => k !== i))}>✕</button></div>)}
+    <button onClick={add} style={{ marginBottom: 10 }}>+ Agregar botón</button></>
+}
+
 function Secciones({ d, set, focus }: { d: Json; set: (d: Json) => void; focus: (id: string) => void }) {
   const secs: Json[] = d.sections
   const [open, setOpenS] = useState<number | null>(() => LS.get('sec', null))
@@ -53,6 +76,7 @@ function Secciones({ d, set, focus }: { d: Json; set: (d: Json) => void; focus: 
     {open === i && <>
       <div className="rgl" style={{ margin: '12px 0 6px' }}>Ícono animado del fondo de esta sección</div>
       <div className="icogrid">{ICONOS.map(([k, e, n]) => <button key={k} className={'icob' + ((s.icon || 'none') === k ? ' on' : '')} title={n} onClick={() => put(i, { ...s, icon: k })}><span>{e}</span><small>{n}</small></button>)}</div>
+      <Botones s={s} set={v => put(i, v)} />
       <SectionForm section={s} set={v => put(i, v)} /></>}
   </div>)}<button className="pri" onClick={add}>+ Agregar sección</button></>
 }
