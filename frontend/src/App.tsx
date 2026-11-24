@@ -26,6 +26,8 @@ const readPrev = (doc?: Document | null): Prev | null => {
 
 function General({ d, set, frame }: { d: Json; set: (d: Json) => void; frame: { current: HTMLIFrameElement | null } }) {
   const hs: Json[] | null = d.meta.hero_stats ?? null
+  const modo = hs !== null ? 'mano' : d.meta.hero_mode === 'grupos' ? 'grupos' : 'clasico'
+  const cambiarModo = (v: string) => { const m = { ...d.meta }; delete m.hero_stats; delete m.hero_mode; if (v === 'grupos') m.hero_mode = 'grupos'; if (v === 'mano') m.hero_stats = deLaVista(); set({ ...d, meta: m }) }
   const setHs = (v: Json[] | null) => { const m = { ...d.meta }; if (v === null) delete m.hero_stats; else m.hero_stats = v; set({ ...d, meta: m }) }
   const deLaVista = (): Json[] => {   // lo que se ve hoy arriba del Inicio, como punto de partida para escribirlo a mano
     const els = Array.from(frame.current?.contentDocument?.querySelectorAll('#heroStats .hstat') || [])
@@ -36,7 +38,11 @@ function General({ d, set, frame }: { d: Json; set: (d: Json) => void; frame: { 
   return <>
     <div className="card">
       <b>Cifras de arriba del Inicio (junto al QR)</b>
-      <label className="mut" style={{ display: 'flex', gap: 6, alignItems: 'center', margin: '8px 0' }}><input type="checkbox" style={{ width: 'auto' }} checked={hs !== null} onChange={e => setHs(e.target.checked ? deLaVista() : null)} />Escribirlas a mano (si no, se calculan solas de las casillas de planta y presupuesto)</label>
+      <select style={{ margin: '8px 0' }} value={modo} onChange={e => cambiarModo(e.target.value)}>
+        <option value="grupos">Automático: la cifra principal de cada grupo</option>
+        <option value="clasico">Automático: planta, procesos, posesiones y presupuesto</option>
+        <option value="mano">A mano</option></select>
+      {modo === 'grupos' && <p className="mut" style={{ margin: '0 0 6px' }}>Toma la primera cifra de la tarjeta de cada grupo en Inicio (hasta 6). Se actualiza sola cuando cambian esas tarjetas, por ejemplo al cargar un documento.</p>}
       {hs && <>
         {hs.map((x, i) => <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
           <input style={{ width: 110 }} placeholder="Cifra" value={x.value} onChange={e => upd(i, 'value', e.target.value)} />
@@ -44,7 +50,7 @@ function General({ d, set, frame }: { d: Json; set: (d: Json) => void; frame: { 
           <button className="danger" aria-label="Quitar cifra" onClick={() => setHs(hs.filter((_, j) => j !== i))}>✕</button></div>)}
         {hs.length < 6 && <button onClick={() => setHs([...hs, { value: '', label: '', prefix: '', suffix: '', animate: false, color: 'auto', long: false }])}>+ Agregar cifra</button>}</>}
     </div>
-    <div className="card"><MetaForm meta={(({ hero_stats, ...m }) => m)(d.meta)} set={m => set({ ...d, meta: { ...m, ...(d.meta.hero_stats != null ? { hero_stats: d.meta.hero_stats } : {}) } })} /></div></>
+    <div className="card"><MetaForm meta={(({ hero_stats, hero_mode, ...m }) => m)(d.meta)} set={m => set({ ...d, meta: { ...m, ...(d.meta.hero_stats != null ? { hero_stats: d.meta.hero_stats } : {}), ...(d.meta.hero_mode ? { hero_mode: d.meta.hero_mode } : {}) } })} /></div></>
 }
 
 // Botones (pestañas internas) de una sección: agregar, renombrar, mover y quitar. Quitar un botón borra sus casillas.

@@ -19,3 +19,13 @@ def test_cifras_del_inicio_automaticas_por_defecto():
 def test_cifras_del_inicio_a_mano():
     h = _rep([{"value": 869, "label": "Planta permanente"}, {"value": "$ 59.808.760", "label": "Cartera de incapacidades"}])
     assert '"v":869' in h and "Cartera de incapacidades" in h and '/*@HERO*/null' not in h
+
+
+def test_cifras_del_inicio_por_grupos():
+    d = json.load(open("seed/report.seed.json"))
+    d["meta"]["hero_mode"] = "grupos"
+    rep, issues = load(d)
+    assert rep is not None, issues
+    h = render(rep)
+    assert '/*@HERO*/null' not in h and "Actos" in h or "actos" in h
+    assert h.count('"v":') >= 4

@@ -490,6 +490,7 @@ class Meta(Base):
     name: Optional[str] = None    # nombre en la lista de la barra lateral (si no, «título · subtítulo»); no cambia la portada
     show_alerts: bool = False
     thresholds: tuple[int, int, int] = (90, 80, 50)   # verde, amarillo, naranja; menos = rojo
+    hero_mode: Optional[Literal["grupos"]] = None   # None = planta y presupuesto; «grupos» = la cifra principal de cada grupo, tomada sola de su tarjeta de Inicio
     hero_stats: Optional[list[Stat]] = None   # cifras de arriba del Inicio escritas a mano; None = se calculan solas de las casillas
     texts: dict[str, str] = {}      # rótulos fijos de las casillas especiales que la persona cambió (clave → texto)
 

@@ -586,9 +586,29 @@ def ji(v):
     return int(v) if float(v).is_integer() else v
 
 
+def hero_items(rep: Report, ctx: "Ctx") -> list | None:
+    """Cifras de arriba del Inicio: a mano, o la cifra principal de cada grupo (de su tarjeta de Inicio), o None = planta y presupuesto."""
+    m = rep.meta
+    if m.hero_stats is not None:
+        return [{"v": x.value, "l": x.label, "p": x.prefix, "s": x.suffix} for x in m.hero_stats]
+    if m.hero_mode == "grupos":
+        out = []
+        for s in rep.sections:
+            if s.hidden or not s.home or not s.home.stats:
+                continue
+            st = s.home.stats[0]
+            v = ctx.bind(st.bind) if st.bind else st.value
+            if v is None:
+                v = st.value
+            lbl = st.label if len(st.label) <= 56 else st.label[:55].rstrip() + "…"
+            out.append({"v": v, "l": lbl, "p": st.prefix, "s": st.suffix})
+        return out[:6] or None
+    return None
+
+
 def js_data(rep: Report) -> dict:
     ctx = Ctx(rep)
-    d = {"HERO": ([{"v": x.value, "l": x.label, "p": x.prefix, "s": x.suffix} for x in rep.meta.hero_stats] if rep.meta.hero_stats is not None else None), "TX": dict(rep.meta.texts), "SB": {s.id: s.icon for s in rep.sections if not s.hidden and s.icon != "none"}}
+    d = {"HERO": hero_items(rep, ctx), "TX": dict(rep.meta.texts), "SB": {s.id: s.icon for s in rep.sections if not s.hidden and s.icon != "none"}}
     a = next(iter(ctx.acts.values()), None)
     d["BIEN"] = [[i.measure, i.name, i.frequency, ji(i.pct), i.date, i.note, i.value] for i in a.items] if a else []
     wf = next((x for s in rep.sections for x in _blocks(s) if isinstance(x, Workflow)), None)
