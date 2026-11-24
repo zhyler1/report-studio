@@ -168,9 +168,17 @@ def _blocks(s: Section):
 
 
 # ───────────────────────── piezas ─────────────────────────
+def fig_style(m: Media) -> str:
+    """Posición y ancho máximo de la figura (centrada por defecto)."""
+    ml = {"left": "0", "center": "auto", "right": "auto"}[m.align]
+    mr = {"left": "auto", "center": "auto", "right": "0"}[m.align]
+    w = f"max-width:{m.width}px;" if m.width > 0 else ""
+    return f' style="{w}margin-left:{ml};margin-right:{mr};text-align:{m.align}"'
+
+
 def media_img(m: Media, caption_style: str, wrap_attr: str = "") -> str:
     cap = f'<figcaption class="muted" style="{caption_style}">{esc(m.caption)}</figcaption>' if m.caption else ""
-    return (f'<figure data-r{wrap_attr}>' + media_tag(m) + cap + "</figure>")
+    return (f'<figure data-r{wrap_attr or fig_style(m)}>' + media_tag(m) + cap + "</figure>")
 
 
 def media_tag(m: Media) -> str:
@@ -429,7 +437,7 @@ def r_chart(b: Chart, ctx: Ctx) -> str:
 def r_media(b: MediaBlock, ctx: Ctx) -> str:
     t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
     cap = f'<figcaption class="muted" style="font-size:12px;font-weight:600;margin-top:8px">{esc(b.media.caption)}</figcaption>' if b.media.caption else ""
-    return f'{t}<figure data-r>{media_tag(b.media)}{cap}</figure>'
+    return f'{t}<figure data-r{fig_style(b.media)}>{media_tag(b.media)}{cap}</figure>'
 
 
 def r_group(b: Group, ctx: Ctx) -> str:

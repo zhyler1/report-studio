@@ -1980,6 +1980,21 @@
      "title": "Height",
      "type": "integer"
     },
+    "align": {
+     "default": "center",
+     "enum": [
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Align",
+     "type": "string"
+    },
+    "width": {
+     "default": 0,
+     "title": "Width",
+     "type": "integer"
+    },
     "autoplay": {
      "default": false,
      "title": "Autoplay",

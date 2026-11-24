@@ -60,6 +60,8 @@ class Media(Base):
     caption: str = ""
     zoom: bool = True
     height: int = 0               # alto mínimo del marcador mientras no hay archivo
+    align: Literal["left", "center", "right"] = "center"   # posición de la imagen en su casilla
+    width: int = 0                # ancho máximo en px (0 = automático, hasta el ancho de la casilla)
     autoplay: bool = False
     loop: bool = False
     muted: bool = True
