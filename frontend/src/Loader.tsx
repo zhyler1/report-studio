@@ -8,9 +8,21 @@ const brief = (b: Json): string => {
   return `${String(t).slice(0, 70)}${n ? ` · ${n} elementos` : ''}`
 }
 
+// Cada línea «## Tema» abre un tema; el texto anterior al primero se ignora si es muy corto.
+export const splitThemes = (t: string): { label: string; text: string }[] => {
+  const out: { label: string; text: string }[] = []
+  let cur: { label: string; lines: string[] } | null = null
+  for (const l of t.split('\n')) {
+    const m = l.match(/^\s*##\s+(.+?)\s*$/)
+    if (m) { if (cur) out.push({ label: cur.label, text: cur.lines.join('\n').trim() }); cur = { label: m[1].replace(/\s*#+$/, ''), lines: [] } } else if (cur) cur.lines.push(l)
+  }
+  if (cur) out.push({ label: cur.label, text: cur.lines.join('\n').trim() })
+  return out.filter(x => x.text.length >= 3)
+}
+
 export default function Loader({ sections, defSection, onAdd, onOpenReport, onClose }: {
   sections: { id?: string; label: string; tabs?: { label?: string }[] }[]; defSection: number
-  onAdd: (si: number, blocks: Json[], ti?: number) => void; onOpenReport: (d: Json) => void; onClose: () => void
+  onAdd: (si: number, blocks: Json[], ti?: number, porTema?: boolean) => void; onOpenReport: (d: Json) => void; onClose: () => void
 }) {
   const [engine, setEngine] = useState<string | null | undefined>(undefined)
   const [text, setText] = useState('')
@@ -22,6 +34,9 @@ export default function Loader({ sections, defSection, onAdd, onOpenReport, onCl
   const [err, setErr] = useState('')
   const [res, setRes] = useState<{ blocks: Json[]; issues: string[] } | null>(null)
   const [ok, setOk] = useState<boolean[]>([])
+  const [porTema, setPorTema] = useState(true)
+  const themes = splitThemes(text)
+  const usaTemas = porTema && themes.length >= 2
   useEffect(() => { api.ingestStatus().then(s => setEngine(s.engine)).catch(() => setEngine(null)) }, [])
 
   const pick = async (f: File) => {
@@ -34,7 +49,18 @@ export default function Loader({ sections, defSection, onAdd, onOpenReport, onCl
   }
   const analyze = async () => {
     setErr(''); setBusy(engine ? 'Analizando con IA… puede tardar un minuto' : 'Leyendo…')
-    try { const r = await api.propose(text, hint, sections[si]?.id || ''); setRes(r); setOk(r.blocks.map(() => true)) } catch (e: any) { setErr(e.message) } finally { setBusy('') }
+    try {
+      if (usaTemas) {   // una consulta por tema; cada casilla queda marcada con su tema para crear un botón (pestaña) por tema
+        const blocks: Json[] = []; const issues: string[] = []
+        for (let k = 0; k < themes.length; k++) {
+          setBusy(`Tema ${k + 1} de ${themes.length}: ${themes[k].label}…`)
+          const r = await api.propose(themes[k].text, [hint, themes[k].label].filter(Boolean).join(' · '), sections[si]?.id || '')
+          r.blocks.forEach((b: Json) => blocks.push({ ...b, _tema: themes[k].label }))
+          r.issues.forEach((x: string) => issues.push(`${themes[k].label}: ${x}`))
+        }
+        setRes({ blocks, issues }); setOk(blocks.map(() => true))
+      } else { const r = await api.propose(text, hint, sections[si]?.id || ''); setRes(r); setOk(r.blocks.map(() => true)) }
+    } catch (e: any) { setErr(e.message) } finally { setBusy('') }
   }
   const chosen = res ? res.blocks.filter((_, i) => ok[i]) : []
 
@@ -50,7 +76,8 @@ export default function Loader({ sections, defSection, onAdd, onOpenReport, onCl
       <div style={{ display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' }}>
         <label className="mut">Agregar a la sección</label>
         <select style={{ width: 'auto' }} value={si} onChange={e => { setSi(Number(e.target.value)); setTi(0) }}>{sections.map((s, i) => <option key={i} value={i}>{s.label}</option>)}</select>
-        {!!sections[si]?.tabs?.length && <><label className="mut">en la pestaña</label><select style={{ width: 'auto' }} value={ti} onChange={e => setTi(Number(e.target.value))}>{sections[si].tabs!.map((t, i) => <option key={i} value={i}>{t.label || 'Pestaña ' + (i + 1)}</option>)}</select></>}
+        {themes.length >= 2 && <label className="mut" style={{ display: 'flex', gap: 6, alignItems: 'center' }}><input type="checkbox" style={{ width: 'auto' }} checked={porTema} onChange={e => setPorTema(e.target.checked)} />un botón (pestaña) por tema ({themes.length})</label>}
+        {!usaTemas && !!sections[si]?.tabs?.length && <><label className="mut">en la pestaña</label><select style={{ width: 'auto' }} value={ti} onChange={e => setTi(Number(e.target.value))}>{sections[si].tabs!.map((t, i) => <option key={i} value={i}>{t.label || 'Pestaña ' + (i + 1)}</option>)}</select></>}
         <input style={{ flex: 1, minWidth: 180 }} value={hint} onChange={e => setHint(e.target.value)} placeholder="¿De qué trata? (opcional, ayuda a la IA)" />
       </div>
       {err && <div className="issues" style={{ marginTop: 10 }}>{err}</div>}
@@ -61,8 +88,8 @@ export default function Loader({ sections, defSection, onAdd, onOpenReport, onCl
       {!res.blocks.length && <p>No se encontraron casillas. Prueba con otro archivo o pega el texto.</p>}
       {res.blocks.map((b, i) => <label key={i} className="sub-card" style={{ display: 'flex', gap: 10, padding: 10, alignItems: 'center', cursor: 'pointer' }}>
         <input type="checkbox" style={{ width: 'auto' }} checked={ok[i]} onChange={e => setOk(ok.map((x, j) => (j === i ? e.target.checked : x)))} />
-        <span><b>{BLOCK[b.type] || b.type}</b><br /><span className="mut">{brief(b)}</span></span></label>)}
-      <div style={{ textAlign: 'right', marginTop: 12 }}><button onClick={() => setRes(null)}>← Volver</button> <button className="pri" disabled={!chosen.length} onClick={() => onAdd(si, chosen, ti)}>Agregar {chosen.length} casilla{chosen.length === 1 ? '' : 's'} a «{sections[si]?.label}»</button></div>
+        <span>{b._tema && <span className="mut">{b._tema} · </span>}<b>{BLOCK[b.type] || b.type}</b><br /><span className="mut">{brief(b)}</span></span></label>)}
+      <div style={{ textAlign: 'right', marginTop: 12 }}><button onClick={() => setRes(null)}>← Volver</button> <button className="pri" disabled={!chosen.length} onClick={() => onAdd(si, chosen, ti, usaTemas)}>Agregar {chosen.length} casilla{chosen.length === 1 ? '' : 's'} a «{sections[si]?.label}»</button></div>
     </>}
   </div></div>
 }
