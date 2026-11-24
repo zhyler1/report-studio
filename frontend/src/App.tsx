@@ -263,7 +263,8 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     setD({ ...dd, sections: [...dd.sections, { ...sec, id: nid, label, home, hidden: false }] })
     flash('Sección «' + label + '» creada, con su tarjeta en Inicio · cambia el nombre en Datos › Secciones'); goAfter.current = nid
   }
-  const addLoaded = (si: number, blocks: Json[], ti = 0, porTema = false) => {
+  const addLoaded = (si: number, blocks: Json[], ti = 0, porTema = false, dudas: string[] = []) => {
+    if (dudas.length) setTimeout(() => alert('Quedó cargado. Revisa estos puntos que la IA no pudo resolver:\n\n' + dudas.map(x => '• ' + x.replace(/^Revisar:\s*/i, '')).join('\n')), 300)
     const dd = dRef.current; if (!dd) return
     const s = dd.sections[si]
     if (porTema) {   // un botón (pestaña interna) por cada tema del documento; si ya existe una con ese nombre, se agrega ahí
@@ -272,7 +273,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
       let tabs: Json[] = (s.tabs || []).map((t: Json) => ({ ...t, blocks: [...t.blocks] }))
       if (!tabs.length && s.blocks?.length) tabs = [{ id: 'general', label: 'General', blocks: [...s.blocks] }]
       blocks.forEach(b => {
-        const { _tema, ...blk } = b; const label = String(_tema || 'Tema')
+        const { _tema, ...blk } = b; const label = String(_tema || 'General')
         let t = tabs.find(x => norm(x.label) === norm(label))
         if (!t) { let id = slug(label), n = 2; while (tabs.some(x => x.id === id)) id = slug(label) + '-' + n++; t = { id, label, blocks: [] }; tabs.push(t) }
         t.blocks.push(blk)
@@ -281,6 +282,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
       goPreview(s.id); return
     }
     const list = s.tabs?.length ? `sections.${si}.tabs.${Math.min(ti, s.tabs.length - 1)}.blocks` : `sections.${si}.blocks`
+    blocks = blocks.map(({ _tema, ...b }) => b)
     const at = (getAt(dd, list) || []).length
     setD(blocks.reduce((acc, b, k) => listOps.insert(acc, list, at + k, b), dd)); setLoader(null)
     goPreview(s.id); select(list + '.' + at)

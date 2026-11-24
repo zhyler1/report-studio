@@ -58,7 +58,7 @@ def extract_text(name: str, data: bytes) -> str:
     if ext == ".docx":
         import docx
         d = docx.Document(io.BytesIO(data))
-        out = [p.text for p in d.paragraphs if p.text.strip()]
+        out = [("## " + p.text.strip()) if re.match(r"(?i)^(heading|t[ií]tulo)\s*[12]\b", p.style.name or "") else p.text for p in d.paragraphs if p.text.strip()]
         for t in d.tables:
             out.append("[TABLA]\n" + _tsv([[c.text for c in r.cells] for r in t.rows]) + "\n[/TABLA]")
         return "\n".join(out)
@@ -202,6 +202,7 @@ Responde SOLO con un objeto JSON {"blocks":[...]} sin texto adicional. Reglas:
     (solo si el documento trae series numéricas comparables; cada serie con tantos valores como etiquetas)
 - Las tablas del documento aparecen entre [TABLA] y [/TABLA] con columnas separadas por tabulador.
 - Si algo no encaja, déjalo fuera antes que inventarlo.
+- Si el documento trata varios temas o actividades distintos (cada uno con su título), agrega a cada casilla el campo "tema" con un nombre corto del tema (máximo 4 palabras, el mismo texto para todas las casillas de ese tema). Con un solo tema no uses "tema".
 - Las líneas «[IMAGEN: archivo.jpg | descripción]» son espacios para imágenes que se suben después: crea por cada una {"type":"media","media":{"kind":"image","slot":"archivo.jpg","src":"","alt":"[IMAGEN: archivo.jpg] descripción","caption":"descripción","zoom":true,"height":170}} y colócala justo después de la casilla del texto al que acompaña. Nunca inventes una URL en src.
 
 Casillas especiales (úsalas cuando el documento traiga ese contenido; son mejores que una lista genérica):
@@ -260,6 +261,9 @@ _TA = TypeAdapter(Block)
 def _validate(items: list[dict]) -> tuple[list[dict], list[str]]:
     ok, issues = [], []
     for i, b in enumerate(items, 1):
+        tema = ""
+        if isinstance(b, dict) and "tema" in b:   # la IA marca el tema de cada casilla; no es parte del esquema
+            b = dict(b); tema = str(b.pop("tema") or "").strip()[:60]
         try:
             m = _TA.validate_python(b)
             if isinstance(m, Chart):
@@ -267,7 +271,10 @@ def _validate(items: list[dict]) -> tuple[list[dict], list[str]]:
                 if p:
                     issues.append(f"Casilla {i} (gráfico) descartada: {p[0]}")
                     continue
-            ok.append(m.model_dump(mode="json"))
+            d = m.model_dump(mode="json")
+            if tema:
+                d["_tema"] = tema
+            ok.append(d)
         except ValidationError as e:
             issues.append(f"Casilla {i} descartada: {e.errors()[0]['msg']}")
     return ok, issues

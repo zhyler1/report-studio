@@ -140,3 +140,10 @@ def test_marcador_imagen_basico():
     assert m[0]["media"]["src"] == "" and m[0]["media"]["caption"] == "Carrito de Compensar"
     ok, issues = ingest._validate(m)
     assert len(ok) == 2 and not issues
+
+
+def test_tema_de_la_ia_se_conserva_y_no_rompe_el_esquema():
+    from app import ingest
+    items = [{"type": "card_list", "title": "A", "style": "plain", "items": ["x"], "tema": "Carrito"}, {"type": "card_list", "title": "B", "style": "plain", "items": ["y"]}]
+    ok, issues = ingest._validate(items)
+    assert not issues and ok[0]["_tema"] == "Carrito" and "_tema" not in ok[1]
