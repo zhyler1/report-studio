@@ -50,7 +50,7 @@ function General({ d, set, frame }: { d: Json; set: (d: Json) => void; frame: { 
           <button className="danger" aria-label="Quitar cifra" onClick={() => setHs(hs.filter((_, j) => j !== i))}>✕</button></div>)}
         {hs.length < 6 && <button onClick={() => setHs([...hs, { value: '', label: '', prefix: '', suffix: '', animate: false, color: 'auto', long: false }])}>+ Agregar cifra</button>}</>}
     </div>
-    <div className="card"><MetaForm meta={(({ hero_stats, hero_mode, ...m }) => m)(d.meta)} set={m => set({ ...d, meta: { ...m, ...(d.meta.hero_stats != null ? { hero_stats: d.meta.hero_stats } : {}), ...(d.meta.hero_mode ? { hero_mode: d.meta.hero_mode } : {}) } })} /></div></>
+    <div className="card"><MetaForm meta={(({ hero_stats, hero_mode, home_hide, ...m }) => m)(d.meta)} set={m => set({ ...d, meta: { ...m, ...(d.meta.home_hide?.length ? { home_hide: d.meta.home_hide } : {}), ...(d.meta.hero_stats != null ? { hero_stats: d.meta.hero_stats } : {}), ...(d.meta.hero_mode ? { hero_mode: d.meta.hero_mode } : {}) } })} /></div></>
 }
 
 // Botones (pestañas internas) de una sección: agregar, renombrar, mover y quitar. Quitar un botón borra sus casillas.
@@ -115,6 +115,32 @@ function Secciones({ d, set, focus }: { d: Json; set: (d: Json) => void; focus: 
       <Botones s={s} set={v => put(i, v)} />
       <SectionForm section={s} set={v => put(i, v)} /></>}
   </div>)}<button className="pri" onClick={add}>+ Agregar sección</button></>
+}
+
+// Tarjetas de Inicio: mostrar/ocultar cada una y quitar cifras sueltas de una tarjeta
+function InicioCards({ d, set, openDrawer }: { d: Json; set: (d: Json) => void; openDrawer: (k: string) => void }) {
+  const secs: Json[] = d.sections
+  const hide: string[] = d.meta.home_hide || []
+  const putS = (i: number, s: Json) => set({ ...d, sections: secs.map((x, k) => (k === i ? s : x)) })
+  const putHome = (i: number, h: Json) => putS(i, { ...secs[i], home: h })
+  const setHide = (k: string, on: boolean) => set({ ...d, meta: { ...d.meta, home_hide: on ? Array.from(new Set([...hide, k])) : hide.filter(x => x !== k) } })
+  return <>
+    <p className="mut" style={{ marginTop: 0 }}>Quita lo que te sobre del botón Inicio. Ocultar una tarjeta no borra la sección: su botón sigue ahí.</p>
+    {secs.filter(s => s.home).map(s => { const i = secs.indexOf(s); const h = s.home; const stats: Json[] = h.stats || []
+      return <div className="card" key={s.id} style={h.hidden ? { opacity: .6 } : undefined}>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input type="checkbox" checked={!h.hidden} onChange={e => putHome(i, { ...h, hidden: !e.target.checked })} /><b style={{ flex: 1 }}>{h.title || s.label}</b></label>
+        {stats.map((x, k) => <div key={k} style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
+          <span style={{ flex: 1, fontSize: 13 }}><b>{(x.prefix || '') + String(x.value ?? '') + (x.suffix || '')}</b> <span className="mut">{x.label}</span></span>
+          <button className="danger" title="Quitar esta cifra de la tarjeta" onClick={() => putHome(i, { ...h, stats: stats.filter((_, j) => j !== k), columns: Math.min(Math.max(stats.length - 1, 1), 3) })}>✕</button></div>)}
+        {!stats.length && <p className="mut" style={{ margin: '6px 0 0', fontSize: 13 }}>Sin cifras{h.text ? ': muestra solo el texto.' : '.'}</p>}
+      </div> })}
+    <div className="card"><div className="rgl" style={{ margin: '0 0 6px' }}>Tarjetas fijas</div>
+      <label style={{ display: 'flex', gap: 8, marginBottom: 6 }}><input type="checkbox" checked={!hide.includes('pt')} onChange={e => setHide('pt', !e.target.checked)} /> Planta transitoria</label>
+      <label style={{ display: 'flex', gap: 8, marginBottom: 6 }}><input type="checkbox" checked={!hide.includes('pres')} onChange={e => setHide('pres', !e.target.checked)} /> Presupuesto (dona)</label>
+      <label style={{ display: 'flex', gap: 8 }}><input type="checkbox" checked={!!d.meta.show_alerts} onChange={e => set({ ...d, meta: { ...d.meta, show_alerts: e.target.checked } })} /> Alertas de todos los grupos</label></div>
+    <div className="card"><div className="rgl" style={{ margin: '0 0 6px' }}>Cifras grandes de arriba</div>
+      <button onClick={() => openDrawer('general')}>Editar en General →</button></div>
+  </>
 }
 
 function Textos({ d, set }: { d: Json; set: (d: Json) => void }) {
@@ -430,10 +456,11 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
       <div className="work">
         <div className="prev"><iframe ref={frame} onLoad={onLoad} title="Vista previa" srcDoc={html} sandbox="allow-scripts allow-same-origin allow-modals allow-popups" /></div>
         {drawer && <div className="drawer">
-          <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', textos: 'Textos fijos', secciones: 'Secciones', alertas: 'Alertas', json: 'JSON', ia: 'Motor de IA', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
+          <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', textos: 'Textos fijos', secciones: 'Secciones', inicio: 'Tarjetas de Inicio', alertas: 'Alertas', json: 'JSON', ia: 'Motor de IA', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
           {drawer === 'casilla' && (sel && getAt(d, sel) ? <div className="card"><p className="mut" style={{ marginTop: 0 }}>Doble clic sobre cualquier texto de la vista previa para editarlo ahí mismo.</p>
             <BlockForm block={getAt(d, sel)} set={v => setD(setAt(d, sel, v))} /></div> : <div className="card"><p className="mut">Haz clic en una casilla de la vista previa.</p></div>)}
           {drawer === 'general' && <General d={d} set={setD} frame={frame} />}
+          {drawer === 'inicio' && <InicioCards d={d} set={setD} openDrawer={openDrawer} />}
           {drawer === 'secciones' && <Secciones d={d} set={setD} focus={goPreview} />}
           {drawer === 'textos' && <Textos d={d} set={setD} />}
           {drawer === 'alertas' && <Alertas d={d} set={setD} />}

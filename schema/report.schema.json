@@ -1763,6 +1763,11 @@
      ],
      "title": "Tag Tone",
      "type": "string"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
     }
    },
    "title": "HomeCard",
@@ -2234,6 +2239,18 @@
       }
      ],
      "title": "Thresholds",
+     "type": "array"
+    },
+    "home_hide": {
+     "default": [],
+     "items": {
+      "enum": [
+       "pt",
+       "pres"
+      ],
+      "type": "string"
+     },
+     "title": "Home Hide",
      "type": "array"
     },
     "hero_mode": {

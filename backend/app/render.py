@@ -556,10 +556,13 @@ def r_home_card(s: Section, i: int, ctx: Ctx) -> str:
 
 def r_inicio(ctx: Ctx) -> str:
     m = ctx.rep.meta
-    cards = "".join(r_home_card(s, i + 1, ctx) for i, s in enumerate(ctx.rep.sections) if s.home)
-    n = len([s for s in ctx.rep.sections if s.home])
-    cards += f'<div class="card gcard" id="homePT" data-r style="--i:{n + 1}"></div>'
-    cards += f'<div class="card gcard" id="homePRES" data-goto="bienestar" data-r style="--i:{n + 2}"></div>'
+    vis = [s for s in ctx.rep.sections if s.home and not s.home.hidden]
+    cards = "".join(r_home_card(s, i + 1, ctx) for i, s in enumerate(vis))
+    n = len(vis)
+    if "pt" not in m.home_hide:
+        cards += f'<div class="card gcard" id="homePT" data-r style="--i:{n + 1}"></div>'
+    if "pres" not in m.home_hide:
+        cards += f'<div class="card gcard" id="homePRES" data-goto="bienestar" data-r style="--i:{n + 2}"></div>'
     c = {"alto": 0, "medio": 0, "bajo": 0}
     for a in ctx.rep.alerts:
         c[a.level] += 1
@@ -606,7 +609,7 @@ def hero_items(rep: Report, ctx: "Ctx") -> list | None:
     if m.hero_mode == "grupos":
         out = []
         for s in rep.sections:
-            if s.hidden or not s.home or not s.home.stats:
+            if s.hidden or not s.home or s.home.hidden or not s.home.stats:
                 continue
             st = s.home.stats[0]
             v = ctx.bind(st.bind) if st.bind else st.value

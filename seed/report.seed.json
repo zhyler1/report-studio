@@ -32,6 +32,7 @@
       80,
       50
     ],
+    "home_hide": [],
     "texts": {}
   },
   "sections": [
@@ -79,7 +80,8 @@
         ],
         "text": "",
         "tag": "",
-        "tag_tone": "red"
+        "tag_tone": "red",
+        "hidden": false
       },
       "blocks": [
         {
@@ -411,7 +413,8 @@
         ],
         "text": "",
         "tag": "",
-        "tag_tone": "red"
+        "tag_tone": "red",
+        "hidden": false
       },
       "blocks": [
         {
@@ -541,7 +544,8 @@
         ],
         "text": "",
         "tag": "Presupuesto {act.budget}",
-        "tag_tone": "red"
+        "tag_tone": "red",
+        "hidden": false
       },
       "blocks": [],
       "tabs": [
@@ -934,7 +938,8 @@
         "stats": [],
         "text": "Inducción · Chatbot Ofelio · Bitácora · Emisora online · Lector QR para eventos y capacitaciones",
         "tag": "Bitácora: edición del 11 de noviembre publicada",
-        "tag_tone": "green"
+        "tag_tone": "green",
+        "hidden": false
       },
       "blocks": [
         {
@@ -1089,7 +1094,8 @@
         ],
         "text": "",
         "tag": "",
-        "tag_tone": "red"
+        "tag_tone": "red",
+        "hidden": false
       },
       "blocks": [
         {
@@ -1219,7 +1225,8 @@
         ],
         "text": "",
         "tag": "",
-        "tag_tone": "red"
+        "tag_tone": "red",
+        "hidden": false
       },
       "blocks": [
         {
