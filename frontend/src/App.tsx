@@ -48,7 +48,18 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
       <span className="mut">{t.blocks?.length || 0} casillas</span>
       <button onClick={() => mv(i, -1)} aria-label="Subir botón">↑</button><button onClick={() => mv(i, 1)} aria-label="Bajar botón">↓</button>
       <button className="danger" aria-label={'Quitar ' + t.label} onClick={() => confirm(`¿Quitar el botón «${t.label}» y sus ${t.blocks?.length || 0} casillas? Puedes deshacer con Ctrl+Z.`) && put(tabs.filter((_, k) => k !== i))}>✕</button></div>)}
-    <button onClick={add} style={{ marginBottom: 10 }}>+ Agregar botón</button></>
+    <button onClick={add} style={{ marginBottom: 10 }}>+ Agregar botón</button>
+    <button style={{ marginBottom: 10, marginLeft: 8 }} title="Reemplaza las cifras de la tarjeta de este grupo en Inicio por las de la casilla de cifras del botón «Resumen» o, si no hay, la última casilla de cifras de la sección" onClick={() => {
+      const lists: Json[][] = [s.blocks || [], ...(s.tabs || []).map((t: Json) => t.blocks || [])]
+      const conCifras = (l: Json[]) => l.filter((b: Json) => b.type === 'stat_grid' && b.items?.length)
+      const rt = (s.tabs || []).find((t: Json) => /resumen/i.test(t.label || ''))
+      const sg = (rt && conCifras(rt.blocks || [])[0]) || conCifras(lists.flat()).pop()
+      if (!sg) { alert('Esta sección no tiene una casilla de cifras de donde tomar el resumen.'); return }
+      if ((s.home?.stats || []).some((x: Json) => x.bind) && lists.flat().some((b: Json) => b.type === 'plants')) { alert('El resumen de este grupo se calcula solo de su casilla de planta; no hace falta actualizarlo.'); return }
+      const stats = sg.items.slice(0, 3).map((x: Json) => ({ value: x.value, label: x.label, prefix: x.prefix || '', suffix: x.suffix || '', animate: typeof x.value === 'number', color: 'auto', long: String(x.value).length > 9 }))
+      const h = s.home || { title: s.label, columns: 0, text: '', tag: '', tag_tone: 'red' }
+      set({ ...s, home: { ...h, stats, columns: Math.min(stats.length, 3), text: '' } })
+    }}>↻ Actualizar resumen de Inicio</button></>
 }
 
 function Secciones({ d, set, focus }: { d: Json; set: (d: Json) => void; focus: (id: string) => void }) {
@@ -287,7 +298,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     setD({ ...dd, sections: [...dd.sections, { ...sec, id: nid, label, home, hidden: false }] })
     flash('Sección «' + label + '» creada, con su tarjeta en Inicio · cambia el nombre en Datos › Secciones'); goAfter.current = nid
   }
-  const addLoaded = (si: number, blocks: Json[], ti = 0, porTema = false, dudas: string[] = [], inicio: Json | null = null) => {
+  const addLoaded = (si: number, blocks: Json[], ti = 0, porTema = false, dudas: string[] = [], inicio: Json | null = null, reemplazar = false) => {
     if (dudas.length) setTimeout(() => alert('Quedó cargado. Revisa estos puntos que la IA no pudo resolver:\n\n' + dudas.map(x => '• ' + x.replace(/^Revisar:\s*/i, '')).join('\n')), 300)
     const dd = dRef.current; if (!dd) return
     const s = dd.sections[si]
@@ -303,11 +314,13 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
       const norm = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
       const slug = (x: string) => norm(x).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'tema'
       let tabs: Json[] = (s.tabs || []).map((t: Json) => ({ ...t, blocks: [...t.blocks] }))
+      const limpios = new Set<string>()   // con «reemplazar», cada botón se vacía una sola vez antes de recibir lo nuevo
       if (!tabs.length && s.blocks?.length) tabs = [{ id: 'general', label: 'General', blocks: [...s.blocks] }]
       blocks.forEach(b => {
         const { _tema, ...blk } = b; const label = String(_tema || 'General')
         let t = tabs.find(x => norm(x.label) === norm(label))
         if (!t) { let id = slug(label), n = 2; while (tabs.some(x => x.id === id)) id = slug(label) + '-' + n++; t = { id, label, blocks: [] }; tabs.push(t) }
+        if (reemplazar && !limpios.has(t.id)) { t.blocks = []; limpios.add(t.id) }
         t.blocks.push(blk)
       })
       setD({ ...dd, sections: dd.sections.map((x: Json, k: number) => k === si ? conHome({ ...x, tabs, blocks: [] }) : x) }); setLoader(null)
@@ -315,8 +328,9 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     }
     const list = s.tabs?.length ? `sections.${si}.tabs.${Math.min(ti, s.tabs.length - 1)}.blocks` : `sections.${si}.blocks`
     blocks = blocks.map(({ _tema, ...b }) => b)
-    const at = (getAt(dd, list) || []).length
-    const nd = blocks.reduce((acc, b, k) => listOps.insert(acc, list, at + k, b), dd)
+    const base = reemplazar ? setAt(dd, list, []) : dd
+    const at = (getAt(base, list) || []).length
+    const nd = blocks.reduce((acc, b, k) => listOps.insert(acc, list, at + k, b), base)
     setD(inicio?.stats?.length ? { ...nd, sections: nd.sections.map((x: Json, k: number) => k === si ? conHome(x) : x) } : nd); setLoader(null)
     goPreview(s.id); select(list + '.' + at)
   }
