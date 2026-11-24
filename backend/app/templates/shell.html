@@ -802,8 +802,10 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
     b.innerHTML=h;mountCharts();
     if(b.offsetParent){try{animate(b)}catch(e){}}
   }
+  var HERO=/*@HERO*/null/*@/HERO*/;
   function renderHero(){
     var hs=document.getElementById('heroStats');if(!hs)return;
+    if(HERO){hs.innerHTML=HERO.map(function(x){var n=(typeof x.v==='number'&&!x.p&&!x.s)?'<span class="num" data-to="'+x.v+'">'+fmt(x.v)+'</span>':'<span class="num">'+esc((x.p||'')+(typeof x.v==='number'?fmt(x.v):x.v)+(x.s||''))+'</span>';return '<div class="hstat">'+n+'<span class="lbl">'+esc(x.l)+'</span></div>'}).join('');return}
     var p0=PER.plantas[0]||[0,0,0],planta=(+p0[1]||0)+(+p0[2]||0);
     var bud=parseMoney(budgetTxt()),tot=totalBien(),pc=(bud?tot/bud*100:0).toFixed(1).replace('.',',')+' %';
     var it=[];

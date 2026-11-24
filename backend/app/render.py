@@ -588,7 +588,7 @@ def ji(v):
 
 def js_data(rep: Report) -> dict:
     ctx = Ctx(rep)
-    d = {"TX": dict(rep.meta.texts), "SB": {s.id: s.icon for s in rep.sections if not s.hidden and s.icon != "none"}}
+    d = {"HERO": ([{"v": x.value, "l": x.label, "p": x.prefix, "s": x.suffix} for x in rep.meta.hero_stats] if rep.meta.hero_stats is not None else None), "TX": dict(rep.meta.texts), "SB": {s.id: s.icon for s in rep.sections if not s.hidden and s.icon != "none"}}
     a = next(iter(ctx.acts.values()), None)
     d["BIEN"] = [[i.measure, i.name, i.frequency, ji(i.pct), i.date, i.note, i.value] for i in a.items] if a else []
     wf = next((x for s in rep.sections for x in _blocks(s) if isinstance(x, Workflow)), None)

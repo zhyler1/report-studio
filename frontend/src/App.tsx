@@ -24,8 +24,27 @@ const readPrev = (doc?: Document | null): Prev | null => {
 }
 
 
-function General({ d, set }: { d: Json; set: (d: Json) => void }) {
-  return <div className="card"><MetaForm meta={d.meta} set={m => set({ ...d, meta: m })} /></div>
+function General({ d, set, frame }: { d: Json; set: (d: Json) => void; frame: { current: HTMLIFrameElement | null } }) {
+  const hs: Json[] | null = d.meta.hero_stats ?? null
+  const setHs = (v: Json[] | null) => { const m = { ...d.meta }; if (v === null) delete m.hero_stats; else m.hero_stats = v; set({ ...d, meta: m }) }
+  const deLaVista = (): Json[] => {   // lo que se ve hoy arriba del Inicio, como punto de partida para escribirlo a mano
+    const els = Array.from(frame.current?.contentDocument?.querySelectorAll('#heroStats .hstat') || [])
+    const r = els.map(e => ({ value: (e.querySelector('.num')?.getAttribute('data-to') || e.querySelector('.num')?.textContent || '').trim(), label: (e.querySelector('.lbl')?.textContent || '').trim(), prefix: '', suffix: '', animate: false, color: 'auto', long: false })).filter(x => x.label)
+    return r.length ? r : [{ value: '', label: '', prefix: '', suffix: '', animate: false, color: 'auto', long: false }]
+  }
+  const upd = (i: number, k: string, v: string) => setHs((hs || []).map((x, j) => (j === i ? { ...x, [k]: v } : x)))
+  return <>
+    <div className="card">
+      <b>Cifras de arriba del Inicio (junto al QR)</b>
+      <label className="mut" style={{ display: 'flex', gap: 6, alignItems: 'center', margin: '8px 0' }}><input type="checkbox" style={{ width: 'auto' }} checked={hs !== null} onChange={e => setHs(e.target.checked ? deLaVista() : null)} />Escribirlas a mano (si no, se calculan solas de las casillas de planta y presupuesto)</label>
+      {hs && <>
+        {hs.map((x, i) => <div key={i} style={{ display: 'flex', gap: 6, marginBottom: 6 }}>
+          <input style={{ width: 110 }} placeholder="Cifra" value={x.value} onChange={e => upd(i, 'value', e.target.value)} />
+          <input style={{ flex: 1 }} placeholder="Qué es (por ejemplo «Planta permanente»)" value={x.label} onChange={e => upd(i, 'label', e.target.value)} />
+          <button className="danger" aria-label="Quitar cifra" onClick={() => setHs(hs.filter((_, j) => j !== i))}>✕</button></div>)}
+        {hs.length < 6 && <button onClick={() => setHs([...hs, { value: '', label: '', prefix: '', suffix: '', animate: false, color: 'auto', long: false }])}>+ Agregar cifra</button>}</>}
+    </div>
+    <div className="card"><MetaForm meta={(({ hero_stats, ...m }) => m)(d.meta)} set={m => set({ ...d, meta: { ...m, ...(d.meta.hero_stats != null ? { hero_stats: d.meta.hero_stats } : {}) } })} /></div></>
 }
 
 // Botones (pestañas internas) de una sección: agregar, renombrar, mover y quitar. Quitar un botón borra sus casillas.
@@ -407,7 +426,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
           <div className="dhead"><b style={{ flex: 1 }}>{({ casilla: 'Opciones de la casilla', general: 'General', textos: 'Textos fijos', secciones: 'Secciones', alertas: 'Alertas', json: 'JSON', ia: 'Motor de IA', versiones: 'Versiones' } as Record<string, string>)[drawer]}</b><button onClick={() => openDrawer(null)}>Cerrar ✕</button></div>
           {drawer === 'casilla' && (sel && getAt(d, sel) ? <div className="card"><p className="mut" style={{ marginTop: 0 }}>Doble clic sobre cualquier texto de la vista previa para editarlo ahí mismo.</p>
             <BlockForm block={getAt(d, sel)} set={v => setD(setAt(d, sel, v))} /></div> : <div className="card"><p className="mut">Haz clic en una casilla de la vista previa.</p></div>)}
-          {drawer === 'general' && <General d={d} set={setD} />}
+          {drawer === 'general' && <General d={d} set={setD} frame={frame} />}
           {drawer === 'secciones' && <Secciones d={d} set={setD} focus={goPreview} />}
           {drawer === 'textos' && <Textos d={d} set={setD} />}
           {drawer === 'alertas' && <Alertas d={d} set={setD} />}
