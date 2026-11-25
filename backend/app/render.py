@@ -544,7 +544,7 @@ def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
     h = f'<section class="panel" id="p-{s.id}"><div class="ptitle" data-r><div><h2>{esc(s.title)}</h2><p>{esc(s.subtitle)}</p></div></div>'
     if s.tabs:
         h += f'<div class="subnav" id="sn-{s.id}">' + "".join(
-            f'<button class="sbtn{" on" if i == 0 else ""}" data-s="{attr(t.id)}" type="button">{esc(t.label)}</button>' for i, t in enumerate(s.tabs)) + "</div>"
+            f'<button class="sbtn{" on" if i == 0 else ""}" data-s="{attr(t.id)}"{(" data-tema=" + chr(34) + t.tema + chr(34)) if t.tema else ""} type="button">{esc(t.label)}</button>' for i, t in enumerate(s.tabs)) + "</div>"
         for i, t in enumerate(s.tabs):
             inner = render_list(t.blocks, ctx, f"sections.{si}.tabs.{i}.blocks") + add_slot(ctx, f"sections.{si}.tabs.{i}.blocks") if (t.blocks or not t.tabs or ctx.edit) else ""
             if t.tabs:
@@ -553,7 +553,11 @@ def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
                 for j, u in enumerate(t.tabs):
                     base = f"sections.{si}.tabs.{i}.tabs.{j}.blocks"
                     inner += f'<div class="sub2{" on" if j == 0 else ""}" data-sub2="{attr(u.id)}">' + render_list(u.blocks, ctx, base) + add_slot(ctx, base) + "</div>"
-            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + inner + "</div>"
+            th = ""
+            if t.tema:
+                th = (f' data-tema="{t.tema}" data-intro="{1 if t.intro else 0}" data-it="{attr(t.intro_titulo or t.label)}" data-is="{attr(t.intro_sub or "Navidad en Presidencia")}"')
+                inner += '<button type="button" class="xm-replay">✨ Ver intro</button>' if t.intro else ""
+            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}"{th}>' + inner + "</div>"
     else:
         h += render_list(s.blocks, ctx, f"sections.{si}.blocks") + add_slot(ctx, f"sections.{si}.blocks")
         if any(isinstance(b, Workflow) for b in _blocks(s)):
@@ -781,6 +785,10 @@ def render(rep: Report, edit: bool = False) -> str:
     if m.theme.layout != "clasico":
         out = out.replace("<html ", f'<html data-layout="{m.theme.layout}" ', 1)
         out = out.replace("</head>", "<style id=\"rs-layout\">" + (SHELL.parent / "layouts.css").read_text(encoding="utf-8") + "</style></head>", 1)
+    if any(t.tema for sec in rep.sections for t in sec.tabs):  # el tema navideño solo viaja si algún botón lo usa
+        tpl = SHELL.parent
+        out = out.replace("</head>", "<style id=\"rs-xmas\">" + (tpl / "xmas.css").read_text(encoding="utf-8") + "</style></head>", 1)
+        out = out.replace("</body>", "<script>" + (tpl / "xmas.js").read_text(encoding="utf-8").replace("</", "<\\/") + "</script></body>", 1)
     if _has_chart(rep):  # el motor de gráficos solo viaja si el informe los usa
         tpl = SHELL.parent
         out = out.replace("</head>", "<style>" + (tpl / "charts.css").read_text(encoding="utf-8") + "</style></head>", 1)

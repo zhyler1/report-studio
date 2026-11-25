@@ -612,7 +612,10 @@
               ]
             }
           ],
-          "tabs": []
+          "tabs": [],
+          "intro": true,
+          "intro_titulo": "",
+          "intro_sub": ""
         },
         {
           "id": "actividades",
@@ -772,7 +775,10 @@
               "efr_measure": "EFR"
             }
           ],
-          "tabs": []
+          "tabs": [],
+          "intro": true,
+          "intro_titulo": "",
+          "intro_sub": ""
         },
         {
           "id": "calendario",
@@ -791,7 +797,10 @@
               "source": "act"
             }
           ],
-          "tabs": []
+          "tabs": [],
+          "intro": true,
+          "intro_titulo": "",
+          "intro_sub": ""
         },
         {
           "id": "presupuesto",
@@ -811,7 +820,10 @@
               "viz": "donut"
             }
           ],
-          "tabs": []
+          "tabs": [],
+          "intro": true,
+          "intro_titulo": "",
+          "intro_sub": ""
         },
         {
           "id": "propuestas",
@@ -940,7 +952,10 @@
               "velitas_note": "Se cambia la leche por un farol"
             }
           ],
-          "tabs": []
+          "tabs": [],
+          "intro": true,
+          "intro_titulo": "",
+          "intro_sub": ""
         }
       ]
     },

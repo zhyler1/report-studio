@@ -113,6 +113,14 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
           <button title="Sacarlo como botón principal de la sección" onClick={() => { const a = t.tabs.filter((_: Json, k: number) => k !== j); let nid = u.id, n = 2; while (tabs.some(x => x.id === nid)) nid = u.id + '-' + n++; const out = tabs.map((x, k) => (k === i ? { ...x, tabs: a } : x)); out.splice(i + 1, 0, { id: nid, label: u.label, blocks: u.blocks || [] }); put(out) }}>⤴</button>
           <button className="danger" aria-label={'Quitar ' + u.label} onClick={() => confirm(`¿Quitar «${u.label}» y sus ${u.blocks?.length || 0} casillas?`) && putSub(i, t.tabs.filter((_: Json, k: number) => k !== j))}>✕</button></div>)}
         <button onClick={() => { const label = (prompt('Nombre del botón nuevo dentro de «' + t.label + '»') || '').trim(); if (!label) return; let sid = slug(label), n = 2; while (t.tabs.some((x: Json) => x.id === sid)) sid = slug(label) + '-' + n++; putSub(i, [...t.tabs, { id: sid, label, blocks: [] }]) }}>+ Botón dentro de «{t.label}»</button></div>}
+      <div style={{ margin: '-2px 0 8px 22px', display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 13 }}>
+        <label>Tema <select value={t.tema || ''} onChange={e => put(tabs.map((x, k) => { if (k !== i) return x; const { tema, ...r } = x; return e.target.value ? { ...r, tema: e.target.value } : r }))}>
+          <option value="">Normal</option><option value="navidad">✨ Navidad (con animaciones)</option></select></label>
+        {t.tema && <label style={{ display: 'flex', gap: 5, alignItems: 'center' }}><input type="checkbox" checked={t.intro !== false} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro: e.target.checked } : x)))} /> Intro animada al abrir</label>}
+        {t.tema && t.intro !== false && <>
+          <input style={{ width: 190 }} placeholder={'Título de la intro: ' + t.label} value={t.intro_titulo || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_titulo: e.target.value } : x)))} />
+          <input style={{ width: 190 }} placeholder="Subtítulo: Navidad en Presidencia" value={t.intro_sub || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_sub: e.target.value } : x)))} /></>}
+      </div>
       {(t.blocks || []).filter((b: Json) => b.type === 'heading' && (b.title || '').trim()).length >= 2 && <div style={{ margin: '-2px 0 8px 22px' }}>
         <button className="pri" style={{ fontSize: 12 }} title="Cada subtítulo de esta página pasa a ser un botón, con las casillas que tiene debajo" onClick={() => {
           const usados = new Set<string>(); const subs: Json[] = []; const antes: Json[] = []; let cur: Json | null = null

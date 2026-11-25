@@ -4798,6 +4798,34 @@
      },
      "title": "Tabs",
      "type": "array"
+    },
+    "tema": {
+     "anyOf": [
+      {
+       "const": "navidad",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Tema"
+    },
+    "intro": {
+     "default": true,
+     "title": "Intro",
+     "type": "boolean"
+    },
+    "intro_titulo": {
+     "default": "",
+     "title": "Intro Titulo",
+     "type": "string"
+    },
+    "intro_sub": {
+     "default": "",
+     "title": "Intro Sub",
+     "type": "string"
     }
    },
    "required": [

@@ -37,3 +37,17 @@ def test_botones_anidados():
     html = render(rep)
     assert 'data-s2="lunes"' in html and 'data-sub2="carrito"' in html and "Texto del carrito" in html
     assert "sections" in render(rep, edit=True) and 'tabs.0.tabs.1.blocks' in render(rep, edit=True)
+
+
+def test_tema_navidad_solo_viaja_si_se_usa():
+    import json, pathlib
+    from app.render import render
+    from app.validate import load
+    seed = json.loads((pathlib.Path(__file__).resolve().parents[2] / "seed/report.seed.json").read_text(encoding="utf-8"))
+    rep, _ = load(seed)
+    assert 'id="rs-xmas"' not in render(rep)
+    bien = next(s for s in seed["sections"] if s["id"] == "bienestar")
+    bien["tabs"].append({"id": "nav", "label": "Enciende lo que nos une", "tema": "navidad", "blocks": []})
+    rep, _ = load(seed)
+    html = render(rep)
+    assert 'id="rs-xmas"' in html and 'data-tema="navidad"' in html and 'data-it="Enciende lo que nos une"' in html and "xm-replay" in html
