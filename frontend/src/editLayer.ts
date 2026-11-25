@@ -135,7 +135,8 @@ export const listOps = {
   },
   dup(d: Json, p: string): Json {
     const { list, i } = parentOf(p); const a = [...getAt(d, list)]
-    a.splice(i + 1, 0, JSON.parse(JSON.stringify(a[i]))); return setAt(d, list, a)
+    const sinId = (o: Json): Json => Array.isArray(o) ? o.map(sinId) : (o && typeof o === 'object') ? Object.fromEntries(Object.entries(o).filter(([k]) => !(k === 'id' && 'type' in o)).map(([k, v]) => [k, sinId(v)])) : o
+    a.splice(i + 1, 0, sinId(JSON.parse(JSON.stringify(a[i])))); return setAt(d, list, a)   // la copia no lleva id (no choca con el original)
   },
   del(d: Json, p: string): Json {
     const { list, i } = parentOf(p); return setAt(d, list, getAt(d, list).filter((_: Json, k: number) => k !== i))

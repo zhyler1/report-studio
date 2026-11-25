@@ -64,6 +64,12 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
     let id = slug(label), n = 2; while (base.some(t => t.id === id)) id = slug(label) + '-' + n++
     set({ ...s, blocks: [], tabs: [...base, { id, label, blocks: [] }] })
   }
+  const sinId = (o: Json): Json => Array.isArray(o) ? o.map(sinId) : (o && typeof o === 'object') ? Object.fromEntries(Object.entries(o).filter(([k]) => !(k === 'id' && 'type' in o)).map(([k, v]) => [k, sinId(v)])) : o
+  const dup = (i: number) => {   // copia el botón con todas sus casillas, justo después y dentro de la misma sección
+    const t = tabs[i]; const label = t.label + ' (copia)'
+    let id = slug(label), n = 2; while (tabs.some(x => x.id === id)) id = slug(label) + '-' + n++
+    const a = [...tabs]; a.splice(i + 1, 0, { ...sinId(JSON.parse(JSON.stringify(t))), id, label }); put(a)
+  }
   const mv = (i: number, dx: number) => { const a = [...tabs], j = i + dx; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; put(a) }
   return <>
     <div className="rgl" style={{ margin: '12px 0 6px' }}>Botones de esta sección ({tabs.length})</div>
@@ -71,6 +77,7 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
     {tabs.map((t, i) => <div key={t.id} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
       <input style={{ flex: 1 }} value={t.label} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
       <span className="mut">{t.blocks?.length || 0} casillas</span>
+      <button title="Duplicar este botón con todas sus casillas" aria-label={'Duplicar ' + t.label} onClick={() => dup(i)}>⧉</button>
       <button onClick={() => mv(i, -1)} aria-label="Subir botón">↑</button><button onClick={() => mv(i, 1)} aria-label="Bajar botón">↓</button>
       <button className="danger" aria-label={'Quitar ' + t.label} onClick={() => confirm(`¿Quitar el botón «${t.label}» y sus ${t.blocks?.length || 0} casillas? Puedes deshacer con Ctrl+Z.`) && put(tabs.filter((_, k) => k !== i))}>✕</button></div>)}
     <button onClick={add} style={{ marginBottom: 10 }}>+ Agregar botón</button>
