@@ -410,7 +410,25 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     clip.forEach((b, k) => { nd = listOps.insert(nd, w.list, w.index + k, JSON.parse(JSON.stringify(b))) })
     setD(nd); select(w.list + '.' + w.index); flash('Pegada ✓')
   }
+  const limpiarVacios = () => {   // quita todos los grupos y columnas vacíos (y los que queden vacíos al quitar otros)
+    const dd = dRef.current; if (!dd) return
+    let n = 0
+    const vacio = (b: Json): boolean => (b.type === 'group' && !(b.blocks || []).length) || (b.type === 'grid' && !(b.columns || []).some((c: Json[]) => c.length))
+    const limpia = (l: Json[]): Json[] => {
+      const out: Json[] = []
+      for (const b of l || []) {
+        const c = b.type === 'group' ? { ...b, blocks: limpia(b.blocks) } : b.type === 'grid' ? { ...b, columns: (b.columns || []).map((x: Json[]) => limpia(x)) } : b
+        if (vacio(c)) { n++; continue }
+        out.push(c)
+      }
+      return out
+    }
+    const nd = { ...dd, sections: dd.sections.map((s: Json) => ({ ...s, blocks: limpia(s.blocks), tabs: (s.tabs || []).map((t: Json) => ({ ...t, blocks: limpia(t.blocks), tabs: (t.tabs || []).map((u: Json) => ({ ...u, blocks: limpia(u.blocks) })) })) })) }
+    if (!n) { flash('No hay contenedores vacíos'); return }
+    setD(nd); select(null); flash(`${n} contenedor${n > 1 ? 'es' : ''} vacío${n > 1 ? 's' : ''} quitado${n > 1 ? 's' : ''} · Ctrl+Z para deshacer`)
+  }
   const op = (a: string) => {
+    if (a === 'clean') { limpiarVacios(); return }
     if (a === 'copy' || a === 'cut') { copyBlock(a === 'cut'); return }
     if (a === 'paste') { pasteBlock(); return }
     const sp = selRef.current, dd = dRef.current; if (!sp || !dd) return
