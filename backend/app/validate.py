@@ -25,6 +25,8 @@ def all_blocks(rep: Report) -> Iterator:
         yield from walk(s.blocks)
         for t in s.tabs:
             yield from walk(t.blocks)
+            for st in t.tabs:
+                yield from walk(st.blocks)
 
 
 def _d(s: str):

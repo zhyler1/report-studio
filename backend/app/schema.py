@@ -440,10 +440,17 @@ class HomeCard(Base):
     hidden: bool = False          # no se muestra en Inicio (el botón de la sección sigue)
 
 
+class SubTab(Base):
+    id: str
+    label: str
+    blocks: list[Block] = []
+
+
 class Tab(Base):
     id: str
     label: str
-    blocks: list[Block]
+    blocks: list[Block] = []
+    tabs: list[SubTab] = []       # sub-botones dentro de este botón (un nivel más)
 
 
 class Section(Base):

@@ -165,6 +165,8 @@ def _blocks(s: Section):
     yield from walk(s.blocks)
     for t in s.tabs:
         yield from walk(t.blocks)
+        for st in t.tabs:
+            yield from walk(st.blocks)
 
 
 # ───────────────────────── piezas ─────────────────────────
@@ -535,7 +537,14 @@ def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
         h += f'<div class="subnav" id="sn-{s.id}">' + "".join(
             f'<button class="sbtn{" on" if i == 0 else ""}" data-s="{attr(t.id)}" type="button">{esc(t.label)}</button>' for i, t in enumerate(s.tabs)) + "</div>"
         for i, t in enumerate(s.tabs):
-            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + render_list(t.blocks, ctx, f"sections.{si}.tabs.{i}.blocks") + add_slot(ctx, f"sections.{si}.tabs.{i}.blocks") + "</div>"
+            inner = render_list(t.blocks, ctx, f"sections.{si}.tabs.{i}.blocks") + add_slot(ctx, f"sections.{si}.tabs.{i}.blocks") if (t.blocks or not t.tabs or ctx.edit) else ""
+            if t.tabs:
+                inner += f'<div class="snav2" data-sn2="{attr(t.id)}">' + "".join(
+                    f'<button class="sbtn{" on" if j == 0 else ""}" data-s2="{attr(u.id)}" type="button">{esc(u.label)}</button>' for j, u in enumerate(t.tabs)) + "</div>"
+                for j, u in enumerate(t.tabs):
+                    base = f"sections.{si}.tabs.{i}.tabs.{j}.blocks"
+                    inner += f'<div class="sub2{" on" if j == 0 else ""}" data-sub2="{attr(u.id)}">' + render_list(u.blocks, ctx, base) + add_slot(ctx, base) + "</div>"
+            h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}">' + inner + "</div>"
     else:
         h += render_list(s.blocks, ctx, f"sections.{si}.blocks") + add_slot(ctx, f"sections.{si}.blocks")
         if any(isinstance(b, Workflow) for b in _blocks(s)):

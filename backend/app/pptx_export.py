@@ -292,7 +292,7 @@ class Deck:
             self.new(clean(s.title), clean(s.subtitle))
             for b in s.blocks:
                 self.block(b)
-            for t in s.tabs:
+            for t in [x for tt in s.tabs for x in [tt, *tt.tabs]]:
                 vis = [b for b in t.blocks if not b.hidden and not isinstance(b, (Budget, CalendarBlock, Proposals, Gallery, MediaBlock))]
                 if not vis:
                     continue

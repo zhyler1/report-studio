@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
 import { attach, getAt, setAt, listOps, lockedAt, splitBlock, ungroup, groupNext, parentBlock } from './editLayer'
 import { BLOCK, ICONOS } from './labels'
@@ -71,28 +71,48 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
     let id = slug(label), n = 2; while (tabs.some(x => x.id === id)) id = slug(label) + '-' + n++
     const a = [...tabs]; a.splice(i + 1, 0, { ...sinId(JSON.parse(JSON.stringify(t))), id, label }); put(a)
   }
-  const [dest, setDest] = useState('__nuevo'); const [nuevo, setNuevo] = useState('')
+  const [dest, setDest] = useState('__nuevo'); const [nuevo, setNuevo] = useState(''); const [modo, setModo] = useState<'sub' | 'titulos'>('sub')
   const unir = () => {   // junta los botones marcados en uno: en uno nuevo o en uno de los marcados; cada uno queda como subtítulo con sus casillas debajo
     const ms = tabs.filter(t => marc.includes(t.id)); if (ms.length < 2) return
     const aNuevo = dest === '__nuevo' || !marc.includes(dest)
     const label = aNuevo ? nuevo.trim() : (ms.find(t => t.id === dest)?.label || ''); if (!label) { alert('Escribe el nombre del botón que reúne a los demás.'); return }
     let id = aNuevo ? slug(label) : dest, n = 2; if (aNuevo) while (tabs.some(x => x.id === id && !marc.includes(x.id))) id = slug(label) + '-' + n++
-    const blocks = ms.flatMap(t => [{ type: 'heading', title: t.label }, ...(t.blocks || [])])
     const first = tabs.findIndex(t => marc.includes(t.id))
-    const rest = tabs.filter(t => !marc.includes(t.id)); rest.splice(first, 0, { id, label, blocks })
+    const rest = tabs.filter(t => !marc.includes(t.id))
+    if (modo === 'sub') {   // el botón nuevo contiene sus propios botones, uno por cada tema
+      const usados = new Set<string>(); const subs: Json[] = []
+      const meter = (t: Json) => { let sid = slug(t.label), k = 2; while (usados.has(sid)) sid = slug(t.label) + '-' + k++; usados.add(sid); subs.push({ id: sid, label: t.label, blocks: t.blocks || [] }) }
+      ms.forEach(t => { meter(t); (t.tabs || []).forEach(meter) })
+      rest.splice(first, 0, { id, label, blocks: [], tabs: subs })
+    } else {
+      const blocks = ms.flatMap(t => [{ type: 'heading', title: t.label }, ...(t.blocks || [])])
+      rest.splice(first, 0, { id, label, blocks })
+    }
     put(rest); setMarc([]); setNuevo(''); setDest('__nuevo')
   }
+  const putSub = (i: number, sub: Json[], vaciar = false) => put(tabs.map((x, k) => (k === i ? { ...x, tabs: sub, ...(vaciar ? { blocks: [] } : {}) } : x)))
   const mv = (i: number, dx: number) => { const a = [...tabs], j = i + dx; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; put(a) }
   return <>
     <div className="rgl" style={{ margin: '12px 0 6px' }}>Botones de esta sección ({tabs.length})</div>
     {!tabs.length && <p className="mut" style={{ margin: '0 0 6px' }}>Esta sección no tiene botones: sus casillas van seguidas. Agrega un botón para separarlas por tema.</p>}
-    {tabs.map((t, i) => <div key={t.id} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+    {tabs.map((t, i) => <Fragment key={t.id}><div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
       <input type="checkbox" title="Marcar para unir con otros botones" checked={marc.includes(t.id)} onChange={e => setMarc(e.target.checked ? [...marc, t.id] : marc.filter(x => x !== t.id))} />
       <input style={{ flex: 1 }} value={t.label} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
       <span className="mut">{t.blocks?.length || 0} casillas</span>
       <button title="Duplicar este botón con todas sus casillas" aria-label={'Duplicar ' + t.label} onClick={() => dup(i)}>⧉</button>
       <button onClick={() => mv(i, -1)} aria-label="Subir botón">↑</button><button onClick={() => mv(i, 1)} aria-label="Bajar botón">↓</button>
-      <button className="danger" aria-label={'Quitar ' + t.label} onClick={() => confirm(`¿Quitar el botón «${t.label}» y sus ${t.blocks?.length || 0} casillas? Puedes deshacer con Ctrl+Z.`) && put(tabs.filter((_, k) => k !== i))}>✕</button></div>)}
+      <button className="danger" aria-label={'Quitar ' + t.label} onClick={() => confirm(`¿Quitar el botón «${t.label}» y sus ${t.blocks?.length || 0} casillas${t.tabs?.length ? ' y sus ' + t.tabs.length + ' sub-botones' : ''}? Puedes deshacer con Ctrl+Z.`) && put(tabs.filter((_, k) => k !== i))}>✕</button></div>
+      {(t.tabs?.length > 0) && <div style={{ margin: '-2px 0 8px 22px', paddingLeft: 10, borderLeft: '3px solid #cbd2de' }}>
+        <div className="mut" style={{ fontSize: 12, marginBottom: 4 }}>Botones dentro de «{t.label}»</div>
+        {t.tabs.map((u: Json, j: number) => <div key={u.id} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 4 }}>
+          <input style={{ flex: 1 }} value={u.label} onChange={e => putSub(i, t.tabs.map((x: Json, k: number) => (k === j ? { ...x, label: e.target.value } : x)))} />
+          <span className="mut">{u.blocks?.length || 0} casillas</span>
+          <button onClick={() => { const a = [...t.tabs], q = j - 1; if (q < 0) return; [a[j], a[q]] = [a[q], a[j]]; putSub(i, a) }} aria-label="Subir">↑</button>
+          <button onClick={() => { const a = [...t.tabs], q = j + 1; if (q >= a.length) return; [a[j], a[q]] = [a[q], a[j]]; putSub(i, a) }} aria-label="Bajar">↓</button>
+          <button title="Sacarlo como botón principal de la sección" onClick={() => { const a = t.tabs.filter((_: Json, k: number) => k !== j); let nid = u.id, n = 2; while (tabs.some(x => x.id === nid)) nid = u.id + '-' + n++; const out = tabs.map((x, k) => (k === i ? { ...x, tabs: a } : x)); out.splice(i + 1, 0, { id: nid, label: u.label, blocks: u.blocks || [] }); put(out) }}>⤴</button>
+          <button className="danger" aria-label={'Quitar ' + u.label} onClick={() => confirm(`¿Quitar «${u.label}» y sus ${u.blocks?.length || 0} casillas?`) && putSub(i, t.tabs.filter((_: Json, k: number) => k !== j))}>✕</button></div>)}
+        <button onClick={() => { const label = (prompt('Nombre del botón nuevo dentro de «' + t.label + '»') || '').trim(); if (!label) return; let sid = slug(label), n = 2; while (t.tabs.some((x: Json) => x.id === sid)) sid = slug(label) + '-' + n++; putSub(i, [...t.tabs, { id: sid, label, blocks: [] }]) }}>+ Botón dentro de «{t.label}»</button></div>}
+      {!(t.tabs?.length > 0) && <div style={{ margin: '-2px 0 8px 22px' }}><button style={{ fontSize: 12 }} title="Este botón pasa a tener botones propios; sus casillas actuales quedan en el primero" onClick={() => { const label = (prompt('Nombre del primer botón dentro de «' + t.label + '»') || '').trim(); if (!label) return; putSub(i, [{ id: slug(label), label, blocks: t.blocks || [] }], true) }}>+ Botones dentro de este botón</button></div>}</Fragment>)}
     <button onClick={add} style={{ marginBottom: 10 }}>+ Agregar botón</button>
     {marc.length > 0 && <div className="card" style={{ margin: '4px 0 10px' }}>
       <div style={{ fontSize: 13, marginBottom: 6 }}>{marc.length < 2 ? 'Marca al menos otro botón para unir con ' : 'Se unen: '}<b>{tabs.filter(t => marc.includes(t.id)).map(t => '«' + t.label + '»').join(' + ')}</b></div>
@@ -103,6 +123,9 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
             {tabs.filter(t => marc.includes(t.id)).map(t => <option key={t.id} value={t.id}>El botón «{t.label}» (conserva ese nombre)</option>)}
           </select></label>
         {(dest === '__nuevo' || !marc.includes(dest)) && <input style={{ width: '100%', marginBottom: 6 }} placeholder="Nombre del botón nuevo, por ejemplo: Enciende lo que nos une" value={nuevo} onChange={e => setNuevo(e.target.value)} />}
+        <div style={{ fontSize: 13, margin: '2px 0 8px' }}>
+          <label style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}><input type="radio" checked={modo === 'sub'} onChange={() => setModo('sub')} /><span><b>Con sus propios botones</b>: dentro quedan {tabs.filter(t => marc.includes(t.id)).map(t => '«' + t.label + '»').join(', ')} como botones</span></label>
+          <label style={{ display: 'flex', gap: 6, alignItems: 'flex-start', marginTop: 4 }}><input type="radio" checked={modo === 'titulos'} onChange={() => setModo('titulos')} /><span><b>En una sola página</b>, cada tema como subtítulo</span></label></div>
         <button className="pri" onClick={unir}>⇉ Unir {marc.length} botones</button></>}
       <button style={{ marginLeft: 8 }} onClick={() => setMarc([])}>Cancelar</button></div>}
     <button style={{ marginBottom: 10, marginLeft: 8 }} title="Reemplaza las cifras de la tarjeta de este grupo en Inicio por las de la casilla de cifras del botón «Resumen» o, si no hay, la última casilla de cifras de la sección" onClick={() => {

@@ -4533,7 +4533,7 @@
    "title": "StepCards",
    "type": "object"
   },
-  "Tab": {
+  "SubTab": {
    "additionalProperties": false,
    "properties": {
     "id": {
@@ -4545,6 +4545,7 @@
      "type": "string"
     },
     "blocks": {
+     "default": [],
      "items": {
       "discriminator": {
        "mapping": {
@@ -4660,8 +4661,148 @@
    },
    "required": [
     "id",
-    "label",
-    "blocks"
+    "label"
+   ],
+   "title": "SubTab",
+   "type": "object"
+  },
+  "Tab": {
+   "additionalProperties": false,
+   "properties": {
+    "id": {
+     "title": "Id",
+     "type": "string"
+    },
+    "label": {
+     "title": "Label",
+     "type": "string"
+    },
+    "blocks": {
+     "default": [],
+     "items": {
+      "discriminator": {
+       "mapping": {
+        "activities": "#/$defs/Activities",
+        "agreement": "#/$defs/Agreement",
+        "budget": "#/$defs/Budget",
+        "calendar": "#/$defs/CalendarBlock",
+        "callout": "#/$defs/Callout",
+        "card_list": "#/$defs/CardList",
+        "chart": "#/$defs/Chart",
+        "gallery": "#/$defs/Gallery",
+        "grid": "#/$defs/Grid",
+        "group": "#/$defs/Group",
+        "heading": "#/$defs/Heading",
+        "link_cards": "#/$defs/LinkCards",
+        "media": "#/$defs/MediaBlock",
+        "note_list": "#/$defs/NoteList",
+        "numbered_cards": "#/$defs/NumberedCards",
+        "plant_card": "#/$defs/PlantCard",
+        "plants": "#/$defs/Plants",
+        "proposals": "#/$defs/Proposals",
+        "ring_card": "#/$defs/RingCard",
+        "row_list": "#/$defs/RowList",
+        "stat_grid": "#/$defs/StatGrid",
+        "status_list": "#/$defs/StatusList",
+        "step_cards": "#/$defs/StepCards",
+        "table": "#/$defs/Table",
+        "workflow": "#/$defs/Workflow"
+       },
+       "propertyName": "type"
+      },
+      "oneOf": [
+       {
+        "$ref": "#/$defs/StatGrid"
+       },
+       {
+        "$ref": "#/$defs/RowList"
+       },
+       {
+        "$ref": "#/$defs/NoteList"
+       },
+       {
+        "$ref": "#/$defs/CardList"
+       },
+       {
+        "$ref": "#/$defs/RingCard"
+       },
+       {
+        "$ref": "#/$defs/StatusList"
+       },
+       {
+        "$ref": "#/$defs/NumberedCards"
+       },
+       {
+        "$ref": "#/$defs/StepCards"
+       },
+       {
+        "$ref": "#/$defs/LinkCards"
+       },
+       {
+        "$ref": "#/$defs/Gallery"
+       },
+       {
+        "$ref": "#/$defs/Table"
+       },
+       {
+        "$ref": "#/$defs/Plants"
+       },
+       {
+        "$ref": "#/$defs/Workflow"
+       },
+       {
+        "$ref": "#/$defs/Agreement"
+       },
+       {
+        "$ref": "#/$defs/Activities"
+       },
+       {
+        "$ref": "#/$defs/Budget"
+       },
+       {
+        "$ref": "#/$defs/CalendarBlock"
+       },
+       {
+        "$ref": "#/$defs/Proposals"
+       },
+       {
+        "$ref": "#/$defs/Chart"
+       },
+       {
+        "$ref": "#/$defs/MediaBlock"
+       },
+       {
+        "$ref": "#/$defs/Grid"
+       },
+       {
+        "$ref": "#/$defs/Group"
+       },
+       {
+        "$ref": "#/$defs/PlantCard"
+       },
+       {
+        "$ref": "#/$defs/Callout"
+       },
+       {
+        "$ref": "#/$defs/Heading"
+       }
+      ]
+     },
+     "title": "Blocks",
+     "type": "array"
+    },
+    "tabs": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/SubTab"
+     },
+     "title": "Tabs",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "label"
    ],
    "title": "Tab",
    "type": "object"

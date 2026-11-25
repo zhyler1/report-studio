@@ -22,3 +22,18 @@ def test_adjunto_en_cualquier_casilla():
     for pos in ("top", "bottom", "left", "right"):
         b.embed_pos = pos
         assert '<video class="pimg" src="https://x/v.mp4"' in render(rep)
+
+
+def test_botones_anidados():
+    import json, pathlib
+    from app.render import render
+    from app.validate import load
+    seed = json.loads((pathlib.Path(__file__).resolve().parents[2] / "seed/report.seed.json").read_text(encoding="utf-8"))
+    bien = next(s for s in seed["sections"] if s["id"] == "bienestar")
+    bien["tabs"] = [{"id": "enciende", "label": "Enciende lo que nos une", "blocks": [], "tabs": [
+        {"id": "lunes", "label": "Lunes", "blocks": [{"type": "callout", "text": "Texto del lunes"}]},
+        {"id": "carrito", "label": "Carrito", "blocks": [{"type": "callout", "text": "Texto del carrito"}]}]}]
+    rep, issues = load(seed)
+    html = render(rep)
+    assert 'data-s2="lunes"' in html and 'data-sub2="carrito"' in html and "Texto del carrito" in html
+    assert "sections" in render(rep, edit=True) and 'tabs.0.tabs.1.blocks' in render(rep, edit=True)

@@ -611,7 +611,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "tabs": []
         },
         {
           "id": "actividades",
@@ -770,7 +771,8 @@
               "total_label": "Proyección PAA de diciembre 2026",
               "efr_measure": "EFR"
             }
-          ]
+          ],
+          "tabs": []
         },
         {
           "id": "calendario",
@@ -788,7 +790,8 @@
               "type": "calendar",
               "source": "act"
             }
-          ]
+          ],
+          "tabs": []
         },
         {
           "id": "presupuesto",
@@ -807,7 +810,8 @@
               "source": "act",
               "viz": "donut"
             }
-          ]
+          ],
+          "tabs": []
         },
         {
           "id": "propuestas",
@@ -935,7 +939,8 @@
               },
               "velitas_note": "Se cambia la leche por un farol"
             }
-          ]
+          ],
+          "tabs": []
         }
       ]
     },
