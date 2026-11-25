@@ -53,6 +53,7 @@ function General({ d, set, frame }: { d: Json; set: (d: Json) => void; frame: { 
     <div className="card"><MetaForm meta={(({ hero_stats, hero_mode, home_hide, ...m }) => m)(d.meta)} set={m => set({ ...d, meta: { ...m, ...(d.meta.home_hide?.length ? { home_hide: d.meta.home_hide } : {}), ...(d.meta.hero_stats != null ? { hero_stats: d.meta.hero_stats } : {}), ...(d.meta.hero_mode ? { hero_mode: d.meta.hero_mode } : {}) } })} /></div></>
 }
 
+const sinIdDeep = (o: Json): Json => Array.isArray(o) ? o.map(sinIdDeep) : (o && typeof o === 'object') ? Object.fromEntries(Object.entries(o).filter(([k]) => !(k === 'id' && 'type' in o)).map(([k, v]) => [k, sinIdDeep(v)])) : o
 // Botones (pestañas internas) de una sección: agregar, renombrar, mover y quitar. Quitar un botón borra sus casillas.
 function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
   const tabs: Json[] = s.tabs || []
@@ -295,6 +296,8 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     const k = e.key.toLowerCase()
     if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? undoRef.current.redo() : undoRef.current.undo() }
     else if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); undoRef.current.redo() }
+    else if ((e.ctrlKey || e.metaKey) && (k === 'c' || k === 'x') && selRef.current && (el?.ownerDocument?.getSelection?.()?.isCollapsed ?? true)) { e.preventDefault(); keyAct.current(k === 'c' ? 'copy' : 'cut') }
+    else if ((e.ctrlKey || e.metaKey) && k === 'v') { e.preventDefault(); keyAct.current('paste') }
     else if (selRef.current && (e.ctrlKey || e.metaKey) && k === 'd') { e.preventDefault(); keyAct.current('dup') }
     else if (selRef.current && (k === 'delete' || k === 'backspace') && !e.ctrlKey && !e.metaKey) { e.preventDefault(); keyAct.current('del!') }
     else if (selRef.current && e.altKey && (k === 'arrowup' || k === 'arrowdown')) { e.preventDefault(); keyAct.current(k === 'arrowup' ? 'up' : 'down') }
@@ -367,13 +370,22 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
   const insertBlock = (type: string) => { if (!picker) return; doInsert(picker.list, picker.index, type, picker.side); setPicker(null) }
   const where = (): { list: string; index: number; si: number } | null => {  // dónde cae una casilla nueva: debajo de la seleccionada o al final de la sección visible
     const dd = dRef.current; if (!dd) return null
-    const sp = selRef.current
+    let sp = selRef.current
+    if (sp) {   // una casilla seleccionada que ya no está a la vista (otro botón o sección) no cuenta como destino
+      const el = frame.current?.contentDocument?.querySelector(`[data-bp="${sp}"]`)
+      const visible = !!el && !!el.closest('.panel.active') && (!el.closest('.sub') || !!el.closest('.sub.on')) && (!el.closest('.sub2') || !!el.closest('.sub2.on'))
+      if (!visible) sp = null
+    }
     if (sp) { const k = sp.split('.'); const i = Number(k.pop()); return { list: k.join('.'), index: i + 1, si: Number(k[1]) || 0 } }
     const doc = frame.current?.contentDocument; const pv = readPrev(doc)
     const si = dd.sections.findIndex((s: Json) => s.id === pv?.tab); if (si < 0) return null
     const s = dd.sections[si]
     let list = `sections.${si}.blocks`
-    if (s.tabs?.length) { const sid = doc?.querySelector(`#sn-${s.id} .sbtn.on`)?.getAttribute('data-s'); const ti = Math.max(0, s.tabs.findIndex((x: Json) => x.id === sid)); list = `sections.${si}.tabs.${ti}.blocks` }
+    if (s.tabs?.length) {
+      const sid = doc?.querySelector(`#sn-${s.id} .sbtn.on`)?.getAttribute('data-s'); const ti = Math.max(0, s.tabs.findIndex((x: Json) => x.id === sid)); list = `sections.${si}.tabs.${ti}.blocks`
+      const t = s.tabs[ti]
+      if (t?.tabs?.length) { const uid = doc?.querySelector(`#p-${s.id} .sub.on .snav2 .sbtn.on`)?.getAttribute('data-s2'); const ui = Math.max(0, t.tabs.findIndex((x: Json) => x.id === uid)); list = `sections.${si}.tabs.${ti}.tabs.${ui}.blocks` }
+    }
     return { list, index: (getAt(dd, list) || []).length, si }
   }
   const insert = (type: string, side?: boolean) => {
@@ -383,7 +395,24 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     if (type === '__pick') { setPicker({ list: w.list, index: w.index, side }); return }
     doInsert(w.list, w.index, type, side)
   }
+  const copyBlock = (cut: boolean) => {   // copia (o corta) la casilla seleccionada al portapapeles de la herramienta, para pegarla en otro botón o sección
+    const sp = selRef.current, dd = dRef.current; if (!sp || !dd) { flash('Selecciona una casilla en la vista previa'); return }
+    const b = getAt(dd, sp); if (!b) return
+    if (cut && lockedAt(dd, sp)) { flash('Casilla bloqueada 🔒: desbloquéala para cortarla'); return }
+    LS.set('clip', [sinIdDeep(JSON.parse(JSON.stringify(b)))])
+    if (cut) { setD(listOps.del(dd, sp)); select(null); flash('Casilla cortada · ve al botón o sección destino y pulsa Pegar (Ctrl+V)') } else flash('Casilla copiada · ve al botón o sección destino y pulsa Pegar (Ctrl+V)')
+  }
+  const pasteBlock = () => {
+    const clip = LS.get<Json[]>('clip', []) || []
+    if (!clip.length) { flash('No hay nada copiado: selecciona una casilla y pulsa Copiar'); return }
+    const w = where(); if (!w) { flash('Abre un botón o sección en la vista previa (o selecciona una casilla) y vuelve a intentarlo'); return }
+    let nd = dRef.current; if (!nd) return
+    clip.forEach((b, k) => { nd = listOps.insert(nd, w.list, w.index + k, JSON.parse(JSON.stringify(b))) })
+    setD(nd); select(w.list + '.' + w.index); flash('Pegada ✓')
+  }
   const op = (a: string) => {
+    if (a === 'copy' || a === 'cut') { copyBlock(a === 'cut'); return }
+    if (a === 'paste') { pasteBlock(); return }
     const sp = selRef.current, dd = dRef.current; if (!sp || !dd) return
     const k = sp.split('.'); const i = Number(k.pop()); const list = k.join('.')
     if (a === 'desel') { select(null); return }

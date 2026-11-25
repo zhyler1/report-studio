@@ -104,7 +104,7 @@ export default function Ribbon(p: RibProps) {
       </>}
       {rib === 'insertar' && <>
         <Grp t="Casillas">{INSERTAR.map(([k, i, l]) => <Btn key={k} i={i} l={l} onClick={() => p.insert(k)} />)}</Grp>
-        <Grp t="Desde archivo"><Btn i="import" l="Desde documento" onClick={() => p.insert('__doc')} /></Grp>
+        <Grp t="Desde archivo"><Btn i="import" l="Desde documento" onClick={() => p.insert('__doc')} /><Btn i="copy" l="Pegar casilla" title="Pega la última casilla copiada o cortada (Ctrl/Cmd + V)" onClick={() => p.op('paste')} /></Grp>
         <Grp t="Plantillas"><Btn i="layers" l="Plantillas de sección" title="Inserta un arreglo de casillas listo o guarda la sección actual como plantilla" onClick={p.openTpl} /></Grp>
         <span className="rmut"><Ic n="info" /> {sel ? 'Se agrega debajo de la casilla seleccionada.' : 'Se agrega al final de la sección que estás viendo.'}</span>
       </>}
@@ -139,6 +139,7 @@ export default function Ribbon(p: RibProps) {
         {canSplit(b) && <Grp t="Partes"><Btn i="columns" l="Separar en casillas" title="Cada parte pasa a ser una casilla que se arrastra, intercambia y bloquea sola" onClick={() => p.op('split')} /></Grp>}
         <Grp t="Agrupar">{b.type === 'group' ? <Btn i="columns" l="Desagrupar" title="Suelta las casillas del grupo" onClick={() => p.op('ungroup')} /> : <Btn i="layers" l="Agrupar con la siguiente" title="Juntas se mueven como un bloque, y cada una se puede mover sola" onClick={() => p.op('groupnext')} />}{sel && parentBlock(d, sel) && <Btn i="left" l="Contenedor" title="Selecciona el bloque que contiene a esta casilla" onClick={() => p.op('parent')} />}</Grp>
         <Grp t="Organizar"><Btn i="left" l="Antes" title="Alt + ↑" onClick={() => p.op('up')} /><Btn i="right" l="Después" title="Alt + ↓" onClick={() => p.op('down')} /><Btn i="copy" l="Duplicar" title="Ctrl/Cmd + D" onClick={() => p.op('dup')} /></Grp>
+        <Grp t="Entre botones y secciones"><Btn i="copy" l="Copiar" title="Ctrl/Cmd + C: copia la casilla para pegarla en otro botón o sección" onClick={() => p.op('copy')} /><Btn i="trash" l="Cortar" title="Ctrl/Cmd + X: la mueve a otro botón o sección" onClick={() => p.op('cut')} /><Btn i="import" l="Pegar" title="Ctrl/Cmd + V: pega debajo de la casilla seleccionada o al final del botón que estás viendo" onClick={() => p.op('paste')} /></Grp>
         <Grp t="Más"><Btn i="sliders" l="Todas las opciones" onClick={() => p.openDrawer('casilla')} /><Btn i="lock" l="Bloquear" title="Nadie la mueve, edita ni borra por accidente" onClick={() => p.op('lock')} /><Btn i="trash" l="Quitar" cls="danger" title="Supr" onClick={() => p.op('del')} /></Grp>
       </>}
       {rib === 'datos' && <>
