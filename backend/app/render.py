@@ -498,6 +498,16 @@ def render_block(b, ctx: Ctx, path: str = "") -> str:
         out = R[type(b)](b, ctx)
     finally:
         ctx.path = prev
+    if b.embed is not None:
+        fig = media_img(b.embed, "font-size:12px;font-weight:600;margin-top:8px")
+        if b.embed_pos == "top":
+            out = fig + out
+        elif b.embed_pos == "left":
+            out = f'<div class="eg">{fig}<div>{out}</div></div>'
+        elif b.embed_pos == "right":
+            out = f'<div class="eg" style="grid-template-columns:minmax(0,1fr) minmax(240px,420px)"><div>{out}</div>{fig}</div>'
+        else:
+            out = out + fig
     if b.bg or b.fg:
         st = (f"background:{b.bg};--card:transparent;--card-h:transparent;" if b.bg else "") + (f"color:{b.fg};--text:{b.fg};--head:{b.fg};--muted:{b.fg};" if b.fg else "")
         out = f'<div class="rs-sty" style="{st}">{out}</div>'

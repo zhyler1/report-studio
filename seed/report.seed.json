@@ -92,6 +92,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "plants",
           "plants": [
             {
@@ -124,6 +125,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "grid",
           "ratio": [
             1.0,
@@ -139,6 +141,7 @@
                 "bg": "",
                 "fg": "",
                 "tints": [],
+                "embed_pos": "bottom",
                 "type": "table",
                 "columns": [
                   {
@@ -189,6 +192,7 @@
                 "bg": "",
                 "fg": "",
                 "tints": [],
+                "embed_pos": "bottom",
                 "type": "card_list",
                 "style": "plain",
                 "items": [
@@ -207,6 +211,7 @@
                 "bg": "",
                 "fg": "",
                 "tints": [],
+                "embed_pos": "bottom",
                 "type": "card_list",
                 "style": "checks",
                 "items": [
@@ -224,6 +229,7 @@
                 "bg": "",
                 "fg": "",
                 "tints": [],
+                "embed_pos": "bottom",
                 "type": "workflow",
                 "heading": "Planta transitoria",
                 "modal_title": "Planta transitoria · Flujo de trabajo de la prórroga",
@@ -352,6 +358,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "agreement",
           "heading": "Seguimiento al Acuerdo Colectivo Sectorial 2025-2027",
           "cutoff": "Corte 12 de noviembre de 2026",
@@ -424,6 +431,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "stat_grid",
           "items": [
             {
@@ -472,6 +480,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "row_list",
           "header": "ACCIONES DE GESTIÓN",
           "columns": [
@@ -560,6 +569,7 @@
               "bg": "",
               "fg": "",
               "tints": [],
+              "embed_pos": "bottom",
               "type": "step_cards",
               "header": "PRESIDENCIA TE ESCUCHA",
               "media": {
@@ -616,6 +626,7 @@
               "bg": "",
               "fg": "",
               "tints": [],
+              "embed_pos": "bottom",
               "type": "activities",
               "items": [
                 {
@@ -773,6 +784,7 @@
               "bg": "",
               "fg": "",
               "tints": [],
+              "embed_pos": "bottom",
               "type": "calendar",
               "source": "act"
             }
@@ -790,6 +802,7 @@
               "bg": "",
               "fg": "",
               "tints": [],
+              "embed_pos": "bottom",
               "type": "budget",
               "source": "act",
               "viz": "donut"
@@ -807,6 +820,7 @@
               "bg": "",
               "fg": "",
               "tints": [],
+              "embed_pos": "bottom",
               "type": "proposals",
               "show": [
                 "ancheta",
@@ -949,6 +963,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "link_cards",
           "items": [
             {
@@ -1016,6 +1031,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "gallery",
           "items": [
             {
@@ -1105,6 +1121,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "stat_grid",
           "items": [
             {
@@ -1162,6 +1179,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "row_list",
           "header": "ACCIONES DE GESTIÓN",
           "columns": [
@@ -1192,6 +1210,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "note_list",
           "header": "OBSERVACIONES",
           "items": [
@@ -1237,6 +1256,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "grid",
           "ratio": [
             1.0,
@@ -1251,6 +1271,7 @@
                 "bg": "",
                 "fg": "",
                 "tints": [],
+                "embed_pos": "bottom",
                 "type": "ring_card",
                 "value": 80.0,
                 "text": "Cumplimiento del plan anual de trabajo del 80 % hasta el 31 de octubre de 2026.",
@@ -1267,6 +1288,7 @@
                 "bg": "",
                 "fg": "",
                 "tints": [],
+                "embed_pos": "bottom",
                 "type": "status_list",
                 "items": [
                   {
@@ -1297,6 +1319,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "numbered_cards",
           "items": [
             {
@@ -1325,6 +1348,7 @@
           "bg": "",
           "fg": "",
           "tints": [],
+          "embed_pos": "bottom",
           "type": "numbered_cards",
           "items": [
             {
