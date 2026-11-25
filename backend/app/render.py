@@ -449,10 +449,19 @@ def r_media(b: MediaBlock, ctx: Ctx) -> str:
     return f'{t}<figure data-r{fig_style(b.media)}>{media_tag(b.media)}{cap}</figure>'
 
 
+def ctr_chip(ctx: Ctx, nombre: str, vacio: bool) -> str:
+    """Modo edición: etiqueta del contenedor con botón para quitarlo (aunque esté vacío y no tenga nada que seleccionar)."""
+    if not (ctx.edit and ctx.path):
+        return ""
+    est = "vacío" if vacio else "con casillas"
+    return (f'<div class="rs-ctr"><span>▢ {nombre} · {est}</span>'
+            f'<button type="button" class="rs-cdel" data-cdel="{attr(ctx.path)}" data-vacio="{1 if vacio else 0}" title="Quitar este contenedor">✕ Quitar contenedor</button></div>')
+
+
 def r_group(b: Group, ctx: Ctx) -> str:
     t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
     inner = render_list(b.blocks, ctx, f"{ctx.path}.blocks") + add_slot(ctx, f"{ctx.path}.blocks")
-    return f'{t}<div class="rs-grp">{inner}</div>' if ctx.edit else f"{t}{inner}"
+    return f'{t}{ctr_chip(ctx, "Grupo", not b.blocks)}<div class="rs-grp">{inner}</div>' if ctx.edit else f"{t}{inner}"
 
 
 def r_grid(b: Grid, ctx: Ctx) -> str:
@@ -462,7 +471,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
         inner = render_list(col, ctx, f"{ctx.path}.columns.{ci}") + add_slot(ctx, f"{ctx.path}.columns.{ci}")
         cols += f"<div>{inner}</div>" if ci == 0 else f'<div class="stk">{inner}</div>'
     sec = " sec" if not b.title else ""
-    return f'{t}<div class="grid g2{sec}">{cols}</div>'
+    return f'{t}{ctr_chip(ctx, "Columnas", not any(b.columns))}<div class="grid g2{sec}">{cols}</div>'
 
 
 R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList: r_card_list, RingCard: r_ring, StatusList: r_status_list,

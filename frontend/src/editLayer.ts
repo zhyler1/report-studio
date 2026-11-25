@@ -193,6 +193,7 @@ const COLORS = ['#C62828', '#E8711A', '#FDC800', '#2E9E5B', '#1F5FAF', '#7C3AED'
 
 const CSS = `
 .rs-add{margin:14px 0;padding:18px;border:2px dashed #9db4d8;border-radius:14px;text-align:center;color:#2160b0;font:600 14px Inter,system-ui,sans-serif;cursor:pointer;background:rgba(33,96,176,.04)}
+.rs-ctr{display:flex;align-items:center;gap:10px;margin:8px 0 4px;font:600 12px Inter,system-ui,sans-serif;color:#5a6785}.rs-cdel{font:700 12px Inter,system-ui,sans-serif;border:1px solid #e3b3b3;background:#fff4f4;color:#b02121;border-radius:8px;padding:4px 10px;cursor:pointer}.rs-cdel:hover{background:#fde4e4}
 .rs-add:hover{background:rgba(33,96,176,.12)}
 #rsHov,#rsSel{position:absolute;pointer-events:none;border-radius:10px;z-index:99990;display:none}
 #rsHov{outline:2px dashed #2160b0;outline-offset:2px}#rsSel{outline:3px solid #E8711A;outline-offset:2px}
@@ -362,6 +363,12 @@ export function attach(doc: Document, h: Host) {
     if (t.closest('#rsBar') || t.closest('[contenteditable=true]')) return
     const du = t.closest('[data-idup]') as HTMLElement | null
     if (du) { e.preventDefault(); e.stopPropagation(); h.put(listOps.dup(h.get(), du.dataset.idup!)); h.toast('Paso duplicado: cámbiale el título, la fecha y el texto'); return }
+    const cd = t.closest('[data-cdel]') as HTMLElement | null
+    if (cd) {
+      e.preventDefault(); e.stopPropagation()
+      if (cd.dataset.vacio === '1' || confirm('Este contenedor tiene casillas. ¿Quitarlo con todo su contenido? Puedes deshacer con Ctrl+Z.')) { h.put(listOps.del(h.get(), cd.dataset.cdel!)); h.toast('Contenedor quitado · Ctrl+Z para deshacer') }
+      return
+    }
     const em = t.closest('[data-iemb]') as HTMLElement | null
     if (em) {
       e.preventDefault(); e.stopPropagation(); const ip = em.dataset.iemb!
