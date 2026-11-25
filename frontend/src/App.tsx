@@ -56,6 +56,7 @@ function General({ d, set, frame }: { d: Json; set: (d: Json) => void; frame: { 
 // Botones (pestañas internas) de una sección: agregar, renombrar, mover y quitar. Quitar un botón borra sus casillas.
 function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
   const tabs: Json[] = s.tabs || []
+  const [marc, setMarc] = useState<string[]>([])
   const slug = (x: string) => x.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 30) || 'boton'
   const put = (t: Json[]) => set({ ...s, tabs: t })
   const add = () => {
@@ -70,17 +71,28 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
     let id = slug(label), n = 2; while (tabs.some(x => x.id === id)) id = slug(label) + '-' + n++
     const a = [...tabs]; a.splice(i + 1, 0, { ...sinId(JSON.parse(JSON.stringify(t))), id, label }); put(a)
   }
+  const unir = () => {   // junta los botones marcados en uno solo: cada uno queda como un subtítulo con sus casillas debajo
+    const ms = tabs.filter(t => marc.includes(t.id)); if (ms.length < 2) return
+    const label = (prompt('Nombre del botón que reúne a «' + ms.map(t => t.label).join('», «') + '»') || '').trim(); if (!label) return
+    let id = slug(label), n = 2; while (tabs.some(x => x.id === id && !marc.includes(x.id))) id = slug(label) + '-' + n++
+    const blocks = ms.flatMap(t => [{ type: 'heading', title: t.label }, ...(t.blocks || [])])
+    const first = tabs.findIndex(t => marc.includes(t.id))
+    const rest = tabs.filter(t => !marc.includes(t.id)); rest.splice(first, 0, { id, label, blocks })
+    put(rest); setMarc([])
+  }
   const mv = (i: number, dx: number) => { const a = [...tabs], j = i + dx; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; put(a) }
   return <>
     <div className="rgl" style={{ margin: '12px 0 6px' }}>Botones de esta sección ({tabs.length})</div>
     {!tabs.length && <p className="mut" style={{ margin: '0 0 6px' }}>Esta sección no tiene botones: sus casillas van seguidas. Agrega un botón para separarlas por tema.</p>}
     {tabs.map((t, i) => <div key={t.id} style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 6 }}>
+      <input type="checkbox" title="Marcar para unir con otros botones" checked={marc.includes(t.id)} onChange={e => setMarc(e.target.checked ? [...marc, t.id] : marc.filter(x => x !== t.id))} />
       <input style={{ flex: 1 }} value={t.label} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, label: e.target.value } : x)))} />
       <span className="mut">{t.blocks?.length || 0} casillas</span>
       <button title="Duplicar este botón con todas sus casillas" aria-label={'Duplicar ' + t.label} onClick={() => dup(i)}>⧉</button>
       <button onClick={() => mv(i, -1)} aria-label="Subir botón">↑</button><button onClick={() => mv(i, 1)} aria-label="Bajar botón">↓</button>
       <button className="danger" aria-label={'Quitar ' + t.label} onClick={() => confirm(`¿Quitar el botón «${t.label}» y sus ${t.blocks?.length || 0} casillas? Puedes deshacer con Ctrl+Z.`) && put(tabs.filter((_, k) => k !== i))}>✕</button></div>)}
     <button onClick={add} style={{ marginBottom: 10 }}>+ Agregar botón</button>
+    <button disabled={marc.length < 2} onClick={unir} style={{ marginBottom: 10, marginLeft: 8 }} title="Marca dos o más botones con la casilla de la izquierda y únelos en uno solo">⇉ Unir marcados en un botón{marc.length > 1 ? ` (${marc.length})` : ''}</button>
     <button style={{ marginBottom: 10, marginLeft: 8 }} title="Reemplaza las cifras de la tarjeta de este grupo en Inicio por las de la casilla de cifras del botón «Resumen» o, si no hay, la última casilla de cifras de la sección" onClick={() => {
       const lists: Json[][] = [s.blocks || [], ...(s.tabs || []).map((t: Json) => t.blocks || [])]
       const conCifras = (l: Json[]) => l.filter((b: Json) => b.type === 'stat_grid' && b.items?.length)
