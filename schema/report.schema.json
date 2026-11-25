@@ -4382,6 +4382,17 @@
     "text": {
      "title": "Text",
      "type": "string"
+    },
+    "embed": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Media"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
     }
    },
    "required": [

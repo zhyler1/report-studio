@@ -280,8 +280,12 @@ def r_step_cards(b: StepCards, ctx: Ctx) -> str:
     def idup(k):   # modo edición: botón para duplicar solo este paso dentro del mismo contenedor
         return (f'<button class="rs-idup" type="button" data-idup="{attr(ctx.path)}.items.{k}" title="Duplicar solo este paso (queda debajo, con la misma imagen)">⧉ Duplicar paso</button>'
                 if ctx.edit and ctx.path else "")
+    def iemb(k):
+        return (f'<button class="rs-idup rs-iemb" type="button" data-iemb="{attr(ctx.path)}.items.{k}" title="Sube una imagen, video o audio debajo del texto de este paso">🖼 Imagen/video</button>'
+                if ctx.edit and ctx.path else "")
     steps = "".join(
-        f'<div class="step" data-r style="--i:{k + 1}">{idup(k)}<div class="big">{esc(s.n)}</div><span class="tag">{esc(s.tag)}</span><br><span class="date">{esc(s.date)}</span><h4>{esc(s.title)}</h4><p>{esc(s.text)}</p></div>'
+        f'<div class="step" data-r style="--i:{k + 1}">{idup(k)}{iemb(k)}<div class="big">{esc(s.n)}</div><span class="tag">{esc(s.tag)}</span><br><span class="date">{esc(s.date)}</span><h4>{esc(s.title)}</h4><p>{esc(s.text)}</p>'
+        + (media_img(s.embed, "font-size:12px;font-weight:600;margin-top:8px") if s.embed else "") + '</div>'
         for k, s in enumerate(b.items))
     fig = media_img(b.media, "font-size:12px;font-weight:600;margin-top:8px") if b.media else ""
     hd = f'<div class="bar-h" data-r>{esc(b.header)}</div>' if b.header else ""

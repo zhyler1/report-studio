@@ -171,6 +171,7 @@ class StepCard(Base):
     date: str
     title: str
     text: Rich
+    embed: Optional[Media] = None   # imagen, video o audio debajo del texto de este paso
 
 
 class StepCards(BlockBase):

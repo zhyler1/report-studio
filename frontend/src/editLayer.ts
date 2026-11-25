@@ -198,7 +198,7 @@ const CSS = `
 #rsHov{outline:2px dashed #2160b0;outline-offset:2px}#rsSel{outline:3px solid #E8711A;outline-offset:2px}
 #rsHov .rsch{position:absolute;top:8px;left:8px;display:flex;gap:6px;pointer-events:none}
 #rsHov u{pointer-events:auto;cursor:pointer;text-decoration:none;background:#475569;color:#fff;font:700 12px Inter,system-ui,sans-serif;padding:6px 10px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.3)}
-.rs-b .step{position:relative}.rs-idup{position:absolute;top:8px;right:8px;z-index:5;display:none;font:700 12px Inter,system-ui,sans-serif;border:0;border-radius:8px;padding:6px 10px;background:#2160b0;color:#fff;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}.rs-b .step:hover .rs-idup{display:block}
+.rs-b .step{position:relative}.rs-idup{position:absolute;top:8px;right:8px;z-index:5;display:none;font:700 12px Inter,system-ui,sans-serif;border:0;border-radius:8px;padding:6px 10px;background:#2160b0;color:#fff;cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.25)}.rs-b .step:hover .rs-idup{display:block}.rs-idup.rs-iemb{right:150px}
 .rs-grp{border:2px dashed #9db4d8;border-radius:14px;padding:12px;margin:8px 0;background:rgba(33,96,176,.03)}
 #rsHov b{pointer-events:auto;cursor:grab;touch-action:none;user-select:none;background:#2160b0;color:#fff;font:700 12px Inter,system-ui,sans-serif;padding:6px 12px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.3);white-space:nowrap}
 #rsHov b.lk{background:#475569}
@@ -362,6 +362,20 @@ export function attach(doc: Document, h: Host) {
     if (t.closest('#rsBar') || t.closest('[contenteditable=true]')) return
     const du = t.closest('[data-idup]') as HTMLElement | null
     if (du) { e.preventDefault(); e.stopPropagation(); h.put(listOps.dup(h.get(), du.dataset.idup!)); h.toast('Paso duplicado: cámbiale el título, la fecha y el texto'); return }
+    const em = t.closest('[data-iemb]') as HTMLElement | null
+    if (em) {
+      e.preventDefault(); e.stopPropagation(); const ip = em.dataset.iemb!
+      pickFile(async f => {
+        if (!/^(image|video|audio)\//.test(f.type)) { h.toast('Ese archivo no es una imagen, video ni audio'); return }
+        h.toast('Subiendo…')
+        try {
+          const url = await h.upload(f); const kind = f.type.startsWith('video') ? 'video' : f.type.startsWith('audio') ? 'audio' : 'image'
+          const cur = getAt(h.get(), ip)?.embed || { slot: 'imagen-paso.jpg', alt: '', caption: '', zoom: true, height: 220 }
+          h.put(setAt(h.get(), ip + '.embed', { ...cur, kind, src: url })); h.toast('Archivo subido ✓ debajo del texto del paso')
+        } catch (x: any) { h.toast('No se pudo subir: ' + x.message) }
+      })
+      return
+    }
     const ad = t.closest('.rs-add') as HTMLElement | null
     if (ad) { e.preventDefault(); const l = ad.dataset.addto!; h.add(l, (getAt(h.get(), l) || []).length); return }
     const el = t.closest('.rs-b'); if (!el) return
