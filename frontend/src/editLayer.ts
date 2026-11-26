@@ -100,8 +100,16 @@ export const splitBlock = (d: Json, p: string): Json => {
 
 /** Deshace un grupo: sus casillas pasan a la lista que lo contiene. */
 export const ungroup = (d: Json, p: string): Json => {
-  const b = getAt(d, p); if (b?.type !== 'group') return d
+  const b = getAt(d, p); if (b?.type !== 'group' && b?.type !== 'popup') return d
   const { list, i } = parentOf(p); const a = [...getAt(d, list)]; a.splice(i, 1, ...(b.blocks || []))
+  return setAt(d, list, a)
+}
+/** Mete la casilla en una ventana emergente: queda una tarjeta que, al hacer clic, abre la casilla original. */
+export const toPopup = (d: Json, p: string): Json => {
+  const b = getAt(d, p); if (!b || b.type === 'popup') return d
+  const nombre = (typeof b.title === 'string' && b.title) || (typeof b.heading === 'string' && b.heading) || 'Ver detalle'
+  const { list, i } = parentOf(p); const a = [...getAt(d, list)]
+  a.splice(i, 1, { type: 'popup', span: b.span || 'full', label: nombre, teaser: 'Haz clic para abrir', icon: '▤', variant: 'tarjeta', size: 'mediana', blocks: [{ ...b, span: 'full' }] })
   return setAt(d, list, a)
 }
 /** Junta la casilla con la siguiente en un grupo. */
@@ -275,7 +283,7 @@ export function attach(doc: Document, h: Host) {
     const kinds = t === 'chart' ? `<select id="rsK">${h.kinds.map(k => `<option value="${k}"${b?.kind === k ? ' selected' : ''}>${k}</option>`).join('')}</select>` : ''
     const vl = t === 'budget' ? [VIZ_BUD, 'donut'] : t === 'plants' ? [VIZ_PLA, 'bars'] : (t === 'ring_card' || t === 'agreement') ? [VIZ, 'ring'] : null
     const viz = vl ? `<select id="rsV" title="Cómo se dibuja">${(vl[0] as [string, string][]).map(([k, l]) => `<option value="${k}"${(b?.viz || vl[1]) === k ? ' selected' : ''}>${l}</option>`).join('')}</select>` : ''
-    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button>${mediaPaths(b, p).length ? '<button data-a="img" title="Sube una imagen, video o audio desde tu equipo (también puedes arrastrar el archivo sobre la imagen, pegarlo, o hacer doble clic en ella)">🖼 Subir imagen</button>' : ''}${b && !b.embed && !['media', 'gallery', 'grid', 'group'].includes(b.type) ? '<button data-a="embed" title="Incrusta una imagen, video o audio en esta casilla">🖼 ＋ Imagen/video</button>' : ''}<button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${canSplit(b) ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada parte se arrastra e intercambia sola">⧉ Separar en casillas</button>' : ''}${parentBlock(h.get(), p) ? '<button data-a="parent" title="Seleccionar el bloque que contiene a esta casilla">⬆ Contenedor</button>' : ''}${b?.type === 'group' ? '<button data-a="ungroup" title="Suelta las casillas del grupo">Desagrupar</button>' : '<button data-a="groupnext" title="Junta esta casilla con la siguiente en un grupo">Agrupar con la siguiente</button>'}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
+    bar.innerHTML = `<button data-a="drag" class="rs-drag" style="touch-action:none" title="Arrastra para mover la casilla">⠿ Arrastrar</button><button data-a="up" title="Subir">↑</button><button data-a="down" title="Bajar">↓</button><button data-a="dup" title="Duplicar">⧉ Duplicar</button>${mediaPaths(b, p).length ? '<button data-a="img" title="Sube una imagen, video o audio desde tu equipo (también puedes arrastrar el archivo sobre la imagen, pegarlo, o hacer doble clic en ella)">🖼 Subir imagen</button>' : ''}${b && !b.embed && !['media', 'gallery', 'grid', 'group'].includes(b.type) ? '<button data-a="embed" title="Incrusta una imagen, video o audio en esta casilla">🖼 ＋ Imagen/video</button>' : ''}<button data-a="add" title="Agregar casilla debajo">＋ Debajo</button><label title="Color de fondo de la casilla">Fondo<input type="color" id="rsBg" value="${b?.bg || '#ffffff'}"></label><label title="Color del texto dentro de la casilla">Texto<input type="color" id="rsFg" value="${b?.fg || '#14243f'}"></label><button data-a="clr" title="Quitar colores de la casilla">Sin color</button>${canSplit(b) ? '<button data-a="split" title="Convierte el bloque en casillas sueltas: cada parte se arrastra e intercambia sola">⧉ Separar en casillas</button>' : ''}${parentBlock(h.get(), p) ? '<button data-a="parent" title="Seleccionar el bloque que contiene a esta casilla">⬆ Contenedor</button>' : ''}${b?.type === 'popup' ? '<button data-a="ungroup" title="Saca las casillas de la ventana emergente">Sacar de la ventana</button>' : (b ? '<button data-a="topopup" title="Convierte esta casilla en una ventana emergente: se abre al hacer clic">🪟 En ventana</button>' : '')}${b?.type === 'group' ? '<button data-a="ungroup" title="Suelta las casillas del grupo">Desagrupar</button>' : '<button data-a="groupnext" title="Junta esta casilla con la siguiente en un grupo">Agrupar con la siguiente</button>'}<button data-a="lock" title="Bloquear: nadie la mueve, edita ni borra por accidente">🔒</button>${kinds}${viz}<button data-a="del" class="x" title="Eliminar">✕</button>`
     bar.style.display = 'flex'
     bar.style.left = Math.max(4, r.l) + 'px'; bar.style.top = Math.max(4, r.t - 42) + 'px'
   }
@@ -339,6 +347,7 @@ export function attach(doc: Document, h: Host) {
     if (lockedAt(d, p)) { h.toast('Casilla bloqueada 🔒: desbloquéala para cambiarla'); return }
     if (a === 'parent') { const q = parentBlock(d, p); if (q) h.select(q); return }
     if (a === 'ungroup') { h.put(ungroup(d, p)); h.select(null); h.toast('Grupo deshecho'); return }
+    if (a === 'topopup') { h.put(toPopup(d, p)); h.toast('Ahora es una ventana emergente: la casilla quedó adentro'); return }
     if (a === 'groupnext') { h.put(groupNext(d, p)); h.toast('Agrupada con la siguiente: se mueven juntas, o por partes'); return }
     if (a === 'split') { h.put(splitBlock(d, p)); h.select(null); h.toast('Separada en casillas: ahora cada parte se arrastra sola'); return }
     if (a === 'up') h.put(listOps.move(d, p, -1)); else if (a === 'down') h.put(listOps.move(d, p, 1))

@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { MetaForm, SectionForm, Defs, blank, BlockForm, blockTypes } from './SchemaForm'
-import { attach, getAt, setAt, listOps, lockedAt, splitBlock, ungroup, groupNext, parentBlock } from './editLayer'
+import { attach, getAt, setAt, listOps, lockedAt, splitBlock, ungroup, toPopup, groupNext, parentBlock } from './editLayer'
 import { BLOCK, ICONOS } from './labels'
 import Loader from './Loader'
 import AiSettings from './AiSettings'
@@ -470,6 +470,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     else if (a === 'del' && confirm('¿Quitar esta casilla?')) { setD(listOps.del(dd, sp)); select(null) }
     else if (a === 'parent') { const q = parentBlock(dd, sp); if (q) select(q) }
     else if (a === 'ungroup') { setD(ungroup(dd, sp)); select(null); flash('Grupo deshecho') }
+    else if (a === 'topopup') { setD(toPopup(dd, sp)); flash('Ahora es una ventana emergente: la casilla quedó adentro') }
     else if (a === 'groupnext') { setD(groupNext(dd, sp)); flash('Agrupada con la siguiente: se mueven juntas, o por partes') }
     else if (a === 'split') { setD(splitBlock(dd, sp)); flash('Separada en casillas: ahora cada parte se arrastra sola'); select(null) }
     else if (a === 'del!') { setD(listOps.del(dd, sp)); select(null); flash('Casilla quitada · Ctrl+Z para deshacer') }

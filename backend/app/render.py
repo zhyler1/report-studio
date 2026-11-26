@@ -476,6 +476,8 @@ def r_agenda(b: AgendaBlock, ctx: Ctx) -> str:
 
 
 def r_heading(b: Heading, ctx: Ctx) -> str:
+    if ctx.edit and not (b.title or "").strip():   # sin título no quedaría nada que tocar: se deja un marcador para poder seleccionarla
+        return '<h3 class="st rs-notitle" data-r style="opacity:.55;border:2px dashed var(--border);border-radius:10px;padding:8px 12px;font-weight:600">(Sin título · haz clic y escribe uno)</h3>'
     return f'<h3 class="st" data-r>{esc(b.title or "")}</h3>'
 
 

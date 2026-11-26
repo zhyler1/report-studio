@@ -35,3 +35,11 @@ def test_ventana_emergente_lleva_su_contenido_y_su_motor():
     assert 'class="rs-pp-src"' in html and 'data-title="Cronograma"' in html and "Contenido de la ventana" in html and "#rsPP" in html
     ed = render(rep, edit=True)
     assert "Contenido de la ventana «Cronograma»" in ed and 'data-addto="' in ed
+
+
+def test_titulo_vacio_deja_marcador_para_seleccionar_en_edicion():
+    from app.schema import Heading
+    r = json.loads((Path(__file__).parents[2] / "seed" / "report.seed.json").read_text(encoding="utf-8"))
+    r["sections"][0]["blocks"].append(Heading(id="h0", title=None).model_dump(mode="json"))
+    rep = Report.model_validate(r)
+    assert "rs-notitle" in render(rep, edit=True) and "rs-notitle" not in render(rep)
