@@ -442,7 +442,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     const APLICA = new Set(['stat_grid', 'card_list', 'callout', 'text', 'note_list', 'numbered_cards', 'ring_card', 'status_list', 'link_cards', 'step_cards', 'row_list', 'agreement', 'plant_card'])
     let k = 0, n = 0
     const rec = (l: Json[]): Json[] => (l || []).map((b: Json) => {
-      if (b.type === 'group') return { ...b, blocks: rec(b.blocks) }
+      if (b.type === 'group' || b.type === 'popup') return { ...b, blocks: rec(b.blocks) }
       if (b.type === 'grid') return { ...b, columns: (b.columns || []).map((c: Json[]) => rec(c)) }
       if (quitar) { if (b.look) { n++; return { ...b, look: '' } } return b }
       if (APLICA.has(b.type) && !b.look && !b.bg) { n++; return { ...b, look: SEQ[k++ % SEQ.length] } }
@@ -612,7 +612,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
         onAdd={blocks => { const si = tpl.si >= 0 ? tpl.si : 0; addLoaded(si, blocks) }} onNew={newSection} />}
       {picker && <div className="modal" onClick={() => setPicker(null)}><div className="modal-b" onClick={e => e.stopPropagation()}>
         <h2 style={{ marginTop: 0 }}>¿Qué quieres poner aquí?</h2>
-        <div className="tiles">{([['text', '✍️', 'Texto (escribir un párrafo)'], ['link', '🔗', 'Enlace o botón (hipervínculo)'], ['agenda', '📅', 'Calendario (desde texto plano)'], ['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video, audio o imagen'], ['stat_grid', '🔢', 'Cifras destacadas'], ['card_list', '📝', 'Texto con lista'], ['table', '▦', 'Tabla'], ['grid', '◫', 'Columnas (poner cosas lado a lado)'], ['__doc', '📥', 'Desde un documento o texto']] as const).map(([k, i, l]) =>
+        <div className="tiles">{([['text', '✍️', 'Texto (escribir un párrafo)'], ['link', '🔗', 'Enlace o botón (hipervínculo)'], ['agenda', '📅', 'Calendario (desde texto plano)'], ['popup', '🪟', 'Ventana emergente (abre un panel)'], ['chart', '📊', 'Gráfico'], ['media', '🎬', 'Video, audio o imagen'], ['stat_grid', '🔢', 'Cifras destacadas'], ['card_list', '📝', 'Texto con lista'], ['table', '▦', 'Tabla'], ['grid', '◫', 'Columnas (poner cosas lado a lado)'], ['__doc', '📥', 'Desde un documento o texto']] as const).map(([k, i, l]) =>
           <button key={k} className="tile" onClick={() => k === '__doc' ? (setLoader(Number(picker.list.split('.')[1]) || 0), setPicker(null)) : insertBlock(k)}><span style={{ fontSize: 30 }}>{i}</span>{l}</button>)}</div>
         <p className="mut" style={{ marginBottom: 4 }}>Otros tipos</p>
         <select defaultValue="" onChange={e => e.target.value && insertBlock(e.target.value)}><option value="">Elegir…</option>{blockTypes().map(x => <option key={x.type} value={x.type}>{BLOCK[x.type] || x.type}</option>)}</select>

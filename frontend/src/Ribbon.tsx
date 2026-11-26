@@ -42,6 +42,7 @@ const P: Record<string, string> = {
   undo: 'M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3', redo: 'M15 14l5-5-5-5M20 9H10a6 6 0 0 0 0 12h3',
   save: 'M5 4h11l3 3v13H5zM8 4v5h7V4M8 20v-6h8v6', import: 'M12 3v12m0 0-4-4m4 4 4-4M5 21h14',
   html: 'M8 8l-5 4 5 4M16 8l5 4-5 4M14 5l-4 14', pdf: 'M6 3h9l4 4v14H6zM14 3v5h5M9 14h6M9 17h4',
+  window: 'M3 5h18v14H3zM3 9h18M6 7h0M9 7h0',
   calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4M8 14h2M12 14h2M16 14h0',
   link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1', trash: 'M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3', chart: 'M4 20V10m6 10V4m6 16v-7M3 20h18',
   film: 'M4 5h16v14H4zM4 9h16M4 15h16M8 5v14M16 5v14', table: 'M3 5h18v14H3zM3 10h18M3 15h18M9 5v14M15 5v14',
@@ -72,7 +73,7 @@ function Color({ label, value, onChange, fallback }: { label: string; value: str
     {value && <button className="rx" title="Quitar color propio" onClick={() => onChange('')}>✕</button>}</span></label>
 }
 
-const INSERTAR: [string, string, string][] = [['chart', 'chart', 'Gráfico'], ['media', 'film', 'Video / imagen'], ['table', 'table', 'Tabla'], ['stat_grid', 'hash', 'Cifras'], ['card_list', 'text', 'Texto y listas'], ['link', 'link', 'Enlace'], ['agenda', 'calendar', 'Calendario'], ['grid', 'columns', 'Columnas']]
+const INSERTAR: [string, string, string][] = [['chart', 'chart', 'Gráfico'], ['media', 'film', 'Video / imagen'], ['table', 'table', 'Tabla'], ['stat_grid', 'hash', 'Cifras'], ['card_list', 'text', 'Texto y listas'], ['link', 'link', 'Enlace'], ['agenda', 'calendar', 'Calendario'], ['popup', 'window', 'Ventana'], ['grid', 'columns', 'Columnas']]
 const TABS: [RibTab, string][] = [['inicio', 'Inicio'], ['insertar', 'Insertar'], ['diseno', 'Diseño'], ['casilla', 'Casilla'], ['datos', 'Datos']]
 
 export default function Ribbon(p: RibProps) {

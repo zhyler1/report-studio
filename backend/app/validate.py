@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from datetime import date
 
-from .schema import (Activities, Block, Budget, CalendarBlock, Chart, Grid, Group, Report)
+from .schema import (Activities, Block, Budget, CalendarBlock, Chart, Grid, Group, PopupBlock, Report)
 
 
 def walk(blocks: list) -> Iterator:
@@ -16,7 +16,7 @@ def walk(blocks: list) -> Iterator:
         if isinstance(b, Grid):
             for col in b.columns:
                 yield from walk(col)
-        elif isinstance(b, Group):
+        elif isinstance(b, (Group, PopupBlock)):
             yield from walk(b.blocks)
 
 

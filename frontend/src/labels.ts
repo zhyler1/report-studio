@@ -10,7 +10,7 @@ export const FIELD: Record<string, string> = {
   hero_title: 'Título del inicio', hidden: 'Ocultar', hours: 'Horas', home: 'Tarjeta en Inicio', icon: 'Ícono', id: 'Identificador interno', intro_word: 'Palabra animada de la portada',
   items: 'Elementos', key: 'Clave de la columna', kind: 'Tipo', label: 'Rótulo', labels: 'Etiquetas del eje', level: 'Nivel', link: 'Enlace', logo_dark: 'Logo (fondo oscuro)',
   logo_light: 'Logo (fondo claro)', logro: 'Logro destacado', long: 'Número largo (letra más pequeña)', loop: 'Repetir', measure: 'Medida', media: 'Imagen / video / audio',
-  milestone: 'Hitos', milestone_date: 'Fecha del hito', min_width: 'Ancho mínimo (px)', modal_title: 'Título de la ventana', muted: 'Sin sonido', n: 'Número', name: 'Nombre',
+  milestone: 'Hitos', milestone_date: 'Fecha del hito', min_width: 'Ancho mínimo (px)', modal_title: 'Título dentro de la ventana (vacío = el rótulo)', muted: 'Sin sonido', n: 'Número', name: 'Nombre',
   note: 'Nota', org: 'Entidad', other: 'Otros', owner: 'Responsable', palace_url: 'Foto del palacio (dirección)', pct: '% de cumplimiento', plants: 'Plantas', posesiones: 'Posesiones',
   posesiones_label: 'Rótulo de posesiones', poster: 'Imagen de portada del video', prefix: 'Prefijo', procesos: 'Procesos', procesos_label: 'Rótulo de procesos', progress: 'Avances',
   projection_from: 'Proyección desde el punto', provistos: 'Provistos', ratio: 'Proporción de columnas', rows: 'Filas', series: 'Series', share_url: 'Enlace del QR',
@@ -27,7 +27,7 @@ export const FIELD: Record<string, string> = {
 }
 
 export const BLOCK: Record<string, string> = {
-  group: 'Grupo de casillas', plant_card: 'Tarjeta de planta', callout: 'Recuadro destacado', text: 'Texto', agenda: 'Calendario de agenda', link: 'Enlace / botón', heading: 'Título de sección',
+  group: 'Grupo de casillas', plant_card: 'Tarjeta de planta', callout: 'Recuadro destacado', text: 'Texto', agenda: 'Calendario de agenda', popup: 'Ventana emergente', link: 'Enlace / botón', heading: 'Título de sección',
   stat_grid: 'Cifras destacadas', row_list: 'Lista de acciones con evidencia', note_list: 'Lista de observaciones', card_list: 'Tarjeta con lista', ring_card: 'Anillo de porcentaje',
   status_list: 'Lista de estados', numbered_cards: 'Tarjetas numeradas', step_cards: 'Pasos con fecha', link_cards: 'Tarjetas con enlace', gallery: 'Galería de imágenes', table: 'Tabla',
   plants: 'Planta de personal', workflow: 'Flujo de trabajo', agreement: 'Acuerdo / avance', activities: 'Actividades', budget: 'Presupuesto', calendar: 'Calendario',
@@ -38,7 +38,7 @@ export const OPT: Record<string, string> = {
   light: 'Claro', dark: 'Oscuro', foto: 'Con foto', clasica: 'Clásica', alto: 'Alto', medio: 'Medio', bajo: 'Bajo', none: 'Ninguno', people: 'Personas', stock: 'Bolsa (velas)',
   heart: 'Corazón', doc: 'Documento', radio: 'Ondas / radio', shield: 'Escudo', auto: 'Automático', blue: 'Azul', red: 'Rojo', green: 'Verde', orange: 'Naranja', yellow: 'Amarillo',
   purple: 'Morado', navy: 'Azul oscuro', left: 'Izquierda', right: 'Derecha', center: 'Centro', text: 'Texto', money: 'Dinero', pct: 'Porcentaje', pct_bar: 'Porcentaje con barra',
-  ambas: 'Mes y lista', mes: 'Solo el mes', lista: 'Solo la lista', pill: 'Etiqueta', number: 'Número', image: 'Imagen', video: 'Video', audio: 'Audio', checks: 'Con vistos', plain: 'Viñetas', warn: 'Advertencia', violet: 'Violeta',
+  boton: 'Botón', tarjeta: 'Tarjeta', pequena: 'Pequeña', mediana: 'Mediana', grande: 'Grande', completa: 'Pantalla completa', ambas: 'Mes y lista', mes: 'Solo el mes', lista: 'Solo la lista', pill: 'Etiqueta', number: 'Número', image: 'Imagen', video: 'Video', audio: 'Audio', checks: 'Con vistos', plain: 'Viñetas', warn: 'Advertencia', violet: 'Violeta',
   ejecutado: 'Ejecutado', proceso: 'En proceso', espera: 'En espera', vacations: 'Vacaciones', bonus: 'Bonificación', ancheta: 'Ancheta', velitas: 'Velitas',
   bar: 'Barras', hbar: 'Barras horizontales', hstacked: 'Barras horizontales apiladas', step: 'Escalón', pareto: 'Pareto', histogram: 'Histograma', pyramid: 'Pirámide', rose: 'Rosa polar', waffle: 'Cuadrícula de 100', pictogram: 'Pictograma de personas', slope: 'Pendiente (antes y después)', dumbbell: 'Mancuernas', bump: 'Ranking en el tiempo', hemicycle: 'Hemiciclo', kpi: 'Tarjetas de indicador', calendar: 'Calendario de actividad', sankey: 'Flujos (sankey)', stacked100: 'Barras apiladas al 100 %', stacked_area: 'Áreas apiladas', combo: 'Combinado (barras + línea)', lollipop: 'Paletas',
   radialbar: 'Anillos concéntricos', bullet: 'Avance frente a meta', scatter: 'Dispersión', bubble: 'Burbujas', waterfall: 'Cascada', funnel: 'Embudo', heatmap: 'Mapa de calor',

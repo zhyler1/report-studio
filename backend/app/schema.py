@@ -459,11 +459,23 @@ class Group(BlockBase):
     blocks: list["Block"] = []
 
 
+class PopupBlock(BlockBase):
+    """Ventana emergente: una tarjeta, botón o texto que, al hacer clic, abre un panel flotante con las casillas que pongas adentro."""
+    type: Literal["popup"] = "popup"
+    label: str = "Ver detalle"            # texto de la tarjeta o del botón
+    teaser: str = ""                      # frase corta bajo el rótulo (solo en la tarjeta)
+    icon: str = "▤"                       # símbolo o emoji de la tarjeta
+    variant: Literal["tarjeta", "boton", "texto"] = "tarjeta"
+    size: Literal["pequena", "mediana", "grande", "completa"] = "mediana"
+    modal_title: str = ""                 # título dentro de la ventana; vacío = el rótulo
+    blocks: list["Block"] = []
+
+
 Block = Annotated[
     Union[
         StatGrid, RowList, NoteList, CardList, RingCard, StatusList, NumberedCards, StepCards,
         LinkCards, Gallery, Table, Plants, Workflow, Agreement, Activities, Budget,
-        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading, TextBlock, LinkBlock, AgendaBlock,
+        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading, TextBlock, LinkBlock, AgendaBlock, PopupBlock,
     ],
     Field(discriminator="type"),
 ]
@@ -560,7 +572,7 @@ class Report(Base):
     alerts: list[Alert] = []
 
 
-for _m in (Gallery, Grid, Group, Section, Tab, Report):
+for _m in (Gallery, Grid, Group, PopupBlock, Section, Tab, Report):
     _m.model_rebuild()
 
 

@@ -23,3 +23,15 @@ def test_bloque_viaja_con_su_motor():
     html = render(Report.model_validate(r))
     assert 'class="rs-ag"' in html and "RSAgenda" in html and ".ag-grid" in html
     assert "Novena de aguinaldos" in html
+
+
+def test_ventana_emergente_lleva_su_contenido_y_su_motor():
+    from app.schema import PopupBlock, TextBlock
+    r = json.loads((Path(__file__).parents[2] / "seed" / "report.seed.json").read_text(encoding="utf-8"))
+    p = PopupBlock(id="pp1", label="Ver cronograma", modal_title="Cronograma", blocks=[TextBlock(id="tp1", text="Contenido de la ventana")])
+    r["sections"][0]["blocks"].append(p.model_dump(mode="json"))
+    rep = Report.model_validate(r)
+    html = render(rep)
+    assert 'class="rs-pp-src"' in html and 'data-title="Cronograma"' in html and "Contenido de la ventana" in html and "#rsPP" in html
+    ed = render(rep, edit=True)
+    assert "Contenido de la ventana «Cronograma»" in ed and 'data-addto="' in ed

@@ -1,0 +1,18 @@
+.rs-pp{margin-bottom:16px}.rs-pp-src{display:none}
+.rs-pp-card{display:flex;flex-direction:column;gap:6px;align-items:flex-start;cursor:pointer;border-left:6px solid var(--blue);transition:transform .25s,box-shadow .25s}
+.rs-pp-card:hover,.rs-pp-card:focus-visible{transform:translateY(-3px);box-shadow:0 14px 30px -14px rgba(0,0,0,.4);outline:none}
+.rs-pp-card .ptico{font-size:34px;line-height:1}.rs-pp-card .lk-go{margin-top:6px}
+button.rs-pp-go{font-family:inherit;border:0;background:none}button.lbtn.rs-pp-go{border:0}
+#rsPP{position:fixed;inset:0;z-index:88;background:rgba(5,10,20,.78);display:none;align-items:center;justify-content:center;padding:20px;-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+#rsPP.on{display:flex;animation:lbin .3s both}
+.pp-box{position:relative;background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:20px;width:100%;max-width:760px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);animation:zin .4s cubic-bezier(.2,1,.3,1) both}
+.pp-box[data-size="pequena"]{max-width:480px}.pp-box[data-size="grande"]{max-width:1100px}.pp-box[data-size="completa"]{max-width:calc(100vw - 40px);height:calc(100vh - 40px);max-height:none}
+.pp-top{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--card)}
+.pp-ttl{flex:1;margin:0;font-size:20px;color:var(--head)}
+.pp-x{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--text);font:800 22px var(--sans);cursor:pointer;line-height:1}.pp-x:hover{background:var(--red);color:#fff}
+.pp-body{overflow:auto;padding:20px;flex:1}
+/* edición: el contenido de la ventana se ve y se edita dentro de un marco */
+.rs-pp-prev{display:flex;flex-direction:column;gap:3px;background:var(--card);border:1px solid var(--border);border-left:6px solid var(--blue);border-radius:14px;padding:12px 16px;margin-bottom:8px}.rs-pp-prev span{color:var(--muted);font-size:13px}
+.rs-pp-edit{border:2px dashed var(--blue);border-radius:16px;padding:12px;margin-bottom:12px;background:color-mix(in srgb,var(--blue) 4%,transparent)}
+.rs-pp-h{font:800 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--blue);margin-bottom:10px}
+@media print{#rsPP{display:none!important}.rs-pp-src{display:block!important;border:1px solid #ccc;border-radius:10px;padding:10px;margin-top:8px}.rs-pp-src::before{content:attr(data-title);display:block;font-weight:800;margin-bottom:6px}}

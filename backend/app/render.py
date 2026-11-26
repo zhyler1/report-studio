@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 from .looks import FAM
-from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, Media, MediaBlock,
+from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, Group, PopupBlock, LinkCards, Media, MediaBlock,
                      NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, TextBlock, LinkBlock, AgendaBlock, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
                      StepCards, Table, Workflow)
 
@@ -161,7 +161,7 @@ def _blocks(s: Section):
             if isinstance(b, Grid):
                 for col in b.columns:
                     yield from walk(col)
-            elif isinstance(b, Group):
+            elif isinstance(b, (Group, PopupBlock)):
                 yield from walk(b.blocks)
     yield from walk(s.blocks)
     for t in s.tabs:
@@ -564,6 +564,26 @@ def r_group(b: Group, ctx: Ctx) -> str:
     return f'{t}{ctr_chip(ctx, "Grupo", not b.blocks)}<div class="rs-grp">{inner}</div>' if ctx.edit else f"{t}{inner}"
 
 
+def r_popup(b: PopupBlock, ctx: Ctx) -> str:
+    t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
+    inner = render_list(b.blocks, ctx, f"{ctx.path}.blocks")
+    ttl = esc(b.modal_title or b.label)
+    if ctx.edit:   # al editar, el contenido de la ventana se ve y se edita aquí mismo, dentro de un marco
+        trig = f'<div class="rs-pp-prev"><b>{esc(b.icon)} {esc(b.label)}</b><span>{esc(b.teaser)}</span></div>'
+        return (f'{t}{trig}{ctr_chip(ctx, "Ventana emergente", not b.blocks)}<div class="rs-pp-edit"><div class="rs-pp-h">Contenido de la ventana «{ttl}» (en el informe se abre al hacer clic)</div>'
+                f'{inner}{add_slot(ctx, f"{ctx.path}.blocks")}</div>')
+    src = f'<div class="rs-pp-src" data-title="{attr(b.modal_title or b.label)}" data-size="{b.size}">{inner}</div>'
+    if b.variant == "boton":
+        trig = f'<button type="button" class="lbtn rs-pp-go" data-r>{esc(b.label)}</button>'
+    elif b.variant == "texto":
+        trig = f'<button type="button" class="lk-txt rs-pp-go" data-r>{esc(b.label)} ↗</button>'
+    else:
+        tz = f'<p class="muted" style="font-size:14px">{esc(b.teaser)}</p>' if b.teaser else ""
+        trig = (f'<div class="card rs-pp-card rs-pp-go" data-r tabindex="0" role="button"><div class="ptico">{esc(b.icon)}</div><h3 class="st" style="margin-bottom:6px">{esc(b.label)}</h3>{tz}'
+                f'<span class="lk-go">Abrir ↗</span></div>')
+    return f'<div class="rs-pp">{t}{trig}{src}</div>'
+
+
 def r_grid(b: Grid, ctx: Ctx) -> str:
     t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
     cols = ""
@@ -577,7 +597,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
 R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList: r_card_list, RingCard: r_ring, StatusList: r_status_list,
      NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading, TextBlock: r_text, LinkBlock: r_link, AgendaBlock: r_agenda,
      Workflow: r_workflow, Agreement: r_agreement, Activities: r_activities, Budget: r_budget, CalendarBlock: r_calendar,
-     Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid, Group: r_group}
+     Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid, Group: r_group, PopupBlock: r_popup}
 
 
 SPAN_W = {"1/2": "calc(50% - 10px)", "1/3": "calc(33.333% - 14px)", "2/3": "calc(66.666% - 7px)", "1/4": "calc(25% - 15px)", "3/4": "calc(75% - 5px)"}
@@ -824,6 +844,10 @@ def _has_agenda(rep: Report) -> bool:
     return any(not b.hidden and isinstance(b, AgendaBlock) for s in rep.sections for b in _blocks(s))
 
 
+def _has_popup(rep: Report) -> bool:
+    return any(not b.hidden and isinstance(b, PopupBlock) for s in rep.sections for b in _blocks(s))
+
+
 def _has_chart(rep: Report) -> bool:
     return any(not b.hidden and (isinstance(b, Chart) or (isinstance(b, (RingCard, Agreement)) and b.viz != "ring")
                                  or (isinstance(b, (Plants, PlantCard)) and b.viz != "bars") or (isinstance(b, Budget) and b.viz != "donut"))
@@ -909,6 +933,10 @@ def render(rep: Report, edit: bool = False) -> str:
         tpl = SHELL.parent
         out = out.replace("</head>", "<style>" + (tpl / "charts.css").read_text(encoding="utf-8") + "</style></head>", 1)
         out = out.replace("</body>", "<script>" + (tpl / "charts.js").read_text(encoding="utf-8").replace("</", "<\\/") + "</script></body>", 1)
+    if _has_popup(rep):
+        tpl = SHELL.parent
+        out = out.replace("</head>", "<style>" + (tpl / "popup.css").read_text(encoding="utf-8") + "</style></head>", 1)
+        out = out.replace("</body>", "<script>" + (tpl / "popup.js").read_text(encoding="utf-8").replace("</", "<\\/") + "</script></body>", 1)
     if _has_agenda(rep):
         tpl = SHELL.parent
         out = out.replace("</head>", "<style>" + (tpl / "agenda.css").read_text(encoding="utf-8") + "</style></head>", 1)
