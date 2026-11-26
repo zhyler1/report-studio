@@ -18,7 +18,7 @@ from pptx.util import Emu, Inches, Pt
 
 from .render import Ctx, _blocks, num_text
 from .schema import (Activities, Agreement, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, MediaBlock, NoteList, NumberedCards,
-                     Plants, PlantCard, Callout, Heading, TextBlock, LinkBlock, Proposals, Report, RingCard, RowList, StatGrid, StatusList, StepCards, Table, Workflow, Budget)
+                     Plants, PlantCard, Callout, Heading, TextBlock, LinkBlock, AgendaBlock, Proposals, Report, RingCard, RowList, StatGrid, StatusList, StepCards, Table, Workflow, Budget)
 
 W, H = 13.333, 7.5
 MX, TOP, BOT = 0.55, 1.45, 7.1
@@ -246,6 +246,11 @@ class Deck:
             if b.title:
                 self.heading(b.title)
             self.bullets([f"{clean(i.label)}" + (f" — {i.url}" if i.url else "") + (f": {clean(i.text)}" if i.text else "") for i in b.items])
+        elif isinstance(b, AgendaBlock):
+            from .render import parse_agenda
+            if b.title:
+                self.heading(b.title)
+            self.bullets([f"{e['d']}" + (f" a {e['e']}" if e['e'] != e['d'] else "") + f" · {clean(e['t'])}" + (f" ({clean(e['x'])})" if e['x'] else "") for e in parse_agenda(b.text)[0]])
         elif isinstance(b, TextBlock):
             if b.title:
                 self.heading(b.title)

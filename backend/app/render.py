@@ -13,7 +13,7 @@ from pathlib import Path
 
 from .looks import FAM
 from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, Media, MediaBlock,
-                     NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, TextBlock, LinkBlock, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
+                     NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, TextBlock, LinkBlock, AgendaBlock, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
                      StepCards, Table, Workflow)
 
 SHELL = Path(__file__).parent / "templates" / "shell.html"
@@ -422,6 +422,59 @@ def r_link(b: LinkBlock, ctx: Ctx) -> str:
     return f'<div class="rs-links">{t}<div class="lk-row" style="justify-content:{jc}">{out}</div></div>'
 
 
+_DATE = r"(\d{4}-\d{1,2}-\d{1,2}|\d{1,2}/\d{1,2}/\d{4})"
+
+
+def _iso(d: str) -> str:
+    """2026-12-5 o 05/12/2026 (día/mes/año, como se escribe en Colombia) → 2026-12-05; vacío si no es una fecha real."""
+    import datetime as _dt
+    d = d.strip()
+    try:
+        if "/" in d:
+            dd, mm, yy = (int(x) for x in d.split("/"))
+        else:
+            yy, mm, dd = (int(x) for x in d.split("-"))
+        return _dt.date(yy, mm, dd).isoformat()
+    except (ValueError, TypeError):
+        return ""
+
+
+def parse_agenda(text: str) -> tuple[list[dict], list[str]]:
+    """Texto plano → (eventos, líneas que no se entendieron). Línea: fecha | título | detalle | categoría."""
+    evs, bad = [], []
+    for raw in (text or "").splitlines():
+        ln = raw.strip()
+        if not ln or ln.startswith("#"):
+            continue
+        parts = [x.strip() for x in ln.split("|")]
+        m = re.match(rf"^{_DATE}\s*(?:\.\.|–|—|-|a)\s*{_DATE}$", parts[0]) or re.match(rf"^{_DATE}$", parts[0])
+        if not m or len(parts) < 2 or not parts[1]:
+            bad.append(ln)
+            continue
+        a = _iso(m.group(1)); z = _iso(m.group(2)) if m.lastindex and m.lastindex > 1 else a
+        if not a or not z:
+            bad.append(ln)
+            continue
+        if z < a:
+            a, z = z, a
+        evs.append({"d": a, "e": z, "t": parts[1], "x": parts[2] if len(parts) > 2 else "", "c": parts[3] if len(parts) > 3 else ""})
+    evs.sort(key=lambda e: (e["d"], e["t"]))
+    return evs, bad
+
+
+def r_agenda(b: AgendaBlock, ctx: Ctx) -> str:
+    evs, bad = parse_agenda(b.text)
+    t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
+    mes = b.month if re.match(r"^\d{4}-\d{2}$", b.month or "") else (evs[0]["d"][:7] if evs else "")
+    spec = json.dumps({"ev": evs, "mes": mes, "vista": b.vista}, ensure_ascii=False, separators=(",", ":"))
+    warn = ""
+    if bad:
+        warn = ('<div class="rs-ag-bad">No se entendieron estas líneas (formato: <b>2026-12-05 | Título | Detalle | Categoría</b>): '
+                + "; ".join(esc(x) for x in bad[:4]) + ("…" if len(bad) > 4 else "") + "</div>")
+    fallback = "".join(f"<li><b>{esc(e['d'])}</b> {esc(e['t'])}</li>" for e in evs)
+    return f'<div class="rs-agenda">{t}<div class="rs-ag" data-spec="{attr(spec)}"><ul class="rs-ag-fb">{fallback}</ul></div>{warn}</div>'
+
+
 def r_heading(b: Heading, ctx: Ctx) -> str:
     return f'<h3 class="st" data-r>{esc(b.title or "")}</h3>'
 
@@ -522,7 +575,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
 
 
 R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList: r_card_list, RingCard: r_ring, StatusList: r_status_list,
-     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading, TextBlock: r_text, LinkBlock: r_link,
+     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading, TextBlock: r_text, LinkBlock: r_link, AgendaBlock: r_agenda,
      Workflow: r_workflow, Agreement: r_agreement, Activities: r_activities, Budget: r_budget, CalendarBlock: r_calendar,
      Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid, Group: r_group}
 
@@ -767,6 +820,10 @@ def hours_text(w: Workflow | None) -> str:
     return f"Suma de la columna HORA: {t} h" + (f" (sin dato en los pasos {' y '.join(map(str, sin))})" if sin else "")
 
 
+def _has_agenda(rep: Report) -> bool:
+    return any(not b.hidden and isinstance(b, AgendaBlock) for s in rep.sections for b in _blocks(s))
+
+
 def _has_chart(rep: Report) -> bool:
     return any(not b.hidden and (isinstance(b, Chart) or (isinstance(b, (RingCard, Agreement)) and b.viz != "ring")
                                  or (isinstance(b, (Plants, PlantCard)) and b.viz != "bars") or (isinstance(b, Budget) and b.viz != "donut"))
@@ -852,6 +909,10 @@ def render(rep: Report, edit: bool = False) -> str:
         tpl = SHELL.parent
         out = out.replace("</head>", "<style>" + (tpl / "charts.css").read_text(encoding="utf-8") + "</style></head>", 1)
         out = out.replace("</body>", "<script>" + (tpl / "charts.js").read_text(encoding="utf-8").replace("</", "<\\/") + "</script></body>", 1)
+    if _has_agenda(rep):
+        tpl = SHELL.parent
+        out = out.replace("</head>", "<style>" + (tpl / "agenda.css").read_text(encoding="utf-8") + "</style></head>", 1)
+        out = out.replace("</body>", "<script>" + (tpl / "agenda.js").read_text(encoding="utf-8").replace("</", "<\\/") + "</script></body>", 1)
     if not edit:  # el informe completo viaja dentro del HTML para poder reimportarlo sin pérdida
         blob = json.dumps(rep.model_dump(mode="json"), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
         out = out.replace("</body>", f'<script type="application/json" id="rs-report">{blob}</script></body>', 1)

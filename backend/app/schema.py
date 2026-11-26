@@ -273,6 +273,16 @@ class LinkBlock(BlockBase):
     align: Literal["left", "center", "right"] = "left"
 
 
+class AgendaBlock(BlockBase):
+    """Calendario interactivo hecho solo con texto plano: una línea por evento.
+    Formato: fecha | título | detalle | categoría   (detalle y categoría son opcionales).
+    La fecha puede ser 2026-12-05, 05/12/2026 o un rango 2026-12-05..2026-12-07 (o 05/12/2026-07/12/2026)."""
+    type: Literal["agenda"] = "agenda"
+    text: str = "2026-12-07 | Día de las velitas | Encuentro en el patio | Cultura\n2026-12-12 | Novena de aguinaldos | Auditorio, 3:00 p. m. | Bienestar\n2026-12-18..2026-12-19 | Jornada de salud | Primer piso | Salud"
+    month: str = ""               # "2026-12"; vacío = el mes del primer evento
+    vista: Literal["mes", "lista", "ambas"] = "ambas"
+
+
 class Heading(BlockBase):
     """Solo un título de sección (usa el campo Título)."""
     type: Literal["heading"] = "heading"
@@ -453,7 +463,7 @@ Block = Annotated[
     Union[
         StatGrid, RowList, NoteList, CardList, RingCard, StatusList, NumberedCards, StepCards,
         LinkCards, Gallery, Table, Plants, Workflow, Agreement, Activities, Budget,
-        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading, TextBlock, LinkBlock,
+        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading, TextBlock, LinkBlock, AgendaBlock,
     ],
     Field(discriminator="type"),
 ]

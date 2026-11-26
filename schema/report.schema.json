@@ -266,6 +266,217 @@
    "title": "Activity",
    "type": "object"
   },
+  "AgendaBlock": {
+   "additionalProperties": false,
+   "description": "Calendario interactivo hecho solo con texto plano: una línea por evento.\nFormato: fecha | título | detalle | categoría   (detalle y categoría son opcionales).\nLa fecha puede ser 2026-12-05, 05/12/2026 o un rango 2026-12-05..2026-12-07 (o 05/12/2026-07/12/2026).",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "verde",
+      "alerta",
+      "oscuro",
+      "oceano",
+      "atardecer",
+      "aurora",
+      "bosque",
+      "vino",
+      "grafito",
+      "bronce",
+      "medianoche",
+      "neon",
+      "blueprint",
+      "acento",
+      "miel",
+      "arena",
+      "postit",
+      "suave",
+      "dorado",
+      "menta",
+      "rosado",
+      "hielo",
+      "burbuja",
+      "borde",
+      "cinta",
+      "tapa",
+      "doble",
+      "punteado",
+      "esquinas",
+      "cabecera",
+      "subrayado",
+      "derecha",
+      "sello",
+      "minimal",
+      "cristal",
+      "rayas",
+      "puntos",
+      "papel",
+      "sombra",
+      "glow"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
+    "num_color": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Num Color",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
+    "embed": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Media"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "embed_pos": {
+     "default": "bottom",
+     "enum": [
+      "top",
+      "bottom",
+      "left",
+      "right"
+     ],
+     "title": "Embed Pos",
+     "type": "string"
+    },
+    "type": {
+     "const": "agenda",
+     "default": "agenda",
+     "title": "Type",
+     "type": "string"
+    },
+    "text": {
+     "default": "2026-12-07 | Día de las velitas | Encuentro en el patio | Cultura\n2026-12-12 | Novena de aguinaldos | Auditorio, 3:00 p. m. | Bienestar\n2026-12-18..2026-12-19 | Jornada de salud | Primer piso | Salud",
+     "title": "Text",
+     "type": "string"
+    },
+    "month": {
+     "default": "",
+     "title": "Month",
+     "type": "string"
+    },
+    "vista": {
+     "default": "ambas",
+     "enum": [
+      "mes",
+      "lista",
+      "ambas"
+     ],
+     "title": "Vista",
+     "type": "string"
+    }
+   },
+   "title": "AgendaBlock",
+   "type": "object"
+  },
   "Agreement": {
    "additionalProperties": false,
    "properties": {
@@ -2321,6 +2532,7 @@
        "discriminator": {
         "mapping": {
          "activities": "#/$defs/Activities",
+         "agenda": "#/$defs/AgendaBlock",
          "agreement": "#/$defs/Agreement",
          "budget": "#/$defs/Budget",
          "calendar": "#/$defs/CalendarBlock",
@@ -2431,6 +2643,9 @@
         },
         {
          "$ref": "#/$defs/LinkBlock"
+        },
+        {
+         "$ref": "#/$defs/AgendaBlock"
         }
        ]
       },
@@ -2639,6 +2854,7 @@
       "discriminator": {
        "mapping": {
         "activities": "#/$defs/Activities",
+        "agenda": "#/$defs/AgendaBlock",
         "agreement": "#/$defs/Agreement",
         "budget": "#/$defs/Budget",
         "calendar": "#/$defs/CalendarBlock",
@@ -2749,6 +2965,9 @@
        },
        {
         "$ref": "#/$defs/LinkBlock"
+       },
+       {
+        "$ref": "#/$defs/AgendaBlock"
        }
       ]
      },
@@ -5853,6 +6072,7 @@
       "discriminator": {
        "mapping": {
         "activities": "#/$defs/Activities",
+        "agenda": "#/$defs/AgendaBlock",
         "agreement": "#/$defs/Agreement",
         "budget": "#/$defs/Budget",
         "calendar": "#/$defs/CalendarBlock",
@@ -5963,6 +6183,9 @@
        },
        {
         "$ref": "#/$defs/LinkBlock"
+       },
+       {
+        "$ref": "#/$defs/AgendaBlock"
        }
       ]
      },
@@ -6858,6 +7081,7 @@
       "discriminator": {
        "mapping": {
         "activities": "#/$defs/Activities",
+        "agenda": "#/$defs/AgendaBlock",
         "agreement": "#/$defs/Agreement",
         "budget": "#/$defs/Budget",
         "calendar": "#/$defs/CalendarBlock",
@@ -6968,6 +7192,9 @@
        },
        {
         "$ref": "#/$defs/LinkBlock"
+       },
+       {
+        "$ref": "#/$defs/AgendaBlock"
        }
       ]
      },
@@ -6999,6 +7226,7 @@
       "discriminator": {
        "mapping": {
         "activities": "#/$defs/Activities",
+        "agenda": "#/$defs/AgendaBlock",
         "agreement": "#/$defs/Agreement",
         "budget": "#/$defs/Budget",
         "calendar": "#/$defs/CalendarBlock",
@@ -7109,6 +7337,9 @@
        },
        {
         "$ref": "#/$defs/LinkBlock"
+       },
+       {
+        "$ref": "#/$defs/AgendaBlock"
        }
       ]
      },

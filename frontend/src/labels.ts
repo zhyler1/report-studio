@@ -4,7 +4,7 @@ export const FIELD: Record<string, string> = {
   animate: 'Animar el número', autoplay: 'Reproducir al abrir', avg: 'Promedio (%)', background: 'Fondo animado', bar_color: 'Color de la barra', bar_pct: 'Porcentaje de la barra',
   bind: 'Tomar de otro bloque', blocks: 'Contenido', bonus: 'Filas de bonificación', bonus_label: 'Rótulo de bonificación', bonus_total: 'Total de bonificación',
   boss: 'Nombre de quien firma', boss_role: 'Cargo de quien firma', budget: 'Presupuesto', button: 'Botón', button_label: 'Texto del botón', caption: 'Pie de foto',
-  color: 'Color', columns: 'Columnas', cover: 'Portada', cutoff: 'Fecha de corte', date: 'Fecha', default: 'Tema inicial', default_month: 'Mes inicial',
+  color: 'Color', columns: 'Columnas', cover: 'Portada', cutoff: 'Fecha de corte', date: 'Fecha', default: 'Tema inicial', default_month: 'Mes inicial', month: 'Mes inicial (ej. 2026-12; vacío = el del primer evento)', vista: 'Qué mostrar',
   disabled: 'Desactivado', efr_measure: 'Medida de ejecución', end: 'Fin (segundos)', evidence: 'Evidencia', footer: 'Pie de página', format: 'Formato', frequency: 'Periodicidad',
   group: 'Grupo', header: 'Encabezado', heading: 'Encabezado', height: 'Alto (px, 0 = automático)', hero_kicker: 'Rótulo superior del inicio', hero_text: 'Texto del inicio',
   hero_title: 'Título del inicio', hidden: 'Ocultar', hours: 'Horas', home: 'Tarjeta en Inicio', icon: 'Ícono', id: 'Identificador interno', intro_word: 'Palabra animada de la portada',
@@ -27,7 +27,7 @@ export const FIELD: Record<string, string> = {
 }
 
 export const BLOCK: Record<string, string> = {
-  group: 'Grupo de casillas', plant_card: 'Tarjeta de planta', callout: 'Recuadro destacado', text: 'Texto', link: 'Enlace / botón', heading: 'Título de sección',
+  group: 'Grupo de casillas', plant_card: 'Tarjeta de planta', callout: 'Recuadro destacado', text: 'Texto', agenda: 'Calendario de agenda', link: 'Enlace / botón', heading: 'Título de sección',
   stat_grid: 'Cifras destacadas', row_list: 'Lista de acciones con evidencia', note_list: 'Lista de observaciones', card_list: 'Tarjeta con lista', ring_card: 'Anillo de porcentaje',
   status_list: 'Lista de estados', numbered_cards: 'Tarjetas numeradas', step_cards: 'Pasos con fecha', link_cards: 'Tarjetas con enlace', gallery: 'Galería de imágenes', table: 'Tabla',
   plants: 'Planta de personal', workflow: 'Flujo de trabajo', agreement: 'Acuerdo / avance', activities: 'Actividades', budget: 'Presupuesto', calendar: 'Calendario',
@@ -38,7 +38,7 @@ export const OPT: Record<string, string> = {
   light: 'Claro', dark: 'Oscuro', foto: 'Con foto', clasica: 'Clásica', alto: 'Alto', medio: 'Medio', bajo: 'Bajo', none: 'Ninguno', people: 'Personas', stock: 'Bolsa (velas)',
   heart: 'Corazón', doc: 'Documento', radio: 'Ondas / radio', shield: 'Escudo', auto: 'Automático', blue: 'Azul', red: 'Rojo', green: 'Verde', orange: 'Naranja', yellow: 'Amarillo',
   purple: 'Morado', navy: 'Azul oscuro', left: 'Izquierda', right: 'Derecha', center: 'Centro', text: 'Texto', money: 'Dinero', pct: 'Porcentaje', pct_bar: 'Porcentaje con barra',
-  pill: 'Etiqueta', number: 'Número', image: 'Imagen', video: 'Video', audio: 'Audio', checks: 'Con vistos', plain: 'Viñetas', warn: 'Advertencia', violet: 'Violeta',
+  ambas: 'Mes y lista', mes: 'Solo el mes', lista: 'Solo la lista', pill: 'Etiqueta', number: 'Número', image: 'Imagen', video: 'Video', audio: 'Audio', checks: 'Con vistos', plain: 'Viñetas', warn: 'Advertencia', violet: 'Violeta',
   ejecutado: 'Ejecutado', proceso: 'En proceso', espera: 'En espera', vacations: 'Vacaciones', bonus: 'Bonificación', ancheta: 'Ancheta', velitas: 'Velitas',
   bar: 'Barras', hbar: 'Barras horizontales', hstacked: 'Barras horizontales apiladas', step: 'Escalón', pareto: 'Pareto', histogram: 'Histograma', pyramid: 'Pirámide', rose: 'Rosa polar', waffle: 'Cuadrícula de 100', pictogram: 'Pictograma de personas', slope: 'Pendiente (antes y después)', dumbbell: 'Mancuernas', bump: 'Ranking en el tiempo', hemicycle: 'Hemiciclo', kpi: 'Tarjetas de indicador', calendar: 'Calendario de actividad', sankey: 'Flujos (sankey)', stacked100: 'Barras apiladas al 100 %', stacked_area: 'Áreas apiladas', combo: 'Combinado (barras + línea)', lollipop: 'Paletas',
   radialbar: 'Anillos concéntricos', bullet: 'Avance frente a meta', scatter: 'Dispersión', bubble: 'Burbujas', waterfall: 'Cascada', funnel: 'Embudo', heatmap: 'Mapa de calor',

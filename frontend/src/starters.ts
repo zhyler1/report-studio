@@ -7,5 +7,6 @@ export const STARTERS: Record<string, any> = {
   table: { title: 'Nueva tabla', columns: [{ key: 'a', label: 'Columna A', format: 'text' }, { key: 'b', label: 'Columna B', format: 'text' }], rows: [{ a: 'Dato', b: 'Dato' }] },
   grid: { columns: [[], []] },
   text: { text: 'Escribe aquí tu texto.' },
+  agenda: { title: 'Calendario', text: '2026-12-07 | Día de las velitas | Encuentro en el patio | Cultura\n2026-12-12 | Novena de aguinaldos | Auditorio, 3:00 p. m. | Bienestar\n2026-12-18..2026-12-19 | Jornada de salud | Primer piso | Salud', vista: 'ambas' },
   link: { items: [{ label: 'Abrir enlace', url: '', text: '' }] },
 }
