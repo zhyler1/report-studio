@@ -93,6 +93,6 @@ def test_estilo_predeterminado_usa_la_paleta():
     rep = Report.model_validate(json.loads((Path(__file__).resolve().parents[2] / "seed/report.seed.json").read_text(encoding="utf-8")))
     rep.sections[0].tabs.append(Tab(id="lkx", label="L", blocks=[StatGrid(id="lk1", items=[Stat(value=5, label="x")], look="degradado")]))
     html = render(rep)
-    assert 'class="rs-lk rs-l-degradado"' in html and ".rs-l-degradado{background:linear-gradient" in html and "var(--navy)" in html
+    assert 'class="rs-lk rs-l-degradado"' in html and ".rs-l-degradado{--h:" in html and "var(--navy)" in html
     import re
     assert len(re.findall(r"<style\b", html)) == html.count("</style>")
