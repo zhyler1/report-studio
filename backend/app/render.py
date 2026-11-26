@@ -11,6 +11,7 @@ import json
 import re
 from pathlib import Path
 
+from .looks import FAM
 from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, Media, MediaBlock,
                      NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, TextBlock, LinkBlock, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
                      StepCards, Table, Workflow)
@@ -583,7 +584,7 @@ def render_block(b, ctx: Ctx, path: str = "") -> str:
             st += f"text-align:{b.text_align};"
         out = f'<div class="rs-sty{" rs-nc" if b.num_color else ""}" style="{st}">{out}</div>'
     if b.look:
-        out = f'<div class="rs-lk rs-l-{b.look}">{out}</div>'
+        out = f'<div class="rs-lk rs-l-{b.look} rs-f{FAM.get(b.look, "l")}">{out}</div>'
     tint = f' data-tint="{attr(json.dumps([x.model_dump() for x in b.tints if x.c], ensure_ascii=False))}"' if any(x.c for x in b.tints) else ""
     if ctx.edit and path:  # modo edición: cada casilla se marca para poder seleccionarla en la vista previa
         lk = ' data-lk="1"' if b.locked else ""

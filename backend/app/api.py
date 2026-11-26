@@ -159,6 +159,14 @@ def _valid(data: dict):
     return rep
 
 
+@router.get("/looks")
+def looks():
+    """Catálogo de estilos de casilla y su CSS (el editor lo usa para dibujar las vistas previas del selector)."""
+    from .looks import LOOKS
+    css = (Path(__file__).parent / "templates" / "looks.css").read_text(encoding="utf-8")
+    return {"css": css, "looks": [{"key": k, "label": n, "group": g, "fam": f} for k, n, g, f in LOOKS]}
+
+
 @router.get("/schema")
 def schema():
     return json_schema()

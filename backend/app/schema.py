@@ -28,6 +28,9 @@ Icon = Literal["none", "people", "stock", "heart", "doc", "radio", "shield",
                "briefcase", "calendar", "chart", "target", "graduation", "megaphone", "gear", "lock", "scale", "building", "trophy", "bell", "clock", "globe"]   # 20 iconos animados de sección
 
 
+from .looks import LookKey  # noqa: E402
+
+
 class Base(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -98,7 +101,7 @@ class BlockBase(Base):
     fg: str = Hex          # color del texto de la casilla (vacío = el del tema)
     tints: list[Tint] = []  # colores puntuales de textos o cifras de la casilla
     font: Literal["", "public", "sistema", "georgia", "verdana", "trebuchet", "mono"] = ""   # letra de la casilla (vacío = la del informe)
-    look: Literal["", "solido", "degradado", "acento", "verde", "alerta", "oscuro", "suave", "dorado", "borde", "cinta", "cristal", "tapa"] = ""   # estilo predeterminado (usa los colores de la paleta)
+    look: LookKey = ""   # estilo predeterminado (usa los colores de la paleta)
     num_color: str = Hex   # color de las cifras de la casilla (vacío = el del estilo o el del tema)
     escala: int = Field(100, ge=50, le=250)   # tamaño del texto de la casilla, en % (100 = normal)
     text_align: Literal["", "left", "center", "right"] = ""   # alineación del texto (vacío = la de la casilla)

@@ -119,3 +119,23 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px;text-
 details.sty{margin-top:12px;border:1px dashed #c9d4e6;border-radius:10px;padding:6px 10px;background:#f8fafd}
 details.sty>summary{cursor:pointer;font-weight:700;font-size:13px;color:#2160b0;padding:4px 0}
 details.sty[open]>summary{margin-bottom:6px}
+
+.lkbox{position:relative}
+.lkrow{display:flex;gap:4px;align-items:flex-start;flex-wrap:wrap;max-width:560px}
+.lkc{display:flex;flex-direction:column;align-items:center;gap:3px;padding:3px;border:1px solid transparent;border-radius:8px;background:none;cursor:pointer;height:auto}
+.lkc:hover{background:#eef3fb}.lkc.on{border-color:#2160b0;background:#e4eefb}
+.lkc small{font-size:9.5px;color:#5a6a85;line-height:1;max-width:64px;text-align:center}
+.lkprev{display:block;width:64px;height:40px;border-radius:7px;overflow:hidden;position:relative;background:#f4f5f7;box-shadow:0 0 0 1px rgba(0,0,0,.08);padding:3px}
+.lkprev .rs-lk{display:block;height:100%;width:100%;box-sizing:border-box;border-radius:5px;overflow:hidden}
+.lkprev .rs-lk::after{display:none!important}
+.lkprev .card{background:var(--card);color:var(--text);border:1px solid var(--border);text-align:center}
+.lkno{display:flex;align-items:center;justify-content:center;height:100%;font:700 13px Inter,system-ui,sans-serif;color:#14243f;background:#fff;border-radius:5px}
+.lkmore{align-self:center;height:34px;padding:0 12px;border-radius:9px;border:1px solid #b9c8e0;background:#fff;color:#2160b0;font:700 12px Inter,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+.lkmore:hover,.lkmore.on{background:#e4eefb}
+.lkpop{position:fixed;left:278px;top:176px;width:min(760px,calc(100vw - 300px));max-height:calc(100vh - 220px);z-index:80;background:#fff;border:1px solid #b9c8e0;border-radius:14px;box-shadow:0 24px 60px rgba(20,36,63,.28);display:flex;flex-direction:column}
+.lkpop-h{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid #e3e9f3}.lkpop-h span{flex:1;color:#5a6a85;font-size:12px}
+.lkpop-b{overflow:auto;padding:10px 14px 14px}
+.lkg{margin-bottom:12px}.lkgt{font:800 11px Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#2160b0;margin-bottom:6px}
+.lkgrid{display:flex;flex-wrap:wrap;gap:8px}
+.lkpop .lkprev{width:96px;height:58px;padding:5px}
+.lkpop .lkc small{font-size:11px;max-width:96px}
