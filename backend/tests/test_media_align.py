@@ -94,4 +94,5 @@ def test_estilo_predeterminado_usa_la_paleta():
     rep.sections[0].tabs.append(Tab(id="lkx", label="L", blocks=[StatGrid(id="lk1", items=[Stat(value=5, label="x")], look="degradado")]))
     html = render(rep)
     assert 'class="rs-lk rs-l-degradado"' in html and ".rs-l-degradado{background:linear-gradient" in html and "var(--navy)" in html
-    assert html.count("<style>") == html.count("</style>")
+    import re
+    assert len(re.findall(r"<style\b", html)) == html.count("</style>")
