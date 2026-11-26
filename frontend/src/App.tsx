@@ -313,7 +313,8 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
   }, [])
   useEffect(() => { window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey) }, [onKey])
   const selRef = useRef<string | null>(null); selRef.current = sel
-  const select = useCallback((p: string | null) => { setSelS(p); setRib(r => (p ? 'casilla' : r === 'casilla' ? 'inicio' : r)); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
+  const select = useCallback((p: string | null) => { setSelS(p); if (p) setDrawer(cur => { const v = cur && ['secciones', 'general', 'textos', 'inicio', 'alertas'].includes(cur) ? 'casilla' : cur; if (v !== cur) LS.set('drawer', v); return v }); setRib(r => (p ? 'casilla' : r === 'casilla' ? 'inicio' : r)); setTimeout(() => (frame.current?.contentDocument as any)?.__rsRedraw?.(), 60) }, [])
+  useEffect(() => { if (sel) document.querySelector('.drawer')?.scrollTo?.({ top: 0 }) }, [sel])
   const flash = useCallback((m: string) => { setToast(m); setTimeout(() => setToast(''), 3500) }, [])
   const kinds = useMemo(() => { const k: any = Defs.current?.Chart?.properties?.kind; const r = k?.$ref ? Defs.current[k.$ref.split('/').pop()] : k; return (r?.enum || []) as string[] }, [id, ready])
   const goAfter = useRef<string | null>(null)

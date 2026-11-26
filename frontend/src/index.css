@@ -115,3 +115,7 @@ table{width:100%;border-collapse:collapse;font-size:13px}td,th{padding:4px;text-
 .lk i{display:flex;align-items:center;justify-content:center;width:42px;height:24px;border-radius:6px;font:700 12px Inter,system-ui,sans-serif;font-style:normal;box-shadow:0 0 0 1px rgba(0,0,0,.08)}
 .lk small{font-size:9.5px;color:#5a6a85;line-height:1}
 .lk:hover{background:#eef3fb}.lk.on{border-color:#2160b0;background:#e4eefb}
+
+details.sty{margin-top:12px;border:1px dashed #c9d4e6;border-radius:10px;padding:6px 10px;background:#f8fafd}
+details.sty>summary{cursor:pointer;font-weight:700;font-size:13px;color:#2160b0;padding:4px 0}
+details.sty[open]>summary{margin-bottom:6px}

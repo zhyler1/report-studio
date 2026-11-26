@@ -141,6 +141,7 @@ function ExcelPaste({ chart, set }: { chart: any; set: (v: any) => void }) {
   </div>
 }
 
+const ESTILO = new Set(['locked', 'span', 'bg', 'fg', 'tints', 'embed', 'embed_pos', 'font', 'look', 'num_color', 'escala', 'text_align'])
 export function ObjectField({ s, value, set, bare }: { s: S; value: any; set: (v: any) => void; bare?: boolean }) {
   const kind = useContext(KindCtx)
   const isChart = s.title === 'Chart', isSeries = s.title === 'Series'
@@ -149,8 +150,13 @@ export function ObjectField({ s, value, set, bare }: { s: S; value: any; set: (v
   if (isSeries) { const keep = SERIES_FIELDS(kind); props = props.filter(([k]) => keep.includes(k)).sort((a, b) => keep.indexOf(a[0]) - keep.indexOf(b[0])) }
   const mixed = s.title === 'Section' && value.tabs?.length > 0
   if (mixed) props = props.filter(([k]) => k !== 'blocks')
-  const sorted = [...props.filter(([k]) => !ORDER_LAST.has(k)), ...props.filter(([k]) => ORDER_LAST.has(k))]
-  const fields = sorted.map(([k, p]) => <Field key={k} k={k} schema={p} value={value[k]} parent={value} set={v => set({ ...value, [k]: v })} />)
+  const esBloque = !!s.properties?.type && norm(s.properties.type).s.const !== undefined && s.properties?.span !== undefined
+  const estilo = esBloque ? props.filter(([k]) => ESTILO.has(k)) : []   // en una casilla, lo de formato va plegado al final y el contenido queda arriba
+  const rest = esBloque ? props.filter(([k]) => !ESTILO.has(k)) : props
+  const sorted = [...rest.filter(([k]) => !ORDER_LAST.has(k)), ...rest.filter(([k]) => ORDER_LAST.has(k))]
+  const mk = ([k, p]: [string, S]) => <Field key={k} k={k} schema={p} value={value[k]} parent={value} set={v => set({ ...value, [k]: v })} />
+  const fields = sorted.map(mk)
+  if (estilo.length) fields.push(<details key="__estilo" className="sty"><summary>🎨 Estilo y formato de la casilla</summary>{estilo.map(mk)}</details>)
   const fix = mixed ? <div className="issues" style={{ background: '#fff8e6', borderColor: '#e8c36a', color: '#6b4e00' }}>
     Esta sección usa pestañas internas: las casillas van dentro de cada pestaña (o con «+ Agregar casilla» en la vista previa).
     {value.blocks?.length > 0 && <> Hay {value.blocks.length} casilla(s) sueltas que no deberían estar aquí. <button onClick={() => set({ ...value, blocks: [], tabs: value.tabs.map((t: any, i: number) => (i === 0 ? { ...t, blocks: [...t.blocks, ...value.blocks] } : t)) })}>Moverlas a la primera pestaña</button> <button className="danger" onClick={() => set({ ...value, blocks: [] })}>Borrarlas</button></>}</div> : null
