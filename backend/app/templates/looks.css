@@ -1,44 +1,27 @@
-/* Estilos de presentación (theme.look). Cambian la forma de las casillas, los títulos y el fondo; el color lo siguen poniendo la paleta y el tema. */
-
-/* ───── AIRE: blanco, mucho espacio, líneas finas ───── */
-html[data-look=aire]:not([data-theme=dark]) body{background:#fff!important}
-html[data-look=aire] .card{border:0;border-radius:10px;padding:26px;box-shadow:0 0 0 1px rgba(100,116,139,.22)}
-html[data-look=aire] .card:hover{transform:none;box-shadow:0 0 0 1px var(--blue)}
-html[data-look=aire] h1{font-weight:300;letter-spacing:-.035em}
-html[data-look=aire] .card h3{font-weight:600;letter-spacing:.01em}
-html[data-look=aire] .tab{border:0;background:transparent;border-radius:6px;font-weight:500}
-html[data-look=aire] .tab.active{background:var(--blue);color:#fff;box-shadow:none}
-html[data-look=aire] .hero{border-radius:12px;box-shadow:none}
-
-/* ───── VIDRIO: cristal sobre degradados de luz ───── */
-html[data-look=vidrio] body{background:radial-gradient(1100px 560px at 12% -8%,color-mix(in srgb,var(--blue) 38%,transparent),transparent 62%),radial-gradient(900px 520px at 92% 6%,color-mix(in srgb,var(--gold) 26%,transparent),transparent 60%),var(--bg1);background-attachment:fixed}
-html[data-look=vidrio] .card{background:rgba(255,255,255,.58);border:1px solid rgba(255,255,255,.75);border-radius:22px;backdrop-filter:blur(18px) saturate(1.35);box-shadow:0 10px 40px rgba(15,23,42,.12)}
-html[data-look=vidrio][data-theme=dark] .card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);box-shadow:0 10px 44px rgba(0,0,0,.35)}
-html[data-look=vidrio] .tab{backdrop-filter:blur(12px);background:rgba(255,255,255,.45);border-color:rgba(255,255,255,.7)}
-html[data-look=vidrio][data-theme=dark] .tab{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.16)}
-html[data-look=vidrio] .hero{border-radius:28px}
-
-/* ───── AUDAZ: bloques con borde grueso y sombra dura ───── */
-html[data-look=audaz] .card{border:2px solid var(--head);border-radius:8px;box-shadow:6px 6px 0 var(--gold);background:var(--card)}
-html[data-look=audaz] .card:hover{transform:translate(-2px,-2px);box-shadow:8px 8px 0 var(--gold)}
-html[data-look=audaz] h1{font-weight:900;text-transform:uppercase;letter-spacing:-.01em}
-html[data-look=audaz] .card h3{font-weight:900;text-transform:uppercase;letter-spacing:.04em;font-size:14px}
-html[data-look=audaz] .tab{border:2px solid var(--head);border-radius:6px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;font-size:12px}
-html[data-look=audaz] .hero{border-radius:8px;border:2px solid var(--head);box-shadow:8px 8px 0 var(--gold)}
-
-/* ───── SUAVE: redondeado, tonos pastel, sombras difusas ───── */
-html[data-look=suave]:not([data-theme=dark]) body{background:linear-gradient(160deg,color-mix(in srgb,var(--blue) 7%,#fff) 0%,color-mix(in srgb,var(--gold) 12%,#fff) 100%);background-attachment:fixed}
-html[data-look=suave] .card{border:0;border-radius:30px;padding:26px;background:color-mix(in srgb,var(--blue) 5%,var(--card));box-shadow:0 14px 44px color-mix(in srgb,var(--blue) 16%,transparent)}
-html[data-look=suave] h1{font-weight:700}
-html[data-look=suave] .tab{border:0;border-radius:999px;padding:12px 22px;box-shadow:0 4px 14px color-mix(in srgb,var(--blue) 14%,transparent)}
-html[data-look=suave] .hero{border-radius:36px}
-
-/* ───── REVISTA: papel, serifa grande y filetes ───── */
-html[data-look=revista]:not([data-theme=dark]) body{background:#FBF8F3!important}
-html[data-look=revista] h1{font-family:Georgia,'Times New Roman',serif;font-weight:700;letter-spacing:-.02em}
-html[data-look=revista] .card h3{font-family:Georgia,'Times New Roman',serif;font-size:19px}
-html[data-look=revista] .card{background:transparent;border:0;border-top:3px solid var(--head);border-radius:0;padding:18px 4px 6px;backdrop-filter:none;box-shadow:none}
-html[data-look=revista] .card:hover{transform:none;background:transparent}
-html[data-look=revista] .tab{background:transparent;border:0;border-bottom:2px solid transparent;border-radius:0;padding:10px 4px;margin:0 8px}
-html[data-look=revista] .tab.active{border-bottom-color:var(--blue)}
-html[data-look=revista] .hero{border-radius:0}
+/* Estilos predeterminados de casilla: todos se calculan con los colores de la paleta del informe */
+.rs-lk{position:relative;border-radius:22px;padding:22px;margin-bottom:16px;overflow:hidden;isolation:isolate}
+.rs-lk::after{content:"";position:absolute;right:-70px;top:-70px;width:210px;height:210px;border-radius:50%;background:rgba(255,255,255,.09);pointer-events:none;z-index:-1;display:none}
+.rs-lk .card{box-shadow:none}
+.rs-lk>.rs-t>.card:last-child,.rs-lk>.card:last-child{margin-bottom:0}
+/* oscuros (texto claro) */
+.rs-l-solido,.rs-l-degradado,.rs-l-verde,.rs-l-alerta,.rs-l-oscuro{--card:rgba(255,255,255,.14);--card-h:rgba(255,255,255,.22);--border:rgba(255,255,255,.28);--text:#fff;--head:#fff;--muted:rgba(255,255,255,.88);color:#fff;box-shadow:0 18px 40px -18px rgba(0,0,0,.45)}
+.rs-l-solido::after,.rs-l-degradado::after,.rs-l-verde::after,.rs-l-alerta::after,.rs-l-oscuro::after{display:block}
+.rs-l-solido .num,.rs-l-degradado .num,.rs-l-verde .num,.rs-l-alerta .num,.rs-l-oscuro .num,.rs-l-solido .cn,.rs-l-degradado .cn,.rs-l-verde .cn,.rs-l-alerta .cn,.rs-l-oscuro .cn{color:#fff!important}
+.rs-l-oscuro .num,.rs-l-oscuro .cn{color:var(--gold)!important}
+.rs-l-solido{background:var(--navy)}
+.rs-l-degradado{background:linear-gradient(135deg,var(--navy),color-mix(in srgb,var(--navy) 55%,var(--blue)))}
+.rs-l-verde{background:linear-gradient(135deg,color-mix(in srgb,var(--green) 72%,#000),color-mix(in srgb,var(--green) 42%,#000))}
+.rs-l-alerta{background:linear-gradient(135deg,color-mix(in srgb,var(--red) 80%,#000),color-mix(in srgb,var(--red) 55%,#000))}
+.rs-l-oscuro{background:linear-gradient(160deg,#18263f,#0a111f)}
+/* cálidos (texto oscuro) */
+.rs-l-acento{background:linear-gradient(135deg,var(--gold),var(--yellow));--card:rgba(255,255,255,.4);--card-h:rgba(255,255,255,.55);--border:rgba(20,36,63,.15);--text:#14243F;--head:#14243F;--muted:#3a3320;color:#14243F;box-shadow:0 18px 40px -20px color-mix(in srgb,var(--yellow) 70%,#000)}
+.rs-l-acento::after{display:block;background:rgba(255,255,255,.28)}
+.rs-l-acento .num,.rs-l-acento .cn{color:#14243F!important}
+/* suaves */
+.rs-l-suave{background:color-mix(in srgb,var(--blue) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--blue) 30%,transparent);--card:color-mix(in srgb,var(--panel) 88%,transparent)}
+.rs-l-dorado{background:color-mix(in srgb,var(--yellow) 14%,var(--panel));border:1px solid color-mix(in srgb,var(--yellow) 45%,transparent);--card:color-mix(in srgb,var(--panel) 88%,transparent)}
+.rs-l-borde{background:transparent;border:2px solid var(--blue);--card:transparent;--card-h:transparent;--border:color-mix(in srgb,var(--blue) 25%,transparent)}
+.rs-l-cinta{background:var(--panel);border:1px solid var(--border);border-left:10px solid var(--yellow);box-shadow:var(--shadow);--card:color-mix(in srgb,var(--blue) 6%,transparent)}
+.rs-l-cristal{background:linear-gradient(135deg,color-mix(in srgb,var(--blue) 16%,transparent),color-mix(in srgb,var(--yellow) 12%,transparent));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid color-mix(in srgb,var(--text) 16%,transparent);box-shadow:0 14px 34px -18px rgba(0,0,0,.35)}
+.rs-l-tapa{background:var(--panel);border-top:6px solid var(--blue);box-shadow:var(--shadow);border-radius:18px;--card:color-mix(in srgb,var(--blue) 6%,transparent)}
+@media print{.rs-lk{box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.rs-lk::after{display:none!important}}

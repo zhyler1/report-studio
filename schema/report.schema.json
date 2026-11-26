@@ -84,6 +84,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -292,6 +312,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -548,6 +588,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -731,6 +791,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -885,6 +965,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -1029,6 +1129,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -1184,6 +1304,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -1598,6 +1738,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -1752,6 +1912,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -2023,6 +2203,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -2274,6 +2474,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -2533,6 +2753,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -2782,6 +3022,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -3092,6 +3352,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -3269,6 +3549,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -3443,6 +3743,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -3603,6 +3923,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -3813,6 +4153,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -4062,6 +4422,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -4298,6 +4678,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -4826,6 +5226,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -5016,6 +5436,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -5203,6 +5643,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -5675,6 +6135,26 @@
      "title": "Font",
      "type": "string"
     },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
+     "type": "string"
+    },
     "escala": {
      "default": 100,
      "maximum": 250,
@@ -5842,6 +6322,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {
@@ -6127,6 +6627,26 @@
       "mono"
      ],
      "title": "Font",
+     "type": "string"
+    },
+    "look": {
+     "default": "",
+     "enum": [
+      "",
+      "solido",
+      "degradado",
+      "acento",
+      "verde",
+      "alerta",
+      "oscuro",
+      "suave",
+      "dorado",
+      "borde",
+      "cinta",
+      "cristal",
+      "tapa"
+     ],
+     "title": "Look",
      "type": "string"
     },
     "escala": {

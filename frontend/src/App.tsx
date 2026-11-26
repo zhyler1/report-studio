@@ -435,7 +435,27 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
     if (!n) { flash('No hay contenedores vacíos'); return }
     setD(nd); select(null); flash(`${n} contenedor${n > 1 ? 'es' : ''} vacío${n > 1 ? 's' : ''} quitado${n > 1 ? 's' : ''} · Ctrl+Z para deshacer`)
   }
+  const variarEstilos = (quitar: boolean) => {   // reparte estilos predeterminados (o los quita) en la lista visible, bajando a grupos y columnas
+    const dd = dRef.current, w = where(); if (!dd || !w) return
+    const SEQ = ['degradado', 'suave', 'cinta', 'acento', 'cristal', 'solido', 'dorado', 'tapa']
+    const APLICA = new Set(['stat_grid', 'card_list', 'callout', 'text', 'note_list', 'numbered_cards', 'ring_card', 'status_list', 'link_cards', 'step_cards', 'row_list', 'agreement', 'plant_card'])
+    let k = 0, n = 0
+    const rec = (l: Json[]): Json[] => (l || []).map((b: Json) => {
+      if (b.type === 'group') return { ...b, blocks: rec(b.blocks) }
+      if (b.type === 'grid') return { ...b, columns: (b.columns || []).map((c: Json[]) => rec(c)) }
+      if (quitar) { if (b.look) { n++; return { ...b, look: '' } } return b }
+      if (APLICA.has(b.type) && !b.look && !b.bg) { n++; return { ...b, look: SEQ[k++ % SEQ.length] } }
+      return b
+    })
+    const cur = getAt(dd, w.list); if (!Array.isArray(cur)) return
+    if (!n && !cur.length) return
+    const nl = rec(cur)
+    if (!n) { flash(quitar ? 'Ninguna casilla tenía estilo' : 'No hay casillas sin estilo en esta lista'); return }
+    setD(setAt(dd, w.list, nl)); flash(quitar ? `Estilos quitados en ${n} casilla${n > 1 ? 's' : ''} · Ctrl+Z para deshacer` : `Estilos repartidos en ${n} casilla${n > 1 ? 's' : ''} · Ctrl+Z para deshacer`)
+  }
   const op = (a: string) => {
+    if (a === 'variar') { variarEstilos(false); return }
+    if (a === 'sinestilo') { variarEstilos(true); return }
     if (a === 'clean') { limpiarVacios(); return }
     if (a === 'copy' || a === 'cut') { copyBlock(a === 'cut'); return }
     if (a === 'paste') { pasteBlock(); return }

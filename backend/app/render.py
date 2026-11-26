@@ -541,6 +541,8 @@ def render_block(b, ctx: Ctx, path: str = "") -> str:
         if b.text_align:
             st += f"text-align:{b.text_align};"
         out = f'<div class="rs-sty" style="{st}">{out}</div>'
+    if b.look:
+        out = f'<div class="rs-lk rs-l-{b.look}">{out}</div>'
     tint = f' data-tint="{attr(json.dumps([x.model_dump() for x in b.tints if x.c], ensure_ascii=False))}"' if any(x.c for x in b.tints) else ""
     if ctx.edit and path:  # modo edición: cada casilla se marca para poder seleccionarla en la vista previa
         lk = ' data-lk="1"' if b.locked else ""
@@ -811,7 +813,7 @@ def render(rep: Report, edit: bool = False) -> str:
     if not edit:  # el informe completo viaja dentro del HTML para poder reimportarlo sin pérdida
         blob = json.dumps(rep.model_dump(mode="json"), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
         out = out.replace("</body>", f'<script type="application/json" id="rs-report">{blob}</script></body>', 1)
-    css = theme_css(m.theme) + ".rs-row{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch;margin-bottom:24px}.rs-c{min-width:0}.rs-sty{border-radius:16px;padding:16px;margin-bottom:12px}@media(max-width:760px){.rs-c{flex-basis:100%!important}}"
+    css = theme_css(m.theme) + ".rs-row{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch;margin-bottom:24px}.rs-c{min-width:0}.rs-sty{border-radius:16px;padding:16px;margin-bottom:12px}@media(max-width:760px){.rs-c{flex-basis:100%!important}}" + (SHELL.parent / "looks.css").read_text(encoding="utf-8")
     out = out.replace("</head>", f"<style>{css[css.index('.rs-row'):]}</style>" + css[:css.index(".rs-row")] + "</head>", 1) if False else out.replace("</head>", css[:css.index(".rs-row")] + "<style>" + css[css.index(".rs-row"):] + "</style></head>", 1)
     left = re.findall(r"@@[A-Z_]+@@", out)
     assert not left, f"marcadores sin resolver: {left}"

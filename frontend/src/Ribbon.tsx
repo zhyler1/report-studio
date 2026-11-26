@@ -50,6 +50,13 @@ const P: Record<string, string> = {
   history: 'M4 12a8 8 0 1 0 3-6.2M4 4v4h4M12 8v5l3 2', info: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM12 11v5M12 8v.5',
   type: 'M4 7V5h16v2M12 5v14M9 19h6', lock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 8 0v3', unlock: 'M6 11h12v9H6zM8 11V8a4 4 0 0 1 7.5-1.5', save2: 'M12 4v10m0 0-4-4m4 4 4-4M5 20h14',
 }
+const LOOKS: [string, string, (a: string, b: string) => string, string][] = [
+  ['solido', 'Sólido', a => a, '#fff'], ['degradado', 'Degradado', a => `linear-gradient(135deg,${a},${a}99)`, '#fff'], ['acento', 'Acento', (_a, b) => `linear-gradient(135deg,${b},${b}cc)`, '#14243f'],
+  ['verde', 'Verde', () => 'linear-gradient(135deg,#1c6b3d,#124d2a)', '#fff'], ['alerta', 'Alerta', () => 'linear-gradient(135deg,#a3201f,#7a1616)', '#fff'], ['oscuro', 'Oscuro', () => 'linear-gradient(160deg,#18263f,#0a111f)', '#ffd24d'],
+  ['suave', 'Suave', a => `${a}1f`, '#14243f'], ['dorado', 'Dorado suave', (_a, b) => `${b}33`, '#14243f'], ['borde', 'Borde', () => 'transparent', '#14243f'],
+  ['cinta', 'Cinta', () => '#fff', '#14243f'], ['cristal', 'Cristal', (a, b) => `linear-gradient(135deg,${a}40,${b}30)`, '#14243f'], ['tapa', 'Tapa', () => '#fff', '#14243f'],
+]
+const lookBox = (k: string, a: string, b: string): React.CSSProperties => k === 'borde' ? { border: `2px solid ${a}` } : k === 'cinta' ? { borderLeft: `8px solid ${b}`, border: '1px solid #dde3ee' } : k === 'tapa' ? { borderTop: `5px solid ${a}`, border: '1px solid #dde3ee' } : {}
 const Ic = ({ n }: { n: string }) => <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d={P[n] || P.file} /></svg>
 
 export type RibProps = {
@@ -133,6 +140,11 @@ export default function Ribbon(p: RibProps) {
       {rib === 'casilla' && b && !b.locked && <>
         <Grp t="Tamaño"><div className="fld"><label>Ancho</label><select value={b.span || 'full'} onChange={e => putB({ span: e.target.value })}>{ANCHOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
           <Btn i="side" l="Casilla al lado" title="Agrega otra casilla a la derecha de esta" onClick={() => p.insert('__pick', true)} /></Grp>
+        <Grp t="Estilo predeterminado"><div className="lks">
+          <button className={'lk' + (!b.look ? ' on' : '')} title="Sin estilo (el normal del tema)" onClick={() => putB({ look: '' })}><i style={{ background: '#fff', border: '1px solid #dde3ee', color: '#14243f' }}>Aa</i><small>Normal</small></button>
+          {LOOKS.map(([k, l, bgf, fgc]) => <button key={k} className={'lk' + (b.look === k ? ' on' : '')} title={l} onClick={() => putB({ look: k })}><i style={{ background: bgf(pal.c[0], pal.c[1]), color: fgc, ...lookBox(k, pal.c[0], pal.c[1]) }}>Aa</i><small>{l}</small></button>)}</div>
+          <Btn i="layers" l="Variar estilos de la lista" title="Reparte estilos distintos entre las casillas sin estilo de esta pestaña, usando los colores del tema" onClick={() => p.op('variar')} />
+          <Btn i="trash" l="Quitar estilos de la lista" title="Quita el estilo predeterminado de todas las casillas de esta pestaña" onClick={() => p.op('sinestilo')} /></Grp>
         <Grp t="Letra de la casilla"><div className="fld"><label>Tipo</label><select value={b.font || ''} onChange={e => putB({ font: e.target.value })}><option value="">La del informe</option>{FUENTES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
           <div className="fld"><label>Tamaño</label><select value={b.escala || 100} onChange={e => putB({ escala: +e.target.value })}>{[70, 80, 90, 100, 115, 130, 150, 175, 200].map(z => <option key={z} value={z}>{z === 100 ? 'Normal (100 %)' : z + ' %'}</option>)}</select></div>
           <div className="fld"><label>Alineación</label><select value={b.text_align || ''} onChange={e => putB({ text_align: e.target.value })}><option value="">Automática</option><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></div></Grp>

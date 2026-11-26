@@ -83,3 +83,15 @@ def test_estilo_por_casilla():
         rep.sections[0].tabs.append(Tab(id="tt", label="T", blocks=[blk]))
     html = render(rep)
     assert "zoom:1.3;" in html and "Georgia" in html and "text-align:center;" in html
+
+
+def test_estilo_predeterminado_usa_la_paleta():
+    import json
+    from pathlib import Path
+    from app.render import render
+    from app.schema import Report, StatGrid, Stat, Tab
+    rep = Report.model_validate(json.loads((Path(__file__).resolve().parents[2] / "seed/report.seed.json").read_text(encoding="utf-8")))
+    rep.sections[0].tabs.append(Tab(id="lkx", label="L", blocks=[StatGrid(id="lk1", items=[Stat(value=5, label="x")], look="degradado")]))
+    html = render(rep)
+    assert 'class="rs-lk rs-l-degradado"' in html and ".rs-l-degradado{background:linear-gradient" in html and "var(--navy)" in html
+    assert html.count("<style>") == html.count("</style>")
