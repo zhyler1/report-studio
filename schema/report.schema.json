@@ -1552,6 +1552,7 @@
          "status_list": "#/$defs/StatusList",
          "step_cards": "#/$defs/StepCards",
          "table": "#/$defs/Table",
+         "text": "#/$defs/TextBlock",
          "workflow": "#/$defs/Workflow"
         },
         "propertyName": "type"
@@ -1631,6 +1632,9 @@
         },
         {
          "$ref": "#/$defs/Heading"
+        },
+        {
+         "$ref": "#/$defs/TextBlock"
         }
        ]
       },
@@ -1774,6 +1778,7 @@
         "status_list": "#/$defs/StatusList",
         "step_cards": "#/$defs/StepCards",
         "table": "#/$defs/Table",
+        "text": "#/$defs/TextBlock",
         "workflow": "#/$defs/Workflow"
        },
        "propertyName": "type"
@@ -1853,6 +1858,9 @@
        },
        {
         "$ref": "#/$defs/Heading"
+       },
+       {
+        "$ref": "#/$defs/TextBlock"
        }
       ]
      },
@@ -3840,6 +3848,7 @@
         "status_list": "#/$defs/StatusList",
         "step_cards": "#/$defs/StepCards",
         "table": "#/$defs/Table",
+        "text": "#/$defs/TextBlock",
         "workflow": "#/$defs/Workflow"
        },
        "propertyName": "type"
@@ -3919,6 +3928,9 @@
        },
        {
         "$ref": "#/$defs/Heading"
+       },
+       {
+        "$ref": "#/$defs/TextBlock"
        }
       ]
      },
@@ -4573,6 +4585,7 @@
         "status_list": "#/$defs/StatusList",
         "step_cards": "#/$defs/StepCards",
         "table": "#/$defs/Table",
+        "text": "#/$defs/TextBlock",
         "workflow": "#/$defs/Workflow"
        },
        "propertyName": "type"
@@ -4652,6 +4665,9 @@
        },
        {
         "$ref": "#/$defs/Heading"
+       },
+       {
+        "$ref": "#/$defs/TextBlock"
        }
       ]
      },
@@ -4706,6 +4722,7 @@
         "status_list": "#/$defs/StatusList",
         "step_cards": "#/$defs/StepCards",
         "table": "#/$defs/Table",
+        "text": "#/$defs/TextBlock",
         "workflow": "#/$defs/Workflow"
        },
        "propertyName": "type"
@@ -4785,6 +4802,9 @@
        },
        {
         "$ref": "#/$defs/Heading"
+       },
+       {
+        "$ref": "#/$defs/TextBlock"
        }
       ]
      },
@@ -4969,6 +4989,123 @@
     "rows"
    ],
    "title": "Table",
+   "type": "object"
+  },
+  "TextBlock": {
+   "additionalProperties": false,
+   "description": "Texto libre: un título opcional y uno o varios párrafos (línea en blanco = párrafo nuevo).",
+   "properties": {
+    "id": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Id"
+    },
+    "title": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title"
+    },
+    "hidden": {
+     "default": false,
+     "title": "Hidden",
+     "type": "boolean"
+    },
+    "locked": {
+     "default": false,
+     "title": "Locked",
+     "type": "boolean"
+    },
+    "span": {
+     "default": "full",
+     "enum": [
+      "full",
+      "1/2",
+      "1/3",
+      "2/3",
+      "1/4",
+      "3/4"
+     ],
+     "title": "Span",
+     "type": "string"
+    },
+    "bg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Bg",
+     "type": "string"
+    },
+    "fg": {
+     "default": "",
+     "pattern": "^(#[0-9a-fA-F]{6})?$",
+     "title": "Fg",
+     "type": "string"
+    },
+    "tints": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/Tint"
+     },
+     "title": "Tints",
+     "type": "array"
+    },
+    "embed": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Media"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "embed_pos": {
+     "default": "bottom",
+     "enum": [
+      "top",
+      "bottom",
+      "left",
+      "right"
+     ],
+     "title": "Embed Pos",
+     "type": "string"
+    },
+    "type": {
+     "const": "text",
+     "default": "text",
+     "title": "Type",
+     "type": "string"
+    },
+    "text": {
+     "default": "Escribe aquí tu texto.",
+     "title": "Text",
+     "type": "string"
+    },
+    "size": {
+     "default": "normal",
+     "enum": [
+      "normal",
+      "grande"
+     ],
+     "title": "Size",
+     "type": "string"
+    }
+   },
+   "title": "TextBlock",
    "type": "object"
   },
   "Theme": {

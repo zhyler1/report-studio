@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, Media, MediaBlock,
-                     NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
+                     NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, TextBlock, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
                      StepCards, Table, Workflow)
 
 SHELL = Path(__file__).parent / "templates" / "shell.html"
@@ -375,6 +375,13 @@ def r_callout(b: Callout, ctx: Ctx) -> str:
     return f'<div class="card win" data-r style="--i:1"><h3>{esc(b.heading)}</h3><p style="font-size:14px">{rich(b.text)}</p></div>'
 
 
+def r_text(b: TextBlock, ctx: Ctx) -> str:
+    fs = "19px" if b.size == "grande" else "16px"
+    t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
+    ps = "".join(f'<p data-r style="font-size:{fs};line-height:1.65;margin:0 0 .8em">{rich(x)}</p>' for x in re.split(r"\n\s*\n", b.text.strip()) if x.strip())
+    return f'<div class="rs-txt">{t}{ps}</div>'
+
+
 def r_heading(b: Heading, ctx: Ctx) -> str:
     return f'<h3 class="st" data-r>{esc(b.title or "")}</h3>'
 
@@ -475,7 +482,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
 
 
 R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList: r_card_list, RingCard: r_ring, StatusList: r_status_list,
-     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading,
+     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading, TextBlock: r_text,
      Workflow: r_workflow, Agreement: r_agreement, Activities: r_activities, Budget: r_budget, CalendarBlock: r_calendar,
      Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid, Group: r_group}
 

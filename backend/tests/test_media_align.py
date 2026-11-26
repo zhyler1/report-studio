@@ -51,3 +51,20 @@ def test_tema_navidad_solo_viaja_si_se_usa():
     rep, _ = load(seed)
     html = render(rep)
     assert 'id="rs-xmas"' in html and 'data-tema="navidad"' in html and 'data-it="Navidad en Presidencia"' in html and 'data-is="Enciende lo que nos une"' in html and "xm-replay" in html
+
+
+def test_bloque_texto_libre():
+    from app.render import render
+    from app.schema import Report
+    import json
+    from pathlib import Path
+    rep = Report.model_validate(json.loads((Path(__file__).resolve().parents[2] / "seed/report.seed.json").read_text(encoding="utf-8")))
+    sec = rep.sections[0]
+    tab = sec.tabs[0] if sec.tabs else None
+    from app.schema import Tab, TextBlock
+    if tab is None:
+        tab = Tab(id="tt", label="T", blocks=[])
+        sec.tabs.append(tab)
+    tab.blocks.append(TextBlock(id="txt1", title="Mi título", text="Primer párrafo con **negrilla**.\n\nSegundo párrafo."))
+    html = render(rep)
+    assert "Primer párrafo con <b>negrilla</b>." in html and "Segundo párrafo." in html and "Mi título" in html

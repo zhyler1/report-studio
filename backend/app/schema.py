@@ -243,6 +243,13 @@ class Callout(BlockBase):
     text: Rich
 
 
+class TextBlock(BlockBase):
+    """Texto libre: un título opcional y uno o varios párrafos (línea en blanco = párrafo nuevo)."""
+    type: Literal["text"] = "text"
+    text: Rich = "Escribe aquí tu texto."
+    size: Literal["normal", "grande"] = "normal"
+
+
 class Heading(BlockBase):
     """Solo un título de sección (usa el campo Título)."""
     type: Literal["heading"] = "heading"
@@ -423,7 +430,7 @@ Block = Annotated[
     Union[
         StatGrid, RowList, NoteList, CardList, RingCard, StatusList, NumberedCards, StepCards,
         LinkCards, Gallery, Table, Plants, Workflow, Agreement, Activities, Budget,
-        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading,
+        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading, TextBlock,
     ],
     Field(discriminator="type"),
 ]
