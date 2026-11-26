@@ -103,4 +103,6 @@ def test_imagen_con_tamano_contenido():
     from app.schema import Media
     assert "max-height:360px" in media_tag(Media(kind="image", src="/media/x.jpg"))
     assert "max-height:200px" in media_tag(Media(kind="image", src="/media/x.jpg", size="pequena"))
+    assert "max-height:700px" in media_tag(Media(kind="image", src="/media/x.jpg", size="xl"))
+    assert "max-height:900px" in media_tag(Media(kind="image", src="/media/x.jpg", size="xxl"))
     assert "max-height" not in media_tag(Media(kind="image", src="/media/x.jpg", size="completa"))

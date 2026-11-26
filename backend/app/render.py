@@ -183,7 +183,7 @@ def media_img(m: Media, caption_style: str, wrap_attr: str = "") -> str:
     return (f'<figure data-r{wrap_attr or fig_style(m)}>' + media_tag(m) + cap + "</figure>")
 
 
-IMG_CAP = {"auto": 360, "pequena": 200, "grande": 560}   # alto máximo con el que se ve una imagen (completa = sin límite)
+IMG_CAP = {"auto": 360, "pequena": 200, "grande": 560, "xl": 700, "xxl": 900}   # alto máximo con el que se ve una imagen (completa = sin límite)
 
 
 def media_tag(m: Media) -> str:

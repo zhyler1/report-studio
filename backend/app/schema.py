@@ -62,7 +62,7 @@ class Media(Base):
     height: int = 0               # alto mínimo del marcador mientras no hay archivo
     align: Literal["left", "center", "right"] = "center"   # posición de la imagen en su casilla
     width: int = 0                # ancho máximo en px (0 = automático, hasta el ancho de la casilla)
-    size: Literal["auto", "pequena", "grande", "completa"] = "auto"   # tamaño con el que se ve la imagen en la casilla (al hacer clic se abre a tamaño real)
+    size: Literal["auto", "pequena", "grande", "xl", "xxl", "completa"] = "auto"   # tamaño con el que se ve la imagen en la casilla (al hacer clic se abre a tamaño real)
     autoplay: bool = False
     loop: bool = False
     muted: bool = True
