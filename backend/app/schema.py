@@ -96,6 +96,9 @@ class BlockBase(Base):
     bg: str = Hex          # color de fondo de la casilla (vacío = el del tema)
     fg: str = Hex          # color del texto de la casilla (vacío = el del tema)
     tints: list[Tint] = []  # colores puntuales de textos o cifras de la casilla
+    font: Literal["", "public", "sistema", "georgia", "verdana", "trebuchet", "mono"] = ""   # letra de la casilla (vacío = la del informe)
+    escala: int = Field(100, ge=50, le=250)   # tamaño del texto de la casilla, en % (100 = normal)
+    text_align: Literal["", "left", "center", "right"] = ""   # alineación del texto (vacío = la de la casilla)
     embed: Optional[Media] = None   # imagen, video o audio incrustado en cualquier casilla
     embed_pos: Literal["top", "bottom", "left", "right"] = "bottom"   # dónde queda frente al contenido de la casilla
 

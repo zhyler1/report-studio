@@ -68,3 +68,18 @@ def test_bloque_texto_libre():
     tab.blocks.append(TextBlock(id="txt1", title="Mi título", text="Primer párrafo con **negrilla**.\n\nSegundo párrafo."))
     html = render(rep)
     assert "Primer párrafo con <b>negrilla</b>." in html and "Segundo párrafo." in html and "Mi título" in html
+
+
+def test_estilo_por_casilla():
+    import json
+    from pathlib import Path
+    from app.render import render
+    from app.schema import Report, StatGrid, Stat
+    rep = Report.model_validate(json.loads((Path(__file__).resolve().parents[2] / "seed/report.seed.json").read_text(encoding="utf-8")))
+    blk = StatGrid(id="eg1", items=[Stat(value="71 %", label="Cumplimiento")], font="georgia", escala=130, text_align="center")
+    rep.sections[0].tabs[0].blocks.append(blk) if rep.sections[0].tabs else rep.sections[0].__dict__.setdefault("x", 1)
+    if not rep.sections[0].tabs:
+        from app.schema import Tab
+        rep.sections[0].tabs.append(Tab(id="tt", label="T", blocks=[blk]))
+    html = render(rep)
+    assert "zoom:1.3;" in html and "Georgia" in html and "text-align:center;" in html

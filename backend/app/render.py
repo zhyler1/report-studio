@@ -336,7 +336,7 @@ def r_table(b: Table, ctx: Ctx) -> str:
                     k = semc(n, ctx.th)
                     cell = f'<div class="pc sg-{k}"><div class="bar sg-{k}" style="--w:{n:g}%"><i></i></div><b class="sgt">{n:g}%</b></div>'
             elif c.format == "money" or c.format == "number":
-                cell = esc(v)
+                cell = f'<span class="cn">{esc(v)}</span>'
             else:
                 cell = esc(v)
             if ci == 0 and c.format == "text":
@@ -530,8 +530,16 @@ def render_block(b, ctx: Ctx, path: str = "") -> str:
             out = f'<div class="eg" style="grid-template-columns:minmax(0,1fr) minmax(240px,420px)"><div>{out}</div>{fig}</div>'
         else:
             out = out + fig
-    if b.bg or b.fg:
+    if b.bg or b.fg or b.font or b.escala != 100 or b.text_align:
         st = (f"background:{b.bg};--card:transparent;--card-h:transparent;" if b.bg else "") + (f"color:{b.fg};--text:{b.fg};--head:{b.fg};--muted:{b.fg};" if b.fg else "")
+        if b.font and b.font in FONTS:
+            st += f"--sans:{FONTS[b.font]};font-family:{FONTS[b.font]};"
+        elif b.font == "public":
+            st += "--sans:'Public Sans','Segoe UI',system-ui,sans-serif;font-family:var(--sans);"
+        if b.escala != 100:
+            st += f"zoom:{b.escala / 100:g};"
+        if b.text_align:
+            st += f"text-align:{b.text_align};"
         out = f'<div class="rs-sty" style="{st}">{out}</div>'
     tint = f' data-tint="{attr(json.dumps([x.model_dump() for x in b.tints if x.c], ensure_ascii=False))}"' if any(x.c for x in b.tints) else ""
     if ctx.edit and path:  # modo edición: cada casilla se marca para poder seleccionarla en la vista previa

@@ -873,20 +873,26 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
   function animate(root){
     var vis=function(el){var r=el.getBoundingClientRect();return r.top<window.innerHeight&&r.bottom>0};
     var pending=[],sc=0;
-    root.querySelectorAll('[data-r],.bar,.num[data-to],.ring').forEach(function(el){
+    root.querySelectorAll('[data-r],.bar,.num,.cn,.ring').forEach(function(el){
       if(el.closest('.sub')&&!el.closest('.sub.on'))return;
       if(el.closest('.sub2')&&!el.closest('.sub2.on'))return;
+      if((el.classList.contains('num')||el.classList.contains('cn'))&&!el.hasAttribute('data-to')){   // cifra escrita a mano: se lee «$ 1.200», «71 %», «31»… y se anima igual
+        var mm=/^(\D*?)(\d{1,3}(?:[.,]\d{3})+|\d+)(\D*)$/.exec((el.getAttribute('data-orig')||el.textContent).trim());
+        if(!mm||/^0\d/.test(mm[2])||el.children.length)return;
+        if(!el.hasAttribute('data-orig'))el.setAttribute('data-orig',el.textContent.trim());
+        el.setAttribute('data-to',mm[2].replace(/[.,]/g,''));if(mm[1])el.setAttribute('data-pre',mm[1]);if(mm[3])el.setAttribute('data-suf',mm[3]);el.setAttribute('data-auto','1');
+      }
       el.__done=false;pending.push(el);
       if(el.hasAttribute('data-r')&&!el.style.getPropertyValue('--i'))el.style.setProperty('--i',(sc++)%6+1);
       if(el.hasAttribute('data-r'))el.classList.remove('in');
       if(el.classList.contains('bar'))el.classList.remove('in');
-      if(el.classList.contains('num')&&!document.body.classList.contains('adm-on'))el.textContent=(el.getAttribute('data-pre')||'')+'0'+(el.getAttribute('data-suf')||'');
+      if((el.classList.contains('num')||el.classList.contains('cn'))&&!document.body.classList.contains('adm-on'))el.textContent=(el.getAttribute('data-pre')||'')+'0'+(el.getAttribute('data-suf')||'');
     });
     function fire(el){
       if(el.__done)return;el.__done=true;
       if(el.hasAttribute('data-r'))el.classList.add('in');
       if(el.classList.contains('bar'))el.classList.add('in');
-      if(el.classList.contains('num'))count(el);
+      if(el.classList.contains('num')||el.classList.contains('cn'))count(el);
       if(el.classList.contains('ring')){var p=+el.getAttribute('data-p'),t0=null;function s(t){if(!t0)t0=t;var k=Math.min((t-t0)/1300,1);el.style.setProperty('--p',(p*(1-Math.pow(1-k,3))).toFixed(1));if(k<1)requestAnimationFrame(s)}reduce?el.style.setProperty('--p',p):requestAnimationFrame(s)}
     }
     if(io)io.disconnect();

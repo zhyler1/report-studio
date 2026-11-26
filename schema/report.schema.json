@@ -70,6 +70,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -247,6 +279,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -470,6 +534,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -621,6 +717,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -743,6 +871,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -856,6 +1016,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -979,6 +1171,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -1360,6 +1584,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -1483,6 +1739,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -1721,6 +2009,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -1941,6 +2261,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -2167,6 +2519,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -2385,6 +2769,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -2662,6 +3078,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -2807,6 +3255,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -2949,6 +3429,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -3078,6 +3590,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -3256,6 +3800,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -3472,6 +4048,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -3677,6 +4285,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -4172,6 +4812,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -4330,6 +5002,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -4486,6 +5190,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -4925,6 +5661,38 @@
      "title": "Tints",
      "type": "array"
     },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
+    },
     "embed": {
      "anyOf": [
       {
@@ -5061,6 +5829,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [
@@ -5314,6 +6114,38 @@
      },
      "title": "Tints",
      "type": "array"
+    },
+    "font": {
+     "default": "",
+     "enum": [
+      "",
+      "public",
+      "sistema",
+      "georgia",
+      "verdana",
+      "trebuchet",
+      "mono"
+     ],
+     "title": "Font",
+     "type": "string"
+    },
+    "escala": {
+     "default": 100,
+     "maximum": 250,
+     "minimum": 50,
+     "title": "Escala",
+     "type": "integer"
+    },
+    "text_align": {
+     "default": "",
+     "enum": [
+      "",
+      "left",
+      "center",
+      "right"
+     ],
+     "title": "Text Align",
+     "type": "string"
     },
     "embed": {
      "anyOf": [

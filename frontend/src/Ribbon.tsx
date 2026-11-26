@@ -133,6 +133,9 @@ export default function Ribbon(p: RibProps) {
       {rib === 'casilla' && b && !b.locked && <>
         <Grp t="Tamaño"><div className="fld"><label>Ancho</label><select value={b.span || 'full'} onChange={e => putB({ span: e.target.value })}>{ANCHOS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
           <Btn i="side" l="Casilla al lado" title="Agrega otra casilla a la derecha de esta" onClick={() => p.insert('__pick', true)} /></Grp>
+        <Grp t="Letra de la casilla"><div className="fld"><label>Tipo</label><select value={b.font || ''} onChange={e => putB({ font: e.target.value })}><option value="">La del informe</option>{FUENTES.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>
+          <div className="fld"><label>Tamaño</label><select value={b.escala || 100} onChange={e => putB({ escala: +e.target.value })}>{[70, 80, 90, 100, 115, 130, 150, 175, 200].map(z => <option key={z} value={z}>{z === 100 ? 'Normal (100 %)' : z + ' %'}</option>)}</select></div>
+          <div className="fld"><label>Alineación</label><select value={b.text_align || ''} onChange={e => putB({ text_align: e.target.value })}><option value="">Automática</option><option value="left">Izquierda</option><option value="center">Centro</option><option value="right">Derecha</option></select></div></Grp>
         <Grp t="Color de la casilla"><Color label="Fondo" value={b.bg} fallback="#ffffff" onChange={v => putB({ bg: v })} /><Color label="Texto" value={b.fg} fallback="#14243f" onChange={v => putB({ fg: v })} /></Grp>
         {b.type === 'chart' && <Grp t="Gráfico"><div className="fld"><label>Tipo</label><select value={b.kind} onChange={e => putB({ kind: e.target.value })}>{p.kinds.map(k => <option key={k} value={k}>{k}</option>)}</select></div></Grp>}
         {(b.type === 'ring_card' || b.type === 'agreement') && <Grp t="Visualización"><div className="fld"><label>Cómo se dibuja</label>

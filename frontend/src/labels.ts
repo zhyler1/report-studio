@@ -1,6 +1,6 @@
 // Nombres en español para los campos, tipos de bloque y opciones del esquema.
 export const FIELD: Record<string, string> = {
-  align: 'Alineación', embed: 'Imagen, video o audio adicional', embed_pos: 'Dónde queda (arriba, abajo, izquierda o derecha)', alt: 'Texto alternativo (accesibilidad)', ancheta: 'Filas de la ancheta', ancheta_media: 'Imagen de la ancheta', ancheta_title: 'Título de ancheta',
+  font: 'Letra de la casilla', escala: 'Tamaño del texto (%)', text_align: 'Alineación del texto', align: 'Alineación', embed: 'Imagen, video o audio adicional', embed_pos: 'Dónde queda (arriba, abajo, izquierda o derecha)', alt: 'Texto alternativo (accesibilidad)', ancheta: 'Filas de la ancheta', ancheta_media: 'Imagen de la ancheta', ancheta_title: 'Título de ancheta',
   animate: 'Animar el número', autoplay: 'Reproducir al abrir', avg: 'Promedio (%)', background: 'Fondo animado', bar_color: 'Color de la barra', bar_pct: 'Porcentaje de la barra',
   bind: 'Tomar de otro bloque', blocks: 'Contenido', bonus: 'Filas de bonificación', bonus_label: 'Rótulo de bonificación', bonus_total: 'Total de bonificación',
   boss: 'Nombre de quien firma', boss_role: 'Cargo de quien firma', budget: 'Presupuesto', button: 'Botón', button_label: 'Texto del botón', caption: 'Pie de foto',
