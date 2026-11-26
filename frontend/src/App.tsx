@@ -17,10 +17,10 @@ const LS = {
 type Prev = { tab: string; sub: (string | null)[]; y: number }
 // al recargar la vista previa tras un cambio: sin portada ni animaciones de entrada (se quitan al asentarse)
 const QUIET = '<style id="rs-quiet">#intro{display:none!important}*,*::before,*::after{animation-delay:0s!important;animation-duration:.001s!important;transition:none!important}</style>'
-const restoreJs = (p: Prev) => `<script>addEventListener('load',function(){setTimeout(function(){var g=document.getElementById('iGo');if(g)g.click();var t=document.querySelector('.tab[data-t="${p.tab}"]');if(t)t.click();${JSON.stringify(p.sub)}.forEach(function(s){var b=document.querySelector('.sbtn[data-s="'+s+'"]');if(b)b.click()});setTimeout(function(){scrollTo(0,${p.y})},200);setTimeout(function(){var q=document.getElementById('rs-quiet');if(q)q.remove()},1100)},120)})</script>`
+const restoreJs = (p: Prev) => `<script>addEventListener('load',function(){setTimeout(function(){var g=document.getElementById('iGo');if(g)g.click();var t=document.querySelector('.tab[data-t="${p.tab}"]');if(t)t.click();${JSON.stringify(p.sub)}.forEach(function(s){if(!s)return;var n=s.indexOf('2:')===0;var b=document.querySelector(n?'.sbtn[data-s2="'+s.slice(2)+'"]':'.sbtn[data-s="'+s+'"]');if(b)b.click()});setTimeout(function(){scrollTo(0,${p.y})},200);setTimeout(function(){var q=document.getElementById('rs-quiet');if(q)q.remove()},1100)},120)})</script>`
 const readPrev = (doc?: Document | null): Prev | null => {
   const a = doc?.querySelector('.tab.active'); if (!doc || !a || doc.getElementById('intro')?.getBoundingClientRect().height) return null
-  return { tab: a.getAttribute('data-t') || 'inicio', sub: Array.from(doc.querySelectorAll('.sbtn.on')).map(b => b.getAttribute('data-s')), y: doc.scrollingElement?.scrollTop || 0 }
+  return { tab: a.getAttribute('data-t') || 'inicio', sub: Array.from(doc.querySelectorAll('.sbtn.on')).map(b => b.hasAttribute('data-s2') ? '2:' + b.getAttribute('data-s2') : b.getAttribute('data-s')).filter(Boolean), y: doc.scrollingElement?.scrollTop || 0 }
 }
 
 
