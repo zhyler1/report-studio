@@ -50,4 +50,4 @@ def test_tema_navidad_solo_viaja_si_se_usa():
     bien["tabs"].append({"id": "nav", "label": "Enciende lo que nos une", "tema": "navidad", "blocks": []})
     rep, _ = load(seed)
     html = render(rep)
-    assert 'id="rs-xmas"' in html and 'data-tema="navidad"' in html and 'data-it="Enciende lo que nos une"' in html and "xm-replay" in html
+    assert 'id="rs-xmas"' in html and 'data-tema="navidad"' in html and 'data-it="Navidad en Presidencia"' in html and 'data-is="Enciende lo que nos une"' in html and "xm-replay" in html
