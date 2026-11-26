@@ -106,3 +106,11 @@ def test_imagen_con_tamano_contenido():
     assert "max-height:700px" in media_tag(Media(kind="image", src="/media/x.jpg", size="xl"))
     assert "max-height:900px" in media_tag(Media(kind="image", src="/media/x.jpg", size="xxl"))
     assert "max-height" not in media_tag(Media(kind="image", src="/media/x.jpg", size="completa"))
+
+
+def test_enlace_seguro():
+    from app.render import safe_href
+    assert safe_href("www.presidencia.gov.co") == "https://www.presidencia.gov.co"
+    assert safe_href("https://x.co/a?b=1") == "https://x.co/a?b=1"
+    assert safe_href("mailto:a@b.co") == "mailto:a@b.co"
+    assert safe_href("javascript:alert(1)") == "" and safe_href("data:text/html,x") == "" and safe_href("") == ""

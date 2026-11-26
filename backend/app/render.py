@@ -12,7 +12,7 @@ import re
 from pathlib import Path
 
 from .schema import (Activities, Agreement, Budget, CalendarBlock, CardList, Chart, Gallery, Grid, Group, LinkCards, Media, MediaBlock,
-                     NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, TextBlock, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
+                     NoteList, NumberedCards, PlantCard, Plants, Callout, Heading, TextBlock, LinkBlock, Proposals, Report, RingCard, RowList, Section, StatGrid, StatusList,
                      StepCards, Table, Workflow)
 
 SHELL = Path(__file__).parent / "templates" / "shell.html"
@@ -387,6 +387,40 @@ def r_text(b: TextBlock, ctx: Ctx) -> str:
     return f'<div class="rs-txt">{t}{ps}</div>'
 
 
+def safe_href(u: str) -> str:
+    """Solo enlaces seguros: http(s), mailto, tel, rutas y anclas; una dirección sin esquema se completa con https://."""
+    u = (u or "").strip()
+    if not u:
+        return ""
+    if re.match(r"^(https?:|mailto:|tel:|/|#)", u, re.I):
+        return u
+    if re.match(r"^[a-z][a-z0-9+.-]*:", u, re.I):   # javascript:, data:, etc.
+        return ""
+    return "https://" + u
+
+
+def r_link(b: LinkBlock, ctx: Ctx) -> str:
+    t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
+    jc = {"left": "flex-start", "center": "center", "right": "flex-end"}[b.align]
+    out = ""
+    for k, it in enumerate(b.items):
+        href = safe_href(it.url)
+        ext = ' target="_blank" rel="noopener noreferrer"' if href.startswith("http") else ""
+        pend = ' title="Falta pegar el enlace"' if not href else ""
+        a = f'href="{attr(href)}"{ext}' if href else ""
+        desc = f'<span class="muted lk-d">{esc(it.text)}</span>' if it.text else ""
+        if b.variant == "tarjeta":
+            tag = "a" if href else "div"
+            out += (f'<{tag} class="card lk-card{" off" if not href else ""}" data-r style="--i:{k + 1}" {a}{pend}><h3>{esc(it.label)}</h3>{desc}'
+                    f'<span class="lk-go">{"Abrir ↗" if href else "Sin enlace"}</span></{tag}>')
+        elif b.variant == "texto":
+            out += f'<div class="lk-one"><a class="lk-txt{" off" if not href else ""}" data-r {a}{pend}>{esc(it.label)}{" ↗" if href else ""}</a>{desc}</div>'
+        else:
+            btn = f'<a class="lbtn" data-r {a}>{esc(it.label)}</a>' if href else f'<span class="lbtn off"{pend}>{esc(it.label)}</span>'
+            out += f'<div class="lk-one">{btn}{desc}</div>'
+    return f'<div class="rs-links">{t}<div class="lk-row" style="justify-content:{jc}">{out}</div></div>'
+
+
 def r_heading(b: Heading, ctx: Ctx) -> str:
     return f'<h3 class="st" data-r>{esc(b.title or "")}</h3>'
 
@@ -487,7 +521,7 @@ def r_grid(b: Grid, ctx: Ctx) -> str:
 
 
 R = {StatGrid: r_stat_grid, RowList: r_row_list, NoteList: r_note_list, CardList: r_card_list, RingCard: r_ring, StatusList: r_status_list,
-     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading, TextBlock: r_text,
+     NumberedCards: r_numbered, StepCards: r_step_cards, LinkCards: r_link_cards, Gallery: r_gallery, Table: r_table, Plants: r_plants, PlantCard: r_plant_card, Callout: r_callout, Heading: r_heading, TextBlock: r_text, LinkBlock: r_link,
      Workflow: r_workflow, Agreement: r_agreement, Activities: r_activities, Budget: r_budget, CalendarBlock: r_calendar,
      Proposals: r_proposals, Chart: r_chart, MediaBlock: r_media, Grid: r_grid, Group: r_group}
 

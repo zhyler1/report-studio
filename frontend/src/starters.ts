@@ -7,4 +7,5 @@ export const STARTERS: Record<string, any> = {
   table: { title: 'Nueva tabla', columns: [{ key: 'a', label: 'Columna A', format: 'text' }, { key: 'b', label: 'Columna B', format: 'text' }], rows: [{ a: 'Dato', b: 'Dato' }] },
   grid: { columns: [[], []] },
   text: { text: 'Escribe aquí tu texto.' },
+  link: { items: [{ label: 'Abrir enlace', url: '', text: '' }] },
 }

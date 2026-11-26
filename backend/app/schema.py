@@ -256,6 +256,20 @@ class TextBlock(BlockBase):
     size: Literal["normal", "grande"] = "normal"
 
 
+class LinkItem(Base):
+    label: str = "Abrir enlace"
+    url: str = ""                 # https://… , correo (mailto:), teléfono (tel:) o una dirección sin https (se completa sola)
+    text: str = ""                # descripción corta debajo (opcional)
+
+
+class LinkBlock(BlockBase):
+    """Enlace o botón con hipervínculo; varios enlaces quedan en fila."""
+    type: Literal["link"] = "link"
+    items: list[LinkItem] = [LinkItem()]
+    variant: Literal["boton", "tarjeta", "texto"] = "boton"
+    align: Literal["left", "center", "right"] = "left"
+
+
 class Heading(BlockBase):
     """Solo un título de sección (usa el campo Título)."""
     type: Literal["heading"] = "heading"
@@ -436,7 +450,7 @@ Block = Annotated[
     Union[
         StatGrid, RowList, NoteList, CardList, RingCard, StatusList, NumberedCards, StepCards,
         LinkCards, Gallery, Table, Plants, Workflow, Agreement, Activities, Budget,
-        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading, TextBlock,
+        CalendarBlock, Proposals, Chart, MediaBlock, Grid, Group, PlantCard, Callout, Heading, TextBlock, LinkBlock,
     ],
     Field(discriminator="type"),
 ]

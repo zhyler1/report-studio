@@ -1,6 +1,6 @@
 // Nombres en español para los campos, tipos de bloque y opciones del esquema.
 export const FIELD: Record<string, string> = {
-  size: 'Cómo se ve (tamaño)', look: 'Estilo predeterminado', num_color: 'Color de las cifras', font: 'Letra de la casilla', escala: 'Tamaño del texto (%)', text_align: 'Alineación del texto', align: 'Alineación', embed: 'Imagen, video o audio adicional', embed_pos: 'Dónde queda (arriba, abajo, izquierda o derecha)', alt: 'Texto alternativo (accesibilidad)', ancheta: 'Filas de la ancheta', ancheta_media: 'Imagen de la ancheta', ancheta_title: 'Título de ancheta',
+  size: 'Cómo se ve (tamaño)', variant: 'Forma del enlace (boton, tarjeta o texto)', look: 'Estilo predeterminado', num_color: 'Color de las cifras', font: 'Letra de la casilla', escala: 'Tamaño del texto (%)', text_align: 'Alineación del texto', align: 'Alineación', embed: 'Imagen, video o audio adicional', embed_pos: 'Dónde queda (arriba, abajo, izquierda o derecha)', alt: 'Texto alternativo (accesibilidad)', ancheta: 'Filas de la ancheta', ancheta_media: 'Imagen de la ancheta', ancheta_title: 'Título de ancheta',
   animate: 'Animar el número', autoplay: 'Reproducir al abrir', avg: 'Promedio (%)', background: 'Fondo animado', bar_color: 'Color de la barra', bar_pct: 'Porcentaje de la barra',
   bind: 'Tomar de otro bloque', blocks: 'Contenido', bonus: 'Filas de bonificación', bonus_label: 'Rótulo de bonificación', bonus_total: 'Total de bonificación',
   boss: 'Nombre de quien firma', boss_role: 'Cargo de quien firma', budget: 'Presupuesto', button: 'Botón', button_label: 'Texto del botón', caption: 'Pie de foto',
@@ -27,7 +27,7 @@ export const FIELD: Record<string, string> = {
 }
 
 export const BLOCK: Record<string, string> = {
-  group: 'Grupo de casillas', plant_card: 'Tarjeta de planta', callout: 'Recuadro destacado', text: 'Texto', heading: 'Título de sección',
+  group: 'Grupo de casillas', plant_card: 'Tarjeta de planta', callout: 'Recuadro destacado', text: 'Texto', link: 'Enlace / botón', heading: 'Título de sección',
   stat_grid: 'Cifras destacadas', row_list: 'Lista de acciones con evidencia', note_list: 'Lista de observaciones', card_list: 'Tarjeta con lista', ring_card: 'Anillo de porcentaje',
   status_list: 'Lista de estados', numbered_cards: 'Tarjetas numeradas', step_cards: 'Pasos con fecha', link_cards: 'Tarjetas con enlace', gallery: 'Galería de imágenes', table: 'Tabla',
   plants: 'Planta de personal', workflow: 'Flujo de trabajo', agreement: 'Acuerdo / avance', activities: 'Actividades', budget: 'Presupuesto', calendar: 'Calendario',

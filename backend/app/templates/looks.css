@@ -31,4 +31,14 @@ html[data-theme="dark"] .rs-l-suave,html[data-theme="dark"] .rs-l-dorado,html[da
 html[data-theme="dark"] .rs-l-suave .num,html[data-theme="dark"] .rs-l-dorado .num,html[data-theme="dark"] .rs-l-borde .num,html[data-theme="dark"] .rs-l-cinta .num,html[data-theme="dark"] .rs-l-cristal .num,html[data-theme="dark"] .rs-l-tapa .num{color:color-mix(in srgb,var(--h) 62%,#fff)!important}
 /* color de cifras elegido a mano: manda sobre el del estilo */
 .rs-nc .num,.rs-nc .cn,.rs-nc .arl-i b{color:var(--numc)!important}
+/* enlaces */
+.rs-links{margin-bottom:14px}.rs-links h3.st{margin-bottom:10px}
+.lk-row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+.lk-one{display:flex;flex-direction:column;gap:6px;align-items:flex-start;max-width:340px}
+.lk-d{font-size:13px}
+.lk-card{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:inherit;flex:1 1 240px;max-width:380px;border-top:5px solid var(--gold);transition:transform .25s,box-shadow .25s}
+a.lk-card:hover{transform:translateY(-3px);box-shadow:0 14px 30px -14px rgba(0,0,0,.4)}
+.lk-card h3{font-size:17px}.lk-go{margin-top:auto;font-weight:800;font-size:13px;color:var(--blue)}
+.lk-card.off{opacity:.65;border-top-style:dashed}
+.lk-txt{color:var(--blue);font-weight:700;text-decoration:underline;text-underline-offset:3px;cursor:pointer}.lk-txt:hover{color:var(--red)}.lk-txt.off{color:var(--muted);text-decoration:none;cursor:default}
 @media print{.rs-lk{box-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.rs-lk::after{display:none!important}}
