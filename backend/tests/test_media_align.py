@@ -96,3 +96,11 @@ def test_estilo_predeterminado_usa_la_paleta():
     assert 'class="rs-lk rs-l-degradado"' in html and ".rs-l-degradado{--h:" in html and "var(--navy)" in html
     import re
     assert len(re.findall(r"<style\b", html)) == html.count("</style>")
+
+
+def test_imagen_con_tamano_contenido():
+    from app.render import media_tag
+    from app.schema import Media
+    assert "max-height:360px" in media_tag(Media(kind="image", src="/media/x.jpg"))
+    assert "max-height:200px" in media_tag(Media(kind="image", src="/media/x.jpg", size="pequena"))
+    assert "max-height" not in media_tag(Media(kind="image", src="/media/x.jpg", size="completa"))

@@ -2968,6 +2968,17 @@
      "title": "Width",
      "type": "integer"
     },
+    "size": {
+     "default": "auto",
+     "enum": [
+      "auto",
+      "pequena",
+      "grande",
+      "completa"
+     ],
+     "title": "Size",
+     "type": "string"
+    },
     "autoplay": {
      "default": false,
      "title": "Autoplay",

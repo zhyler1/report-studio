@@ -183,13 +183,18 @@ def media_img(m: Media, caption_style: str, wrap_attr: str = "") -> str:
     return (f'<figure data-r{wrap_attr or fig_style(m)}>' + media_tag(m) + cap + "</figure>")
 
 
+IMG_CAP = {"auto": 360, "pequena": 200, "grande": 560}   # alto máximo con el que se ve una imagen (completa = sin límite)
+
+
 def media_tag(m: Media) -> str:
     if m.kind == "video":
         a = " controls" + (" autoplay" if m.autoplay else "") + (" loop" if m.loop else "") + (" muted" if m.muted else "") + " playsinline"
         return f'<video class="pimg" src="{attr(m.src)}"' + (f' poster="{attr(m.poster)}"' if m.poster else "") + f'{a} data-slot="{attr(m.slot)}"></video>'
     if m.kind == "audio":
         return f'<audio class="mediaa" src="{attr(m.src)}" controls data-slot="{attr(m.slot)}"></audio>'
-    return (f'<img class="pimg zoom" src="{attr(m.src)}" data-slot="{attr(m.slot)}" data-h="{m.height}" alt="{attr(m.alt)}" title="Clic para ampliar">')
+    cap = IMG_CAP.get(m.size)
+    st = f' style="max-height:{cap}px;width:auto;max-width:100%;object-fit:contain"' if cap else ""
+    return (f'<img class="pimg zoom" src="{attr(m.src)}" data-slot="{attr(m.slot)}" data-h="{m.height}" alt="{attr(m.alt)}" title="Clic para ver a tamaño real"{st}>')
 
 
 def stat_html(s, i: int, ctx: Ctx, card: bool, ident: str = "", lbl_id: str = "") -> str:

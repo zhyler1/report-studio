@@ -213,7 +213,12 @@ figure{margin:0}
 .qrgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
 #lb{position:fixed;inset:0;z-index:90;background:rgba(5,10,20,.9);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out}
 #lb.on{display:flex;animation:lbin .3s both}
-#lb img{max-width:96vw;max-height:92vh;border-radius:12px;box-shadow:0 20px 80px rgba(0,0,0,.6);animation:zin .4s cubic-bezier(.2,1,.3,1) both;background:#fff}
+#lb{overflow:auto;align-items:flex-start;justify-content:flex-start;padding:0}
+#lbw{min-width:100%;min-height:100%;display:flex;padding:20px;box-sizing:border-box}
+#lb img{display:block;margin:auto;max-width:none;max-height:none;border-radius:12px;box-shadow:0 20px 80px rgba(0,0,0,.6);animation:zin .4s cubic-bezier(.2,1,.3,1) both;background:#fff;cursor:zoom-out}
+#lb img.fit{max-width:calc(100vw - 40px);max-height:calc(100vh - 40px);cursor:zoom-in}
+#lbh{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:rgba(0,0,0,.65);color:#fff;font:600 12px var(--sans);padding:7px 14px;border-radius:999px;pointer-events:none;white-space:nowrap}
+#lb button{position:fixed}
 #lb button{position:absolute;top:calc(env(safe-area-inset-top,0px) + 16px);right:20px;width:44px;height:44px;border-radius:50%;border:none;background:#fff;color:#14243F;font:800 24px var(--sans);cursor:pointer}
 @keyframes lbin{from{opacity:0}to{opacity:1}}
 @keyframes zin{from{transform:scale(.8);opacity:0}to{transform:none;opacity:1}}
@@ -672,7 +677,7 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
   </div>
   <div class="pt-body" id="ptBody"></div>
 </div></div>
-<div id="lb" role="dialog" aria-label="Imagen ampliada" ><img id="lbi" alt="[IMAGEN: presidencia-te-escucha.jpg] Afiche La Presidencia ¡Te escucha!" src="https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/pr.jpg"><button type="button" id="lbx" aria-label="Cerrar">×</button></div>
+<div id="lb" role="dialog" aria-label="Imagen ampliada" ><div id="lbw"><img id="lbi" alt="[IMAGEN: presidencia-te-escucha.jpg] Afiche La Presidencia ¡Te escucha!" src="https://media.presidencia.gov.co/Intranet/th/NOVIEMBRE2026/pr.jpg"></div><button type="button" id="lbx" aria-label="Cerrar">×</button><div id="lbh"></div></div>
 <div class="blob a"></div><div class="blob b"></div>
 <div class="hero-watermark" aria-hidden="true"></div>
 <div id="secbg" aria-hidden="true"></div>
@@ -966,8 +971,14 @@ h1{font-size:clamp(32px,5vw,58px);letter-spacing:-.03em}
   /* lightbox */
   var lb=document.getElementById('lb'),lbi=document.getElementById('lbi');
   document.querySelectorAll('img.pimg').forEach(function(im){im.classList.add('zoom');im.setAttribute('title','Clic para ampliar')});
-  document.addEventListener('click',function(e){var im=e.target.closest&&e.target.closest('img.zoom');if(im&&im.id!=='lbi'){lbi.src=im.src;lbi.alt=im.alt;lb.classList.add('on')}});
-  lb.addEventListener('click',function(){lb.classList.remove('on')});
+  var lbh=document.getElementById('lbh');
+  function lbHint(){var w=lbi.naturalWidth,h=lbi.naturalHeight,big=w>innerWidth-40||h>innerHeight-40,fit=lbi.classList.contains('fit');
+    lbh.textContent=w?((fit?'Ajustada a la pantalla':'Tamaño real')+' · '+w+' × '+h+' px'+(big?(fit?' · clic para ver a tamaño real':' · clic para ajustar · arrastra con el scroll'):'')):'';}
+  lbi.addEventListener('load',lbHint);
+  document.addEventListener('click',function(e){var im=e.target.closest&&e.target.closest('img.zoom');if(im&&im.id!=='lbi'){
+    lbi.classList.toggle('fit',!im.classList.contains('pimg'));   // las imágenes del informe se abren a tamaño real; el QR y similares, ajustados
+    lbi.src=im.currentSrc||im.src;lbi.alt=im.alt;lb.scrollTop=0;lb.scrollLeft=0;lb.classList.add('on');lbHint()}});
+  lb.addEventListener('click',function(e){if(e.target===lbi){lbi.classList.toggle('fit');lbHint();return}lb.classList.remove('on')});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')lb.classList.remove('on')});
   
 

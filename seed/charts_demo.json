@@ -633,6 +633,7 @@
         "height": 420,
         "align": "center",
         "width": 0,
+        "size": "auto",
         "autoplay": false,
         "loop": false,
         "muted": true
@@ -993,6 +994,7 @@
         "height": 170,
         "align": "center",
         "width": 0,
+        "size": "auto",
         "autoplay": false,
         "loop": false,
         "muted": true
@@ -1015,6 +1017,7 @@
         "height": 170,
         "align": "center",
         "width": 0,
+        "size": "auto",
         "autoplay": false,
         "loop": false,
         "muted": true
@@ -1145,6 +1148,7 @@
        "height": 380,
        "align": "center",
        "width": 0,
+       "size": "auto",
        "autoplay": false,
        "loop": false,
        "muted": true
@@ -1160,6 +1164,7 @@
        "height": 380,
        "align": "center",
        "width": 0,
+       "size": "auto",
        "autoplay": false,
        "loop": false,
        "muted": true
