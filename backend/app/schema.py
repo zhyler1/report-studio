@@ -453,8 +453,8 @@ class Tab(Base):
     tabs: list[SubTab] = []       # sub-botones dentro de este botón (un nivel más)
     tema: Optional[Literal["navidad"]] = None   # tema visual solo para este botón
     intro: bool = True            # con tema: animación de entrada al abrir el botón
-    intro_titulo: str = ""        # título de la intro (por defecto, el nombre del botón)
-    intro_sub: str = ""           # subtítulo de la intro (por defecto «Navidad en Presidencia»)
+    intro_titulo: str = ""        # título de la intro (por defecto «Navidad en Presidencia»)
+    intro_sub: str = ""           # subtítulo de la intro (por defecto, el nombre del botón)
 
 
 class Section(Base):

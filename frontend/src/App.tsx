@@ -118,8 +118,8 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
           <option value="">Normal</option><option value="navidad">✨ Navidad (con animaciones)</option></select></label>
         {t.tema && <label style={{ display: 'flex', gap: 5, alignItems: 'center' }}><input type="checkbox" checked={t.intro !== false} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro: e.target.checked } : x)))} /> Intro animada al abrir</label>}
         {t.tema && t.intro !== false && <>
-          <input style={{ width: 190 }} placeholder={'Título de la intro: ' + t.label} value={t.intro_titulo || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_titulo: e.target.value } : x)))} />
-          <input style={{ width: 190 }} placeholder="Subtítulo: Navidad en Presidencia" value={t.intro_sub || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_sub: e.target.value } : x)))} /></>}
+          <input style={{ width: 190 }} placeholder="Título de la intro: Navidad en Presidencia" value={t.intro_titulo || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_titulo: e.target.value } : x)))} />
+          <input style={{ width: 190 }} placeholder={'Subtítulo: ' + t.label} value={t.intro_sub || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_sub: e.target.value } : x)))} /></>}
       </div>
       {(t.blocks || []).filter((b: Json) => b.type === 'heading' && (b.title || '').trim()).length >= 2 && <div style={{ margin: '-2px 0 8px 22px' }}>
         <button className="pri" style={{ fontSize: 12 }} title="Cada subtítulo de esta página pasa a ser un botón, con las casillas que tiene debajo" onClick={() => {

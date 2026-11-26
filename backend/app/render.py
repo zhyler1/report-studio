@@ -555,7 +555,7 @@ def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
                     inner += f'<div class="sub2{" on" if j == 0 else ""}" data-sub2="{attr(u.id)}">' + render_list(u.blocks, ctx, base) + add_slot(ctx, base) + "</div>"
             th = ""
             if t.tema:
-                th = (f' data-tema="{t.tema}" data-intro="{1 if t.intro else 0}" data-it="{attr(t.intro_titulo or t.label)}" data-is="{attr(t.intro_sub or "Navidad en Presidencia")}"')
+                th = (f' data-tema="{t.tema}" data-intro="{1 if t.intro else 0}" data-it="{attr(t.intro_titulo or "Navidad en Presidencia")}" data-is="{attr(t.intro_sub or t.label)}"')
                 inner += '<button type="button" class="xm-replay">✨ Ver intro</button>' if t.intro else ""
             h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}"{th}>' + inner + "</div>"
     else:
