@@ -197,19 +197,38 @@ function InicioCards({ d, set, openDrawer }: { d: Json; set: (d: Json) => void; 
   const putHome = (i: number, h: Json) => putS(i, { ...secs[i], home: h })
   const setHide = (k: string, on: boolean) => set({ ...d, meta: { ...d.meta, home_hide: on ? Array.from(new Set([...hide, k])) : hide.filter(x => x !== k) } })
   return <>
-    <p className="mut" style={{ marginTop: 0 }}>Quita lo que te sobre del botón Inicio. Ocultar una tarjeta no borra la sección: su botón sigue ahí.</p>
+    <p className="mut" style={{ marginTop: 0 }}>Cambia a mano lo que dice cada tarjeta de Inicio (cifras, texto y etiqueta) o quita lo que te sobre. Ocultar una tarjeta no borra la sección: su botón sigue ahí.</p>
     {secs.filter(s => s.home).map(s => { const i = secs.indexOf(s); const h = s.home; const stats: Json[] = h.stats || []
       return <div className="card" key={s.id} style={h.hidden ? { opacity: .6 } : undefined}>
-        <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input type="checkbox" checked={!h.hidden} onChange={e => putHome(i, { ...h, hidden: !e.target.checked })} /><b style={{ flex: 1 }}>{h.title || s.label}</b></label>
+        <label style={{ display: 'flex', gap: 8, alignItems: 'center' }}><input type="checkbox" style={{ width: 'auto' }} checked={!h.hidden} onChange={e => putHome(i, { ...h, hidden: !e.target.checked })} /><b style={{ flex: 1 }}>{h.title || s.label}</b></label>
         {stats.map((x, k) => <div key={k} style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
           <span style={{ flex: 1, fontSize: 13 }}><b>{(x.prefix || '') + String(x.value ?? '') + (x.suffix || '')}</b> <span className="mut">{x.label}</span></span>
           <button className="danger" title="Quitar esta cifra de la tarjeta" onClick={() => putHome(i, { ...h, stats: stats.filter((_, j) => j !== k), columns: Math.min(Math.max(stats.length - 1, 1), 3) })}>✕</button></div>)}
         {!stats.length && <p className="mut" style={{ margin: '6px 0 0', fontSize: 13 }}>Sin cifras{h.text ? ': muestra solo el texto.' : '.'}</p>}
+        {(h.tag || h.text) && <p className="mut" style={{ margin: '6px 0 0', fontSize: 12.5 }}>{h.text && <>Texto: «{h.text.slice(0, 50)}» </>}{h.tag && <>· Etiqueta: «{h.tag.slice(0, 40)}»</>}</p>}
+        <details style={{ marginTop: 8 }}><summary style={{ cursor: 'pointer', fontWeight: 700, color: '#2160b0' }}>✎ Editar a mano esta tarjeta</summary>
+          <label>Título de la tarjeta</label><input value={h.title || ''} placeholder={s.label} onChange={e => putHome(i, { ...h, title: e.target.value })} />
+          <label>Cifras</label>
+          {stats.map((x, k) => { const up = (patch: Json) => putHome(i, { ...h, stats: stats.map((y, j) => (j === k ? { ...y, ...patch } : y)) })
+            return <div key={k} className="card" style={{ padding: 8, margin: '4px 0' }}>
+              <div style={{ display: 'flex', gap: 4 }}>
+                <input style={{ width: 52 }} placeholder="antes" title="Símbolo antes del número (ej. $)" value={x.prefix || ''} onChange={e => up({ prefix: e.target.value })} />
+                <input style={{ flex: 1 }} placeholder="Número" disabled={!!x.bind} title={x.bind ? 'Este número se calcula solo desde los datos del informe' : 'El número que se muestra'} value={x.bind ? String(x.value ?? '') + ' (automático)' : String(x.value ?? '')} onChange={e => up({ value: /^-?\d+(\.\d+)?$/.test(e.target.value.trim()) ? Number(e.target.value.trim()) : e.target.value })} />
+                <input style={{ width: 52 }} placeholder="después" title="Símbolo después del número (ej. %)" value={x.suffix || ''} onChange={e => up({ suffix: e.target.value })} />
+              </div>
+              <input placeholder="Lo que significa el número" value={x.label || ''} onChange={e => up({ label: e.target.value })} style={{ marginTop: 4 }} /></div> })}
+          <button onClick={() => putHome(i, { ...h, stats: [...stats, { value: 0, label: 'Nueva cifra' }], columns: Math.min(stats.length + 1, 3) })}>+ Agregar cifra</button>
+          <label>Texto bajo las cifras</label><textarea rows={2} value={h.text || ''} onChange={e => putHome(i, { ...h, text: e.target.value })} />
+          <label>Etiqueta (déjala vacía para quitarla)</label>
+          <div style={{ display: 'flex', gap: 6 }}><input style={{ flex: 1 }} value={h.tag || ''} onChange={e => putHome(i, { ...h, tag: e.target.value })} />
+            <select style={{ width: 90 }} value={h.tag_tone || 'red'} onChange={e => putHome(i, { ...h, tag_tone: e.target.value })}><option value="red">Roja</option><option value="green">Verde</option></select>
+            {h.tag && <button className="danger" title="Quitar la etiqueta" onClick={() => putHome(i, { ...h, tag: '' })}>✕</button>}</div>
+        </details>
       </div> })}
     <div className="card"><div className="rgl" style={{ margin: '0 0 6px' }}>Tarjetas fijas</div>
-      <label style={{ display: 'flex', gap: 8, marginBottom: 6 }}><input type="checkbox" checked={!hide.includes('pt')} onChange={e => setHide('pt', !e.target.checked)} /> Planta transitoria</label>
-      <label style={{ display: 'flex', gap: 8, marginBottom: 6 }}><input type="checkbox" checked={!hide.includes('pres')} onChange={e => setHide('pres', !e.target.checked)} /> Presupuesto (dona)</label>
-      <label style={{ display: 'flex', gap: 8 }}><input type="checkbox" checked={!!d.meta.show_alerts} onChange={e => set({ ...d, meta: { ...d.meta, show_alerts: e.target.checked } })} /> Alertas de todos los grupos</label></div>
+      <label style={{ display: 'flex', gap: 8, marginBottom: 6 }}><input type="checkbox" style={{ width: 'auto' }} checked={!hide.includes('pt')} onChange={e => setHide('pt', !e.target.checked)} /> Planta transitoria</label>
+      <label style={{ display: 'flex', gap: 8, marginBottom: 6 }}><input type="checkbox" style={{ width: 'auto' }} checked={!hide.includes('pres')} onChange={e => setHide('pres', !e.target.checked)} /> Presupuesto (dona)</label>
+      <label style={{ display: 'flex', gap: 8 }}><input type="checkbox" style={{ width: 'auto' }} checked={!!d.meta.show_alerts} onChange={e => set({ ...d, meta: { ...d.meta, show_alerts: e.target.checked } })} /> Alertas de todos los grupos</label></div>
     <div className="card"><div className="rgl" style={{ margin: '0 0 6px' }}>Cifras grandes de arriba</div>
       <button onClick={() => openDrawer('general')}>Editar en General →</button></div>
   </>
