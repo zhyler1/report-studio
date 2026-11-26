@@ -438,7 +438,7 @@ export default function App({ esAdmin = true }: { servidorPersonal?: boolean; es
   }
   const variarEstilos = (quitar: boolean) => {   // reparte estilos predeterminados (o los quita) en la lista visible, bajando a grupos y columnas
     const dd = dRef.current, w = where(); if (!dd || !w) return
-    const SEQ = ['degradado', 'suave', 'cinta', 'acento', 'cristal', 'solido', 'dorado', 'tapa']
+    const SEQ = ['degradado', 'suave', 'cinta', 'acento', 'cristal', 'oceano', 'menta', 'tapa', 'atardecer', 'hielo', 'doble', 'miel', 'aurora', 'rosado', 'sello', 'solido', 'bosque', 'puntos', 'dorado', 'neon', 'derecha', 'vino', 'rayas', 'esquinas']
     const APLICA = new Set(['stat_grid', 'card_list', 'callout', 'text', 'note_list', 'numbered_cards', 'ring_card', 'status_list', 'link_cards', 'step_cards', 'row_list', 'agreement', 'plant_card'])
     let k = 0, n = 0
     const rec = (l: Json[]): Json[] => (l || []).map((b: Json) => {
