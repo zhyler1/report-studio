@@ -393,6 +393,28 @@ def media_from_url(body: UrlBody):
 _MEDIA_RE = re.compile(r'(?<=["\'(])/media/([A-Za-z0-9_.-]+)(?=["\')])')
 
 
+def _lighten(f: Path) -> tuple[str, bytes]:
+    """Imagen liviana para el HTML exportado: máx. 1600 px de lado y JPEG de buena calidad (PNG solo si tiene transparencia).
+    Si no se puede reducir (GIF, SVG, ya es pequeña…), se deja tal cual."""
+    mime = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
+    raw = f.read_bytes()
+    if mime not in ("image/png", "image/jpeg", "image/webp") or len(raw) < 250_000:
+        return mime, raw
+    try:
+        from io import BytesIO
+        from PIL import Image, ImageOps
+        im = ImageOps.exif_transpose(Image.open(BytesIO(raw)))
+        im.thumbnail((1600, 1600))
+        out = BytesIO()
+        if im.mode in ("RGBA", "LA", "P") and "transparency" in im.info or im.mode in ("RGBA", "LA"):
+            im.save(out, "PNG", optimize=True); new = "image/png"
+        else:
+            im.convert("RGB").save(out, "JPEG", quality=80, optimize=True, progressive=True); new = "image/jpeg"
+        return (new, out.getvalue()) if len(out.getvalue()) < len(raw) else (mime, raw)
+    except Exception:
+        return mime, raw
+
+
 def embed_media(html: str) -> str:
     """Reemplaza /media/<archivo> por data URI (en atributos, estilos y datos) para que el HTML exportado sea un solo archivo."""
     cache: dict[str, str] = {}
@@ -404,8 +426,8 @@ def embed_media(html: str) -> str:
             if not f.is_file():
                 cache[n] = m.group(0)
             else:
-                mime = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
-                cache[n] = f"data:{mime};base64,{base64.b64encode(f.read_bytes()).decode()}"
+                mime, raw = _lighten(f)
+                cache[n] = f"data:{mime};base64,{base64.b64encode(raw).decode()}"
         return cache[n]
     return _MEDIA_RE.sub(sub, html)
 

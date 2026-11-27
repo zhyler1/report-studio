@@ -56,3 +56,13 @@ def test_texto_con_formato_se_limpia_y_se_dibuja():
     r["sections"][0]["blocks"].append(TextBlock(id="tf1", text="Hola mundo", html="<p>Hola <b>mundo</b></p><ul><li>uno</li></ul>").model_dump(mode="json"))
     html = render(Report.model_validate(r))
     assert 'class="rs-txt rs-rich"' in html and "<li>uno</li>" in html
+
+
+def test_exportar_html_reduce_imagenes_pesadas(tmp_path, monkeypatch):
+    from app import api
+    from PIL import Image
+    monkeypatch.setattr(api, "MEDIA_DIR", tmp_path)
+    Image.effect_noise((3000, 2400), 90).convert("RGB").save(tmp_path / "grande.png")
+    antes = (tmp_path / "grande.png").stat().st_size
+    out = api.embed_media('<img src="/media/grande.png">')
+    assert antes > 1_000_000 and len(out) < antes / 3 and out.startswith('<img src="data:image/jpeg;base64,')
