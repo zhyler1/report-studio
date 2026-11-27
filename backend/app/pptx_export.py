@@ -254,7 +254,11 @@ class Deck:
         elif isinstance(b, TextBlock):
             if b.title:
                 self.heading(b.title)
-            self.bullets([clean(x) for x in b.text.split("\n\n") if x.strip()])
+            if b.html.strip():
+                from bs4 import BeautifulSoup
+                self.bullets([clean(x) for x in BeautifulSoup(b.html, "html.parser").get_text("\n").split("\n") if x.strip()])
+            else:
+                self.bullets([clean(x) for x in b.text.split("\n\n") if x.strip()])
         elif isinstance(b, Heading):
             self.heading(b.title or "")
         elif isinstance(b, Workflow):

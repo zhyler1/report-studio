@@ -139,3 +139,16 @@ details.sty[open]>summary{margin-bottom:6px}
 .lkgrid{display:flex;flex-wrap:wrap;gap:8px}
 .lkpop .lkprev{width:96px;height:58px;padding:5px}
 .lkpop .lkc small{font-size:11px;max-width:96px}
+
+.rte{border:1px solid #cfd8e6;border-radius:10px;background:#fff;overflow:hidden}
+.rtbar{display:flex;flex-wrap:wrap;gap:3px;align-items:center;padding:6px;background:#f1f5fb;border-bottom:1px solid #d9e1ee}
+.rtb{min-width:30px;height:30px;padding:0 7px;border:1px solid transparent;border-radius:7px;background:#fff;color:#14213d;font:600 13px Inter,system-ui,sans-serif;cursor:pointer}
+.rtb:hover{background:#e4eefb;border-color:#b9c8e0}
+.rtsep{width:1px;height:20px;background:#cfd8e6;margin:0 3px}
+.rtsel{height:30px;width:auto;padding:0 6px;font-size:12px}
+.rtcol{position:relative;display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;margin:0;border-radius:7px;background:#fff;border:1px solid #d9e1ee;font:800 15px Inter,sans-serif;color:#c62828;cursor:pointer}
+.rtcol.hl{color:#e0a800}.rtcol input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer;padding:0}
+.rtbody{min-height:150px;max-height:420px;overflow:auto;padding:12px 14px;font:15px/1.6 Inter,system-ui,sans-serif;outline:none}
+.rtbody:focus{box-shadow:inset 0 0 0 2px #2160b0}
+.rtbody p,.rtbody div{margin:0 0 .6em}.rtbody ul,.rtbody ol{margin:0 0 .6em;padding-left:1.4em}.rtbody h3{font-size:19px;margin:.4em 0}.rtbody h4{font-size:16px;margin:.4em 0}
+.rtbody blockquote{margin:.5em 0;padding:.3em 1em;border-left:4px solid #e0a800;background:#fff8e6}.rtbody a{color:#2160b0}

@@ -8196,6 +8196,11 @@
      ],
      "title": "Size",
      "type": "string"
+    },
+    "html": {
+     "default": "",
+     "title": "Html",
+     "type": "string"
     }
    },
    "title": "TextBlock",

@@ -381,7 +381,68 @@ def r_callout(b: Callout, ctx: Ctx) -> str:
     return f'<div class="card win" data-r style="--i:1"><h3>{esc(b.heading)}</h3><p style="font-size:14px">{rich(b.text)}</p></div>'
 
 
+_OK_TAGS = {"p", "div", "br", "b", "strong", "i", "em", "u", "s", "strike", "del", "ul", "ol", "li", "h3", "h4", "a", "span", "font", "blockquote", "sub", "sup"}
+_ALIGN = {"left", "right", "center", "justify"}
+_FONT_SZ = {"1": ".75em", "2": ".9em", "3": "1em", "4": "1.2em", "5": "1.5em", "6": "2em", "7": "2.6em"}
+_COLOR = re.compile(r"^(#[0-9a-fA-F]{3,8}|rgba?\(\s*\d{1,3}\s*(,\s*[\d.]+\s*){2,3}\)|[a-zA-Z]{3,20})$")
+
+
+def clean_html(raw: str) -> str:
+    """Deja pasar solo el formato permitido del editor (negrilla, listas, color, tamaño, alineación, enlaces); todo lo demás se descarta."""
+    from bs4 import BeautifulSoup, Comment
+    soup = BeautifulSoup(raw or "", "html.parser")
+    for c in soup.find_all(string=lambda x: isinstance(x, Comment)):
+        c.extract()
+    for t in soup.find_all(True):
+        if t.name in ("script", "style", "iframe", "object", "embed", "form", "input", "button", "svg", "math", "head", "title", "meta", "link"):
+            t.decompose()
+    for t in list(soup.find_all(True)):
+        if t.name not in _OK_TAGS:
+            t.unwrap()
+            continue
+        keep: dict[str, str] = {}
+        st = []
+        for part in (t.get("style") or "").split(";"):
+            if ":" not in part:
+                continue
+            k, v = (x.strip().lower() for x in part.split(":", 1))
+            if k == "color" and _COLOR.match(v):
+                st.append(f"color:{v}")
+            elif k == "font-size" and re.fullmatch(r"\d{1,3}(\.\d+)?(px|em|rem|%)", v):
+                st.append(f"font-size:{v}")
+            elif k == "text-align" and v in _ALIGN:
+                st.append(f"text-align:{v}")
+            elif k == "font-weight" and v in ("bold", "700", "800", "900"):
+                st.append("font-weight:700")
+            elif k == "font-style" and v == "italic":
+                st.append("font-style:italic")
+            elif k == "text-decoration" and re.fullmatch(r"(underline|line-through)( (underline|line-through))?", v):
+                st.append(f"text-decoration:{v}")
+        if t.name == "font":
+            if t.get("color") and _COLOR.match(t["color"].strip()):
+                st.append(f"color:{t['color'].strip()}")
+            if t.get("size") in _FONT_SZ:
+                st.append(f"font-size:{_FONT_SZ[t['size']]}")
+            t.name = "span"
+        if t.name == "a":
+            h = safe_href(t.get("href", ""))
+            if h:
+                keep["href"] = h
+                keep["target"] = "_blank"
+                keep["rel"] = "noopener noreferrer"
+        if t.get("align") in _ALIGN:
+            st.append(f"text-align:{t['align']}")
+        if st:
+            keep["style"] = ";".join(dict.fromkeys(st))
+        t.attrs = keep
+    return str(soup)
+
+
 def r_text(b: TextBlock, ctx: Ctx) -> str:
+    if b.html.strip():
+        fs = "19px" if b.size == "grande" else "16px"
+        t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
+        return f'<div class="rs-txt rs-rich" data-r style="font-size:{fs}">{t}{clean_html(b.html)}</div>'
     fs = "19px" if b.size == "grande" else "16px"
     t = f'<h3 class="st" data-r>{esc(b.title)}</h3>' if b.title else ""
     ps = "".join(f'<p data-r style="font-size:{fs};line-height:1.65;margin:0 0 .8em">{rich(x)}</p>' for x in re.split(r"\n\s*\n", b.text.strip()) if x.strip())
@@ -946,7 +1007,7 @@ def render(rep: Report, edit: bool = False) -> str:
     if not edit:  # el informe completo viaja dentro del HTML para poder reimportarlo sin pérdida
         blob = json.dumps(rep.model_dump(mode="json"), ensure_ascii=False, separators=(",", ":")).replace("</", "<\\/")
         out = out.replace("</body>", f'<script type="application/json" id="rs-report">{blob}</script></body>', 1)
-    css = theme_css(m.theme) + ".rs-row{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch;margin-bottom:24px}.rs-c{min-width:0}.rs-sty{border-radius:16px;padding:16px;margin-bottom:12px}@media(max-width:760px){.rs-c{flex-basis:100%!important}}" + (SHELL.parent / "looks.css").read_text(encoding="utf-8")
+    css = theme_css(m.theme) + ".rs-row{display:flex;flex-wrap:wrap;gap:20px;align-items:stretch;margin-bottom:24px}.rs-c{min-width:0}.rs-sty{border-radius:16px;padding:16px;margin-bottom:12px}@media(max-width:760px){.rs-c{flex-basis:100%!important}}.rs-rich{line-height:1.65}.rs-rich p,.rs-rich div{margin:0 0 .7em}.rs-rich ul,.rs-rich ol{margin:0 0 .8em;padding-left:1.4em}.rs-rich li{margin:.2em 0}.rs-rich h3.st{margin-bottom:.5em}.rs-rich h3:not(.st),.rs-rich h4{margin:.6em 0 .3em}.rs-rich blockquote{margin:.6em 0;padding:.4em 1em;border-left:4px solid var(--gold);background:color-mix(in srgb,var(--gold) 12%,transparent);border-radius:0 10px 10px 0}.rs-rich a{color:var(--blue);font-weight:600;text-decoration:underline;text-underline-offset:3px}" + (SHELL.parent / "looks.css").read_text(encoding="utf-8")
     out = out.replace("</head>", f"<style>{css[css.index('.rs-row'):]}</style>" + css[:css.index(".rs-row")] + "</head>", 1) if False else out.replace("</head>", css[:css.index(".rs-row")] + "<style>" + css[css.index(".rs-row"):] + "</style></head>", 1)
     left = re.findall(r"@@[A-Z_]+@@", out)
     assert not left, f"marcadores sin resolver: {left}"

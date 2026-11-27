@@ -257,6 +257,7 @@ class TextBlock(BlockBase):
     type: Literal["text"] = "text"
     text: Rich = "Escribe aquí tu texto."
     size: Literal["normal", "grande"] = "normal"
+    html: str = ""   # texto con formato (negrilla, listas, colores…) escrito en el editor; si viene, manda sobre `text`
 
 
 class LinkItem(Base):

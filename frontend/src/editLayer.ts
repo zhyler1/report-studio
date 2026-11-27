@@ -435,7 +435,7 @@ export function attach(doc: Document, h: Host) {
       const s = win.getSelection(); if (!s || s.isCollapsed || !s.rangeCount) return
       const r = s.getRangeAt(0)
       const n = r.commonAncestorContainer; let el = (n.nodeType === 3 ? n.parentElement : n) as HTMLElement | null
-      if (!el || el.closest('[contenteditable=true],svg,.rs-chart,#rsBar,#rsTx')) return
+      if (!el || el.closest('[contenteditable=true],svg,.rs-chart,#rsBar,#rsTx,.rs-rich')) return
       const blk = el.closest('.rs-b') as HTMLElement | null; if (!blk || lockedAt(h.get(), blk.getAttribute('data-bp'))) return
       while (el !== blk && el.parentElement && el.parentElement !== blk && !el.hasAttribute('data-to') && (/^(B|I|STRONG|EM)$/.test(el.tagName) || el.hasAttribute('data-rc'))) el = el.parentElement
       if (el === blk || !isLeaf(el)) { if (el === blk || el.querySelector('div,p,li,table,figure,h3,h4,ul')) return }
@@ -459,6 +459,7 @@ export function attach(doc: Document, h: Host) {
     hideTx()
     const t = e.target as HTMLElement
     if (t.closest('svg') || t.closest('.rs-chart') || t.closest('#rsBar')) { if (t.closest('.rs-chart')) h.toast('Los datos del gráfico se editan en el panel de la derecha'); return }
+    if (t.closest('.rs-rich')) { h.toast('Este texto tiene formato: edítalo en el panel de la derecha («Opciones de la casilla» → Texto)'); return }
     const blk = t.closest('.rs-b'); if (!blk || !t.textContent?.trim()) return
     if (lockedAt(h.get(), blk.getAttribute('data-bp'))) { h.toast('Casilla bloqueada 🔒: desbloquéala para editarla'); return }
     const fx = t.closest('[data-tx]') as HTMLElement | null

@@ -1,5 +1,5 @@
 import { STARTERS } from './starters'
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import { BLOCK, CHART_FIELDS, LONG, OPT, SERIES_FIELDS, label } from './labels'
 import { api } from './api'
 
@@ -141,11 +141,56 @@ function ExcelPaste({ chart, set }: { chart: any; set: (v: any) => void }) {
   </div>
 }
 
+const escH = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+const textToHtml = (t: string) => t.split(/\n\s*\n/).filter(x => x.trim()).map(p => '<p>' + escH(p).replace(/\*\*(.+?)\*\*/gs, '<b>$1</b>').replace(/\n/g, '<br>') + '</p>').join('')
+
+/** Editor de texto con formato (negrilla, cursiva, listas, color, tamaño, enlaces…) para la casilla Texto. */
+function RichEditor({ value, set }: { value: any; set: (v: any) => void }) {
+  const ref = useRef<HTMLDivElement>(null), last = useRef(''), sel = useRef<Range | null>(null)
+  useEffect(() => {
+    const el = ref.current; if (!el) return
+    const h = value.html || textToHtml(value.text || '')
+    if (h !== last.current && document.activeElement !== el) { el.innerHTML = h; last.current = h }
+  }, [value.html, value.text])
+  const emit = () => { const el = ref.current; if (!el) return; const h = el.innerHTML; last.current = h; set({ ...value, html: h, text: el.innerText.replace(/\n{3,}/g, '\n\n').trim() || ' ' }) }
+  const keep = () => { const s = window.getSelection(); if (s && s.rangeCount && ref.current?.contains(s.anchorNode)) sel.current = s.getRangeAt(0).cloneRange() }
+  const run = (c: string, v?: string) => {
+    const el = ref.current; if (!el) return
+    el.focus()
+    if (sel.current) { const s = window.getSelection(); s?.removeAllRanges(); s?.addRange(sel.current) }
+    document.execCommand('styleWithCSS', false, 'true'); document.execCommand(c, false, v); keep(); emit()
+  }
+  const B = (l: React.ReactNode, c: string, title: string, v?: string, st?: React.CSSProperties) =>
+    <button type="button" className="rtb" title={title} style={st} onMouseDown={e => e.preventDefault()} onClick={() => run(c, v)}>{l}</button>
+  return <div className="rte">
+    <div className="rtbar">
+      {B(<b>N</b>, 'bold', 'Negrilla (Ctrl+B)')}{B(<i>K</i>, 'italic', 'Cursiva (Ctrl+I)')}{B(<u>S</u>, 'underline', 'Subrayado (Ctrl+U)')}{B(<s>T</s>, 'strikeThrough', 'Tachado')}
+      <span className="rtsep" />
+      {B('H1', 'formatBlock', 'Título dentro del texto', 'h3')}{B('H2', 'formatBlock', 'Subtítulo', 'h4')}{B('¶', 'formatBlock', 'Párrafo normal', 'p')}{B('❝', 'formatBlock', 'Cita destacada', 'blockquote')}
+      <span className="rtsep" />
+      {B('• Lista', 'insertUnorderedList', 'Lista con viñetas')}{B('1. Lista', 'insertOrderedList', 'Lista numerada')}
+      <span className="rtsep" />
+      {B('⯇', 'justifyLeft', 'Alinear a la izquierda')}{B('≡', 'justifyCenter', 'Centrar')}{B('⯈', 'justifyRight', 'Alinear a la derecha')}{B('☰', 'justifyFull', 'Justificar')}
+      <span className="rtsep" />
+      <select className="rtsel" title="Tamaño de la letra" defaultValue="" onMouseDown={keep} onChange={e => { if (e.target.value) run('fontSize', e.target.value); e.target.value = '' }}>
+        <option value="">Tamaño</option><option value="2">Pequeño</option><option value="3">Normal</option><option value="4">Mediano</option><option value="5">Grande</option><option value="6">Muy grande</option><option value="7">Enorme</option></select>
+      <label className="rtcol" title="Color del texto seleccionado">A<input type="color" defaultValue="#c62828" onMouseDown={keep} onChange={e => run('foreColor', e.target.value)} /></label>
+      <label className="rtcol hl" title="Resaltar con color">▇<input type="color" defaultValue="#ffe08a" onMouseDown={keep} onChange={e => run('hiliteColor', e.target.value)} /></label>
+      <span className="rtsep" />
+      <button type="button" className="rtb" title="Convertir el texto seleccionado en enlace" onMouseDown={e => { e.preventDefault(); keep() }} onClick={() => { const u = window.prompt('Dirección del enlace (https://…)'); if (u) run('createLink', u) }}>🔗</button>
+      {B('⌫', 'removeFormat', 'Quitar el formato del texto seleccionado')}{B('↶', 'undo', 'Deshacer')}{B('↷', 'redo', 'Rehacer')}
+    </div>
+    <div ref={ref} className="rtbody" contentEditable suppressContentEditableWarning spellCheck lang="es" onInput={emit} onBlur={() => { keep(); emit() }} onMouseUp={keep} onKeyUp={keep}
+      onPaste={e => { e.preventDefault(); const t = e.clipboardData.getData('text/plain'); document.execCommand('insertText', false, t); emit() }} />
+    <p className="mut" style={{ margin: '4px 0 0', fontSize: 12 }}>Selecciona el texto y usa los botones. Pega siempre como texto limpio.</p>
+  </div>
+}
+
 const ESTILO = new Set(['locked', 'span', 'bg', 'fg', 'tints', 'embed', 'embed_pos', 'font', 'look', 'num_color', 'escala', 'text_align'])
 export function ObjectField({ s, value, set, bare }: { s: S; value: any; set: (v: any) => void; bare?: boolean }) {
   const kind = useContext(KindCtx)
   const isChart = s.title === 'Chart', isSeries = s.title === 'Series'
-  let props = Object.entries<S>(s.properties || {}).filter(([k, p]) => k !== 'type' || norm(p).s.const === undefined)
+  let props = Object.entries<S>(s.properties || {}).filter(([k, p]) => (k !== 'type' || norm(p).s.const === undefined) && !(value.type === 'text' && k === 'html'))
   if (isChart) { const keep = CHART_FIELDS[value.kind]; if (keep) props = props.filter(([k]) => keep.includes(k)).sort((a, b) => keep.indexOf(a[0]) - keep.indexOf(b[0])) }
   if (isSeries) { const keep = SERIES_FIELDS(kind); props = props.filter(([k]) => keep.includes(k)).sort((a, b) => keep.indexOf(a[0]) - keep.indexOf(b[0])) }
   const mixed = s.title === 'Section' && value.tabs?.length > 0
@@ -154,7 +199,7 @@ export function ObjectField({ s, value, set, bare }: { s: S; value: any; set: (v
   const estilo = esBloque ? props.filter(([k]) => ESTILO.has(k)) : []   // en una casilla, lo de formato va plegado al final y el contenido queda arriba
   const rest = esBloque ? props.filter(([k]) => !ESTILO.has(k)) : props
   const sorted = [...rest.filter(([k]) => !ORDER_LAST.has(k)), ...rest.filter(([k]) => ORDER_LAST.has(k))]
-  const mk = ([k, p]: [string, S]) => <Field key={k} k={k} schema={p} value={value[k]} parent={value} set={v => set({ ...value, [k]: v })} />
+  const mk = ([k, p]: [string, S]) => (value.type === 'text' && k === 'text') ? <div key={k}><label>Texto</label><RichEditor value={value} set={set} /></div> : <Field key={k} k={k} schema={p} value={value[k]} parent={value} set={v => set({ ...value, [k]: v })} />
   const fields = sorted.map(mk)
   if (estilo.length) fields.push(<details key="__estilo" className="sty"><summary>🎨 Estilo y formato de la casilla</summary>{estilo.map(mk)}</details>)
   const fix = mixed ? <div className="issues" style={{ background: '#fff8e6', borderColor: '#e8c36a', color: '#6b4e00' }}>

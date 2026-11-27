@@ -43,3 +43,16 @@ def test_titulo_vacio_deja_marcador_para_seleccionar_en_edicion():
     r["sections"][0]["blocks"].append(Heading(id="h0", title=None).model_dump(mode="json"))
     rep = Report.model_validate(r)
     assert "rs-notitle" in render(rep, edit=True) and "rs-notitle" not in render(rep)
+
+
+def test_texto_con_formato_se_limpia_y_se_dibuja():
+    from app.render import clean_html
+    from app.schema import TextBlock
+    sucio = '<p style="color:#c00;position:fixed">Hola <b onclick="x()">mundo</b><script>alert(1)</script><a href="javascript:alert(1)">mal</a><a href="ejemplo.com">bien</a></p><iframe src=x></iframe>'
+    out = clean_html(sucio)
+    assert "script" not in out and "iframe" not in out and "onclick" not in out and "javascript" not in out and "position" not in out
+    assert "<b>mundo</b>" in out and 'href="https://ejemplo.com"' in out and "color:#c00" in out
+    r = json.loads((Path(__file__).parents[2] / "seed" / "report.seed.json").read_text(encoding="utf-8"))
+    r["sections"][0]["blocks"].append(TextBlock(id="tf1", text="Hola mundo", html="<p>Hola <b>mundo</b></p><ul><li>uno</li></ul>").model_dump(mode="json"))
+    html = render(Report.model_validate(r))
+    assert 'class="rs-txt rs-rich"' in html and "<li>uno</li>" in html
