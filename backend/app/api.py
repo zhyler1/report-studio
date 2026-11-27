@@ -394,7 +394,7 @@ _MEDIA_RE = re.compile(r'(?<=["\'(])/media/([A-Za-z0-9_.-]+)(?=["\')])')
 
 
 def _lighten(f: Path) -> tuple[str, bytes]:
-    """Imagen liviana para el HTML exportado: máx. 1600 px de lado y JPEG de buena calidad (PNG solo si tiene transparencia).
+    """Imagen liviana para el HTML exportado: máx. 1280 px de lado y JPEG de buena calidad (PNG solo si tiene transparencia).
     Si no se puede reducir (GIF, SVG, ya es pequeña…), se deja tal cual."""
     mime = mimetypes.guess_type(f.name)[0] or "application/octet-stream"
     raw = f.read_bytes()
@@ -404,12 +404,12 @@ def _lighten(f: Path) -> tuple[str, bytes]:
         from io import BytesIO
         from PIL import Image, ImageOps
         im = ImageOps.exif_transpose(Image.open(BytesIO(raw)))
-        im.thumbnail((1600, 1600))
+        im.thumbnail((1280, 1280))
         out = BytesIO()
         if im.mode in ("RGBA", "LA", "P") and "transparency" in im.info or im.mode in ("RGBA", "LA"):
             im.save(out, "PNG", optimize=True); new = "image/png"
         else:
-            im.convert("RGB").save(out, "JPEG", quality=80, optimize=True, progressive=True); new = "image/jpeg"
+            im.convert("RGB").save(out, "JPEG", quality=74, optimize=True, progressive=True); new = "image/jpeg"
         return (new, out.getvalue()) if len(out.getvalue()) < len(raw) else (mime, raw)
     except Exception:
         return mime, raw
@@ -429,7 +429,11 @@ def embed_media(html: str) -> str:
                 mime, raw = _lighten(f)
                 cache[n] = f"data:{mime};base64,{base64.b64encode(raw).decode()}"
         return cache[n]
-    return _MEDIA_RE.sub(sub, html)
+    # La copia de datos que viaja al final del HTML no lleva imágenes incrustadas (duplicaría el peso): ahí quedan como /media/…
+    cut = html.find('id="rs-report"')
+    if cut < 0:
+        return _MEDIA_RE.sub(sub, html)
+    return _MEDIA_RE.sub(sub, html[:cut]) + html[cut:]
 
 
 @router.get("/reports/{rid}/preview", response_class=HTMLResponse)

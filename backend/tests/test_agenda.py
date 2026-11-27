@@ -66,3 +66,12 @@ def test_exportar_html_reduce_imagenes_pesadas(tmp_path, monkeypatch):
     antes = (tmp_path / "grande.png").stat().st_size
     out = api.embed_media('<img src="/media/grande.png">')
     assert antes > 1_000_000 and len(out) < antes / 3 and out.startswith('<img src="data:image/jpeg;base64,')
+
+
+def test_exportar_no_duplica_imagenes_en_la_copia_de_datos(tmp_path, monkeypatch):
+    from app import api
+    from PIL import Image
+    monkeypatch.setattr(api, "MEDIA_DIR", tmp_path)
+    Image.effect_noise((2500, 2000), 90).convert("RGB").save(tmp_path / "f.png")
+    out = api.embed_media('<img src="/media/f.png"><script type="application/json" id="rs-report">{"src":"/media/f.png"}</script>')
+    assert out.count("data:image/jpeg") == 1 and '{"src":"/media/f.png"}' in out
