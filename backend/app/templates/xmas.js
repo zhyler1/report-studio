@@ -239,8 +239,13 @@
         var sn=sub.closest('.panel')&&sub.closest('.panel').querySelector('.subnav'),other=sn&&[].slice.call(sn.querySelectorAll('.sbtn')).filter(function(b){return b.getAttribute('data-s')!==sub.getAttribute('data-sub')})[0];
         if(other)other.click();else{var home=document.querySelector('.tab[data-t="inicio"]')||document.querySelector('.tab');if(home)home.click()}}
       el.querySelector('.xw-ex').addEventListener('click',function(){full?exit():enter()});
-      if(!edit){new MutationObserver(function(){var on=sub.classList.contains('on');if(on&&!full)enter();else if(!on&&full){full=false;stopPlay();sub.classList.remove('xw-full','xw-closed','xw-open');document.documentElement.classList.remove('xw-lock')}}).observe(sub,{attributes:true,attributeFilter:['class']});
-        if(sub.classList.contains('on'))setTimeout(enter,60)}
+      if(!edit){
+        var pan=sub.closest('.panel');
+        function sync2(){var on=sub.classList.contains('on')&&(!pan||pan.classList.contains('active'));
+          if(on&&!full)enter();
+          else if(!on&&full){full=false;stopPlay();sub.classList.remove('xw-full','xw-closed','xw-open');document.documentElement.classList.remove('xw-lock')}}
+        var mo=new MutationObserver(sync2);mo.observe(sub,{attributes:true,attributeFilter:['class']});if(pan)mo.observe(pan,{attributes:true,attributeFilter:['class']});
+        if(sub.classList.contains('on'))setTimeout(sync2,60)}
       // cámara en pantallas angostas: sigue al tren
       function follow(i,instant){var w=vp.scrollWidth-vp.clientWidth;if(w<=0)return;var x=(ST[i][0]/W)*sc.clientWidth-vp.clientWidth/2,l=Math.max(0,Math.min(w,x));vp.scrollTo?vp.scrollTo({left:l,behavior:instant||RM?'auto':'smooth'}):(vp.scrollLeft=l)}
       // nieve
