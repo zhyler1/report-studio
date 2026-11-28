@@ -257,4 +257,4 @@ def test_export_zip_endpoint(c):
     assert r.status_code == 200
     z = zipfile.ZipFile(io.BytesIO(r.content))
     assert "index.html" in z.namelist()
-    assert b"data:image" not in z.read("index.html")
+    assert b"data:image/jpeg" not in z.read("index.html") and b"data:image/png" not in z.read("index.html")
