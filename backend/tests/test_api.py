@@ -248,3 +248,13 @@ def test_incluye_estilos_de_celular():
     from app.validate import load
     h = render(load(json.load(open("seed/report.seed.json", encoding="utf-8")))[0])
     assert 'id="rs-mobile"' in h and "max-width:640px" in h
+
+
+def test_export_zip_endpoint(c):
+    import io, zipfile
+    rid = c.post("/api/reports", json={"data": SEED}).json()["id"]
+    r = c.get(f"/api/reports/{rid}/export.zip?base=https://x.gov.co/img")
+    assert r.status_code == 200
+    z = zipfile.ZipFile(io.BytesIO(r.content))
+    assert "index.html" in z.namelist()
+    assert b"data:image" not in z.read("index.html")

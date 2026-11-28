@@ -436,6 +436,45 @@ def embed_media(html: str) -> str:
     return _MEDIA_RE.sub(sub, html[:cut]) + html[cut:]
 
 
+def externalize_media(html: str, base: str = "imagenes") -> tuple[str, dict[str, bytes]]:
+    """Como embed_media, pero las imágenes quedan como archivos aparte: devuelve el HTML apuntando a <base>/<archivo> y {archivo: bytes}."""
+    base = (base or "imagenes").strip().rstrip("/")
+    files: dict[str, bytes] = {}
+    names: dict[str, str] = {}
+
+    def sub(m):
+        n = m.group(1)
+        if n not in names:
+            f = MEDIA_DIR / n
+            if not f.is_file():
+                names[n] = m.group(0)
+            else:
+                mime, raw = _lighten(f)
+                ext = {"image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp"}.get(mime) if mime != (mimetypes.guess_type(n)[0] or "") else None
+                out = (Path(n).stem + ext) if ext else n
+                files[out] = raw
+                names[n] = f"{base}/{out}"
+        return names[n]
+    cut = html.find('id="rs-report"')
+    if cut < 0:
+        return _MEDIA_RE.sub(sub, html), files
+    return _MEDIA_RE.sub(sub, html[:cut]) + html[cut:], files
+
+
+@router.get("/reports/{rid}/export.zip")
+def export_site(rid: int, base: str = "imagenes", s: Store = Depends(get_store)):
+    """HTML liviano + carpeta de imágenes. base = carpeta relativa (imagenes) o la dirección web donde se subirán (https://…/imagenes)."""
+    import zipfile
+    from io import BytesIO
+    html, files = externalize_media(_html(s, rid), base)
+    buf = BytesIO()
+    with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("index.html", html)
+        for n, raw in files.items():
+            z.writestr(f"imagenes/{n}", raw)
+    return Response(buf.getvalue(), media_type="application/zip", headers={"Content-Disposition": f'attachment; filename="informe-{rid}-web.zip"'})
+
+
 @router.get("/reports/{rid}/preview", response_class=HTMLResponse)
 def preview(rid: int, s: Store = Depends(get_store)):
     return HTMLResponse(_html(s, rid))

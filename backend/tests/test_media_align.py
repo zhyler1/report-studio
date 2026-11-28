@@ -130,3 +130,13 @@ def test_tren_de_actividades():
     bien["tabs"][0]["tren"] = False
     rep, _ = load(seed)
     assert ' data-tren="1"' not in render(rep)
+
+
+def test_export_zip_con_imagenes_aparte(tmp_path, monkeypatch):
+    from app import api
+    monkeypatch.setattr(api, "MEDIA_DIR", tmp_path)
+    (tmp_path / "a.png").write_bytes(b"\x89PNG-fake")
+    html = '<img src="/media/a.png"><div id="rs-report">/media/a.png</div>'
+    out, files = api.externalize_media(html, "https://x.gov.co/img/")
+    assert 'src="https://x.gov.co/img/a.png"' in out and out.endswith("/media/a.png</div>")
+    assert files == {"a.png": b"\x89PNG-fake"}
