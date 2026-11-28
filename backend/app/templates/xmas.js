@@ -299,6 +299,12 @@
       var first=0;bs.forEach(function(b,i){if(b.classList.contains('on'))first=i});cur=first;headS=tgt(cur);sts[cur].classList.add('on');cam.x=ST[cur][0];
       closePanel();size();window.addEventListener('resize',size);
       if('IntersectionObserver' in window){new IntersectionObserver(function(en){var was=vis;vis=en[0].isIntersecting;if(!vis)stopPlay();else if(!was&&intro)t0=0},{threshold:.01}).observe(el)}
+      var fly=document.createElement('div');fly.className='xw-fly';fly.setAttribute('aria-hidden','true');fly.innerHTML='<b class="sl"></b><svg class="g" viewBox="0 0 40 40" width="1.1em" height="1.1em"><path d="M8 20 Q10 4 22 5 Q32 6 31 20Z" fill="#c8212e"/><circle cx="31" cy="8" r="4" fill="#fff"/><rect x="6" y="17" width="28" height="6" rx="3" fill="#fff"/><circle cx="20" cy="26" r="9" fill="#ffd9b8"/><path d="M11 28 Q20 44 29 28 Q20 33 11 28Z" fill="#fff"/><circle cx="16.5" cy="25" r="1.3" fill="#222"/><circle cx="23.5" cy="25" r="1.3" fill="#222"/></svg><span>🦌</span><span>🦌</span><i></i>';el.appendChild(fly);
+      function volar(){if(!RM&&vis&&(full||edit)&&!sub.classList.contains('xw-open')&&!introWait&&!intro){fly.style.top=(9+Math.random()*16)+'%';fly.classList.remove('go');void fly.offsetWidth;fly.classList.add('go')}setTimeout(volar,18000+Math.random()*14000)}
+      setTimeout(volar,7000);
+      // al pulsar un sub-botón (editor o fuera del mapa) el tren también se mueve
+      var mo2=new MutationObserver(function(){var k=bs.findIndex(function(b){return b.classList.contains('on')});if(k>=0&&k!==cur&&!moving&&!intro&&!introWait){closePanel();hideCard();setSel(k);moving=true;var d=Math.abs(tgt(k)-headS);mv={from:headS,to:tgt(k),t:performance.now(),d:RM?1:Math.max(1800,Math.min(4600,d*2.2))}}});
+      bs.forEach(function(b){mo2.observe(b,{attributes:true,attributeFilter:['class']})});
       requestAnimationFrame(frame);setTimeout(size,300);
       if(RM){intro=false}
     });

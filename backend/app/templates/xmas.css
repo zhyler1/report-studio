@@ -192,3 +192,12 @@ html.xw-lock .arrows,html.xw-lock #slideTag,html.xw-lock #xmSnow{display:none!im
 @media (max-width:700px){.xw-ttl{top:12px;max-width:62%}.xw-cuenta{right:10px;top:10px}.xw-bar{width:110px}.xw-ui{gap:7px;flex-wrap:wrap;bottom:12px}.xw-b{padding:8px 12px;font-size:12px}.xw-card{bottom:74px}}
 @media (prefers-reduced-motion:reduce){.xw-tl,.xw-tcen{transition:none!important}}
 .xw-card p,.xw-card h2{opacity:1!important}.xw-card p{color:#4a2d0d!important}.xw-card h2{color:#9b1c2a!important}
+
+.xw-fly{position:absolute;left:0;top:14%;z-index:4;display:flex;align-items:center;gap:2px;font-size:clamp(26px,3.6vw,46px);pointer-events:none;opacity:0;white-space:nowrap;filter:drop-shadow(0 0 10px rgba(255,230,140,.8))}
+.xw-fly span{display:inline-block;transform:scaleX(-1)}.xw-fly span.g{margin-left:-1.3em;margin-top:-.5em}
+.xw-fly i{position:absolute;right:100%;top:55%;width:240px;height:6px;margin-right:6px;border-radius:6px;background:linear-gradient(90deg,transparent,rgba(255,236,160,.85))}
+.xw-fly.go{animation:xwFly 9s linear forwards}
+@keyframes xwFly{0%{transform:translate(-20vw,30px) rotate(6deg);opacity:0}8%{opacity:1}50%{transform:translate(50vw,-26px) rotate(-3deg)}92%{opacity:1}100%{transform:translate(112vw,34px) rotate(6deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.xw-fly{display:none}}
+.xw-fly .sl{width:1.5em;height:.7em;margin-top:.5em;border-radius:.1em .1em .7em .7em;background:linear-gradient(180deg,#e03a46,#8a1020);border-bottom:.12em solid #f6c453;position:relative}.xw-fly span.g{margin-left:-1.2em;margin-top:-.2em;position:relative}
+.xw-fly svg.g{margin-left:-1.2em;margin-top:-.3em;position:relative}
