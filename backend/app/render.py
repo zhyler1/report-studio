@@ -751,6 +751,8 @@ def r_section(s: Section, ctx: Ctx, si: int = 0) -> str:
             th = ""
             if t.tema:
                 th = (f' data-tema="{t.tema}" data-intro="{1 if t.intro else 0}" data-it="{attr(t.intro_titulo or "Navidad en Presidencia")}" data-is="{attr(t.intro_sub or t.label)}"')
+                if t.tabs and t.tren and not ctx.edit:
+                    th += ' data-tren="1"'
                 inner += '<button type="button" class="xm-replay">✨ Ver intro</button>' if t.intro else ""
             h += f'<div class="sub{" on" if i == 0 else ""}" data-sub="{attr(t.id)}"{th}>' + inner + "</div>"
     else:

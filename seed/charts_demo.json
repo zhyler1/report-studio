@@ -666,7 +666,8 @@
      "tabs": [],
      "intro": true,
      "intro_titulo": "",
-     "intro_sub": ""
+     "intro_sub": "",
+     "tren": true
     },
     {
      "id": "actividades",
@@ -834,7 +835,8 @@
      "tabs": [],
      "intro": true,
      "intro_titulo": "",
-     "intro_sub": ""
+     "intro_sub": "",
+     "tren": true
     },
     {
      "id": "calendario",
@@ -861,7 +863,8 @@
      "tabs": [],
      "intro": true,
      "intro_titulo": "",
-     "intro_sub": ""
+     "intro_sub": "",
+     "tren": true
     },
     {
      "id": "presupuesto",
@@ -889,7 +892,8 @@
      "tabs": [],
      "intro": true,
      "intro_titulo": "",
-     "intro_sub": ""
+     "intro_sub": "",
+     "tren": true
     },
     {
      "id": "propuestas",
@@ -1028,7 +1032,8 @@
      "tabs": [],
      "intro": true,
      "intro_titulo": "",
-     "intro_sub": ""
+     "intro_sub": "",
+     "tren": true
     }
    ]
   },

@@ -7763,6 +7763,11 @@
      "default": "",
      "title": "Intro Sub",
      "type": "string"
+    },
+    "tren": {
+     "default": true,
+     "title": "Tren",
+     "type": "boolean"
     }
    },
    "required": [

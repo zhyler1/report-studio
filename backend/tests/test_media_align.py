@@ -114,3 +114,19 @@ def test_enlace_seguro():
     assert safe_href("https://x.co/a?b=1") == "https://x.co/a?b=1"
     assert safe_href("mailto:a@b.co") == "mailto:a@b.co"
     assert safe_href("javascript:alert(1)") == "" and safe_href("data:text/html,x") == "" and safe_href("") == ""
+
+
+def test_tren_de_actividades():
+    import json, pathlib
+    from app.render import render
+    from app.validate import load
+    seed = json.loads((pathlib.Path(__file__).resolve().parents[2] / "seed/report.seed.json").read_text(encoding="utf-8"))
+    bien = next(s for s in seed["sections"] if s["id"] == "bienestar")
+    bien["tabs"] = [{"id": "nav", "label": "Enciende lo que nos une", "tema": "navidad", "blocks": [], "tabs": [
+        {"id": "a", "label": "Novenas", "blocks": []}, {"id": "b", "label": "Villa", "blocks": []}]}]
+    rep, _ = load(seed)
+    assert 'data-tren="1"' in render(rep).split('<script')[0].split('</style>')[-1] or ' data-tren="1"' in render(rep)
+    assert ' data-tren="1"' not in render(rep, edit=True)
+    bien["tabs"][0]["tren"] = False
+    rep, _ = load(seed)
+    assert ' data-tren="1"' not in render(rep)

@@ -117,6 +117,7 @@ function Botones({ s, set }: { s: Json; set: (s: Json) => void }) {
         <label>Tema <select value={t.tema || ''} onChange={e => put(tabs.map((x, k) => { if (k !== i) return x; const { tema, ...r } = x; return e.target.value ? { ...r, tema: e.target.value } : r }))}>
           <option value="">Normal</option><option value="navidad">✨ Navidad (con animaciones)</option></select></label>
         {t.tema && <label style={{ display: 'flex', gap: 5, alignItems: 'center' }}><input type="checkbox" checked={t.intro !== false} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro: e.target.checked } : x)))} /> Intro animada al abrir</label>}
+        {t.tema && (t.tabs || []).length > 0 && <label style={{ display: 'flex', gap: 5, alignItems: 'center' }} title="Los botones de adentro se ven como vagones de un tren; Santa, los renos y los duendes pasan de vagón en vagón"><input type="checkbox" checked={t.tren !== false} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, tren: e.target.checked } : x)))} /> 🚂 Tren de actividades</label>}
         {t.tema && t.intro !== false && <>
           <input style={{ width: 190 }} placeholder="Título de la intro: Navidad en Presidencia" value={t.intro_titulo || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_titulo: e.target.value } : x)))} />
           <input style={{ width: 190 }} placeholder={'Subtítulo: ' + t.label} value={t.intro_sub || ''} onChange={e => put(tabs.map((x, k) => (k === i ? { ...x, intro_sub: e.target.value } : x)))} /></>}

@@ -508,6 +508,7 @@ class Tab(Base):
     intro: bool = True            # con tema: animación de entrada al abrir el botón
     intro_titulo: str = ""        # título de la intro (por defecto «Navidad en Presidencia»)
     intro_sub: str = ""           # subtítulo de la intro (por defecto, el nombre del botón)
+    tren: bool = True             # con tema y sub-botones: los sub-botones son vagones de un tren con Santa, renos y duendes
 
 
 class Section(Base):

@@ -79,4 +79,47 @@
     setTimeout(function(){sync(true)},40);
   },true);
   setTimeout(function(){sync(false)},900);
+
+  /* Tren de actividades: cada sub-botón es un vagón; la comitiva de Santa pasa de vagón en vagón */
+  function trains(){
+    [].forEach.call(document.querySelectorAll('.sub[data-tren="1"]'),function(sub){
+      var nav=sub.querySelector('.snav2');if(!nav||sub.querySelector('.xt'))return;
+      var bs=[].slice.call(nav.querySelectorAll('.sbtn'));if(!bs.length)return;
+      var el=document.createElement('div');el.className='xt';
+      el.innerHTML='<div class="xt-hd"><b>El tren de la Navidad</b><span>Toca un vagón o deja que Santa recorra todas las actividades.</span><button type="button" class="xt-btn">▶ Recorrer el tren</button></div><div class="xt-vp"><div class="xt-tr"><div class="xt-rail"></div></div></div>';
+      var tr=el.querySelector('.xt-tr'),vp=el.querySelector('.xt-vp'),btn=el.querySelector('.xt-btn'),ws=[],cur=0,timer=0,playing=0;
+      bs.forEach(function(b,i){
+        var w=document.createElement('button');w.type='button';w.className='xt-w';w.setAttribute('aria-label','Actividad '+(i+1)+': '+b.textContent);
+        w.innerHTML='<span class="xt-bx"><span class="xt-n">'+(i+1)+'</span><span class="xt-l">'+esc(b.textContent)+'</span></span><span class="xt-wh"><i></i><i></i></span>';
+        w.addEventListener('click',function(){stop();go(i)});tr.appendChild(w);ws.push(w)});
+      var lo=document.createElement('div');lo.className='xt-loco';lo.setAttribute('aria-hidden','true');lo.innerHTML='<span>🚂</span><div class="xt-sm"><i></i><i></i><i></i></div>';tr.appendChild(lo);
+      var cw=document.createElement('div');cw.className='xt-crew';cw.setAttribute('aria-hidden','true');cw.innerHTML='<div class="xt-cr"><span class="e">🧝</span><span class="s">🎅</span><span class="d">🦌</span><span class="d">🦌</span></div>';tr.appendChild(cw);
+      nav.parentNode.insertBefore(el,nav);
+      function place(i,anim){
+        var w=ws[i];if(!w||!w.offsetWidth)return;
+        var x=w.offsetLeft+w.offsetWidth/2,y=w.offsetTop+(w.querySelector('.xt-bx').offsetTop)-6;
+        cw.style.transition=anim&&!RM?'':'none';cw.style.transform='translate('+x+'px,'+(y-34)+'px)';
+        if(!anim)void cw.offsetWidth;
+        if(anim&&!RM){cw.classList.remove('go');void cw.offsetWidth;cw.classList.add('go');setTimeout(function(){cw.classList.remove('go')},1000)}
+        var l=Math.max(0,x-vp.clientWidth/2);vp.scrollTo?vp.scrollTo({left:l,behavior:anim&&!RM?'smooth':'auto'}):(vp.scrollLeft=l);
+      }
+      function go(i){
+        cur=i;ws.forEach(function(w,k){w.classList.toggle('on',k===i)});
+        if(!bs[i].classList.contains('on'))bs[i].click();
+        place(i,true);
+      }
+      function stop(){playing=0;clearTimeout(timer);btn.textContent='▶ Recorrer el tren'}
+      function step(){if(!playing)return;if(cur>=ws.length-1){stop();return}go(cur+1);timer=setTimeout(step,5200)}
+      btn.addEventListener('click',function(){
+        if(playing){stop();return}
+        playing=1;btn.textContent='❚❚ Detener';
+        if(cur>=ws.length-1)go(0);timer=setTimeout(step,cur===0?1200:200);
+      });
+      var first=bs.findIndex?bs.findIndex(function(b){return b.classList.contains('on')}):0;if(first<0)first=0;cur=first;ws[first].classList.add('on');
+      function init(){place(cur,false)}
+      if('IntersectionObserver' in window){var io=new IntersectionObserver(function(en){if(en[0].isIntersecting){init();if(!el._ok){el._ok=1}}else stop()});io.observe(el)}
+      window.addEventListener('resize',init);setTimeout(init,300);
+    });
+  }
+  trains();
 })();
