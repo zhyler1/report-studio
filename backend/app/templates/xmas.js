@@ -203,7 +203,7 @@
       var el=document.createElement('div');el.className='xw';
       el.innerHTML='<div class="xw-vp"><div class="xw-sc"><svg class="xw-svg" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" role="group" aria-label="Mapa del tren de la Navidad">'+o+'</svg><canvas class="xw-cv"></canvas></div></div><div class="xw-vg"></div>'
         +'<div class="xw-ttl"><small>Oficina de Talento Humano</small><b>'+esc(title)+'</b>'+(subt?'<span>'+esc(subt)+'</span>':'')+'</div>'
-        +'<div class="xw-cuenta"><b class="xw-num">0</b><span>de '+n+' estaciones</span><div class="xw-bar"><i></i></div><button type="button" class="xw-b xw-ex">'+(edit?'⛶ Pantalla completa':'✕ Salir de la Navidad')+'</button></div>'
+        +'<div class="xw-cuenta"><b class="xw-num">0</b><span>de '+n+' estaciones</span><div class="xw-bar"><i></i></div><div class="xw-bt"><button type="button" class="xw-b xw-act" aria-expanded="false">🎁 Actividades</button><button type="button" class="xw-b xw-ex">'+(edit?'⛶ Pantalla completa':'✕ Salir de la Navidad')+'</button></div></div><div class="xw-menu" role="menu">'+bs.map(function(b,k){return '<button type="button" class="xw-mi" role="menuitem" data-k="'+k+'"><i>'+(k+1)+'</i><span>'+esc(b.textContent.trim())+'</span><em>⭐</em></button>'}).join('')+'</div>'
         +'<section class="xw-card" aria-live="polite"><h2></h2><p></p><div class="xw-row"><button type="button" class="xw-b xw-pri xw-enter">Entrar</button><button type="button" class="xw-b xw-cl">Cerrar</button></div></section>'
         +'<div class="xw-prompt"><button type="button" class="xw-b xw-pri xw-go"></button></div>'
         +'<nav class="xw-ui" aria-label="Controles del tren"><button type="button" class="xw-b xw-pv" aria-label="Estación anterior">◀</button><button type="button" class="xw-b xw-play">▶ Recorrido</button><button type="button" class="xw-b xw-nx" aria-label="Estación siguiente">▶</button><button type="button" class="xw-b xw-zi" aria-label="Acercar">+</button><button type="button" class="xw-b xw-zo" aria-label="Alejar">−</button></nav>'
@@ -223,10 +223,10 @@
       function startS(){return Math.max(0,sArc[0]-900)}
       function pose(s){s=Math.max(0,Math.min(len-2,s));var p=track.getPointAtLength(s),p2=track.getPointAtLength(s+2);return {x:p.x,y:p.y,a:Math.atan2(p2.y-p.y,p2.x-p.x)}}
       function descr(k){var s2=sub.querySelectorAll('.sub2')[k];if(!s2)return '';var e=[].slice.call(s2.querySelectorAll('p,.callout,.note,li')).filter(function(x){return !x.closest('.xw-pnh')&&(x.textContent||'').trim().length>24})[0];var t=e?e.textContent.trim().replace(/\s+/g,' '):'';return t.length>170?t.slice(0,167)+'…':t}
-      function setSel(i){cur=i;sts.forEach(function(s,k){s.classList.toggle('on',k===i)});if(!bs[i].classList.contains('on'))bs[i].click()}
+      function setSel(i){cur=i;if(typeof mi!=='undefined')mi.forEach(function(m,k){m.classList.toggle('on',k===i)});sts.forEach(function(s,k){s.classList.toggle('on',k===i)});if(!bs[i].classList.contains('on'))bs[i].click()}
       function showCard(){var k=cur;card.querySelector('h2').textContent=bs[k].textContent.trim();card.querySelector('p').textContent=descr(k)||'Estación '+(k+1)+' de '+n;el.classList.add('xw-cardon')}
       function hideCard(){el.classList.remove('xw-cardon','xw-promptOn')}
-      function openPanel(){if(!full)return;hideCard();sub.classList.remove('xw-closed');sub.classList.add('xw-open');if(!visited[cur]){visited[cur]=1;nv++;sts[cur].classList.add('v');numE.textContent=nv;barE.style.width=(nv/n*100)+'%'}}
+      function openPanel(){if(!full)return;hideCard();sub.classList.remove('xw-closed');sub.classList.add('xw-open');if(!visited[cur]){visited[cur]=1;nv++;sts[cur].classList.add('v');mi[cur]&&mi[cur].classList.add('v');numE.textContent=nv;barE.style.width=(nv/n*100)+'%'}}
       function closePanel(){sub.classList.add('xw-closed');sub.classList.remove('xw-open')}
       function drive(i,user){
         i=Math.max(0,Math.min(n-1,i));if(moving||intro||introWait)return;userCam=0;
@@ -242,10 +242,15 @@
       el.querySelector('.xw-nx').addEventListener('click',function(){stopPlay();drive(cur+1,true)});
       el.querySelector('.xw-zi').addEventListener('click',function(){cam.z=Math.min(1.9,cam.z*1.25)});
       el.querySelector('.xw-zo').addEventListener('click',function(){cam.z=Math.max(.6,cam.z/1.25)});
+      var menu=el.querySelector('.xw-menu'),actB=el.querySelector('.xw-act'),mi=[].slice.call(menu.querySelectorAll('.xw-mi'));
+      function menuTo(o){el.classList.toggle('xw-menuOn',o);actB.setAttribute('aria-expanded',o?'true':'false')}
+      actB.addEventListener('click',function(e){e.stopPropagation();menuTo(!el.classList.contains('xw-menuOn'))});
+      mi.forEach(function(m,k){m.addEventListener('click',function(e){e.stopPropagation();menuTo(false);stopPlay();if(!full&&!edit)return;drive(k,true)})});
+      el.addEventListener('click',function(e){if(!e.target.closest('.xw-menu,.xw-act'))menuTo(false)});
       goB.addEventListener('click',openPanel);el.querySelector('.xw-enter').addEventListener('click',openPanel);el.querySelector('.xw-cl').addEventListener('click',hideCard);
       sts.forEach(function(s,k){s.addEventListener('click',function(e){if(drag&&drag.moved)return;e.stopPropagation();drive(k,true)});s.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();drive(k,true)}})});
       [].forEach.call(sub.querySelectorAll('.xw-x'),function(b){b.addEventListener('click',function(){stopPlay();closePanel();showCard();el.classList.add('xw-promptOn');goB.textContent='Entrar a «'+bs[cur].textContent.trim()+'»'})});
-      document.addEventListener('keydown',function(e){if(!full||(!sub.classList.contains('on')&&!edit))return;var open=sub.classList.contains('xw-open');if(e.key==='Escape'){if(open)closePanel();else exit()}else if(e.key==='ArrowRight'&&!open){stopPlay();drive(cur+1,true)}else if(e.key==='ArrowLeft'&&!open){stopPlay();drive(cur-1,true)}else if(e.key==='Enter'&&!open&&el.classList.contains('xw-promptOn')){openPanel()}});
+      document.addEventListener('keydown',function(e){if(!full||(!sub.classList.contains('on')&&!edit))return;var open=sub.classList.contains('xw-open');if(e.key==='Escape'){if(el.classList.contains('xw-menuOn'))menuTo(false);else if(open)closePanel();else exit()}else if(e.key==='ArrowRight'&&!open){stopPlay();drive(cur+1,true)}else if(e.key==='ArrowLeft'&&!open){stopPlay();drive(cur-1,true)}else if(e.key==='Enter'&&!open&&el.classList.contains('xw-promptOn')){openPanel()}});
       // arrastrar para mirar alrededor
       vp.addEventListener('pointerdown',function(e){if(e.button>0)return;drag={x:e.clientX,y:e.clientY,cx:cam.x,cy:cam.y,moved:false,id:e.pointerId}});
       window.addEventListener('pointermove',function(e){if(!drag)return;var dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(!drag.moved&&Math.abs(dx)+Math.abs(dy)<7)return;drag.moved=true;userCam=1;sc.classList.add('xw-grab');var k=vb.w/vp.clientWidth;cam.x=Math.max(300,Math.min(W-300,drag.cx-dx*k));cam.y=Math.max(480,Math.min(700,drag.cy-dy*k))});
