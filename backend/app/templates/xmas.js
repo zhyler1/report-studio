@@ -82,7 +82,7 @@
 
   /* Tren de actividades: cada sub-botón es un vagón; la comitiva de Santa pasa de vagón en vagón */
   function trains(){
-    [].forEach.call(document.querySelectorAll('.sub[data-tren="1"]'),function(sub){
+    [].forEach.call(document.querySelectorAll('.sub[data-tren]'),function(sub){
       var nav=sub.querySelector('.snav2');if(!nav||sub.querySelector('.xt'))return;
       var bs=[].slice.call(nav.querySelectorAll('.sbtn'));if(!bs.length)return;
       var el=document.createElement('div');el.className='xt';

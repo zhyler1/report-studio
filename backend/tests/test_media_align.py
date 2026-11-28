@@ -126,7 +126,7 @@ def test_tren_de_actividades():
         {"id": "a", "label": "Novenas", "blocks": []}, {"id": "b", "label": "Villa", "blocks": []}]}]
     rep, _ = load(seed)
     assert 'data-tren="1"' in render(rep).split('<script')[0].split('</style>')[-1] or ' data-tren="1"' in render(rep)
-    assert ' data-tren="1"' not in render(rep, edit=True)
+    assert ' data-tren="2"' in render(rep, edit=True) and ' data-tren="1"' not in render(rep, edit=True)
     bien["tabs"][0]["tren"] = False
     rep, _ = load(seed)
     assert ' data-tren="1"' not in render(rep)
