@@ -226,3 +226,10 @@ html.xw-lock .arrows,html.xw-lock #slideTag,html.xw-lock #xmSnow{display:none!im
 .xw-mi span{flex:1}.xw-mi em{font-style:normal;opacity:0}.xw-mi.v em{opacity:1}
 .sub.xw-full.xw-open .xw-bt,.sub.xw-full.xw-open .xw-menu{opacity:0;pointer-events:none}
 @media (max-width:700px){.xw-menu{top:104px;right:10px}.xw-bt{flex-wrap:wrap;justify-content:flex-end}}
+.sub[data-tema="navidad"]{--green2:#7ee0a0;--red2:#ff9a9a;--sg:#7ee0a0}
+.sub[data-tema="navidad"] .win h3{color:#9af0b8}
+@media (max-width:700px){
+ .xw-ttl{top:46px;max-width:100%;left:12px}.xw-ttl small{font-size:10px}.xw-ttl b{font-size:30px}.xw-ttl span{font-size:12px}
+ .xw-cuenta{top:8px}.xw-bt{margin-top:2px}
+}
+@media (max-width:700px){.xw-ttl{top:104px;left:12px}.xw-ttl b{font-size:28px}.xw-menu{top:96px}}
